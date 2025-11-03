@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login - Sistema RH</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --cor-fundo-gradiente-1: #1a2a3a;
+        --cor-fundo-gradiente-2: #0e1e2e;
+        --cor-card-fundo: rgba(255, 255, 255, 0.05);
+        --cor-card-borda: rgba(255, 255, 255, 0.1);
+        --cor-texto-claro: #e0e0e0;
+        --cor-texto-input: #ffffff;
+        --cor-placeholder: #a0a0a0;
+        --cor-input-borda: rgba(255, 255, 255, 0.2);
+        --cor-input-focus-borda: #00bcd4;
+        --cor-input-focus-sombra: rgba(0, 188, 212, 0.3);
+        --cor-botao-primario: #00bcd4;
+        --cor-botao-primario-hover: #00acc1;
+        --cor-erro-fundo: #fbebee;
+        --cor-erro-texto: #c0392b;
+        --cor-erro-borda: #f5c6cb;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--cor-fundo-gradiente-1) 0%,
+          var(--cor-fundo-gradiente-2) 100%
+        );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: "Inter", Arial, sans-serif;
+        color: var(--cor-texto-claro);
+        overflow: hidden;
+        position: relative;
+      }
+
+      body::after {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: -10%;
+        width: 120%;
+        height: 120%;
+        background: linear-gradient(
+          45deg,
+          #00bcd4,
+          #007bff,
+          #00bcd4,
+          #007bff
+        );
+        background-size: 400% 400%;
+        animation: gradient-background 15s ease infinite;
+        opacity: 0.1;
+        filter: blur(80px);
+        z-index: 0;
+      }
+
+      @keyframes gradient-background {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+            circle at 10% 20%,
+            rgba(0, 188, 212, 0.05) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            circle at 90% 80%,
+            rgba(0, 188, 212, 0.05) 0%,
+            transparent 70%
+          );
+        background-size: 80% 80%;
+        background-repeat: no-repeat;
+        opacity: 0.8;
+        z-index: 1;
+      }
+
+      .login-container {
+        background: var(--cor-card-fundo);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--cor-card-borda);
+        border-radius: 18px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        max-width: 780px;
+        width: 90%;
+        z-index: 10;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        padding: 0;
+      }
+
+      .login-container::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          #00bcd4,
+          #007bff,
+          #00bcd4,
+          #007bff
+        );
+        background-size: 400% 400%;
+        border-radius: 20px;
+        z-index: -1;
+        animation: gradient-border 8s ease infinite;
+        opacity: 0.4;
+      }
+
+      @keyframes gradient-border {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      .login-info {
+        flex: 1;
+        padding: 1.75rem 2.25rem;
+        text-align: left;
+      }
+
+      .login-info h2 {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #ffffff;
+        text-shadow: 0 0 8px rgba(0, 188, 212, 0.3);
+        margin-bottom: 0.2rem;
+      }
+
+      .login-info p {
+        font-size: 0.95rem;
+        color: var(--cor-texto-claro);
+        margin-bottom: 1.25rem;
+      }
+
+      .login-info h3 {
+        font-weight: 500;
+        font-size: 1.05rem;
+        color: var(--cor-botao-primario);
+        margin-top: 2rem;
+      }
+
+      .login-form-wrapper {
+        flex: 1.1;
+        padding: 1.75rem 2.25rem;
+        border-left: 1px solid var(--cor-card-borda);
+      }
+
+      .error-alert {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+      }
+      
+      .mb-compact {
+        margin-bottom: 0.7rem !important;
+      }
+      
+      .input-group-icon {
+        position: relative;
+      }
+
+      .input-group-icon .form-control,
+      .input-group-icon .form-select {
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--cor-input-borda);
+        border-radius: 10px;
+        padding: 0.65rem 1rem 0.65rem 2.8rem; 
+        color: var(--cor-texto-input);
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+      
+      .input-group-icon .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a0a0a0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-position: right 1rem center;
+        background-size: 14px 10px;
+        background-repeat: no-repeat;
+        appearance: none;
+      }
+
+      .form-select option {
+        background: var(--cor-fundo-gradiente-2);
+        color: var(--cor-texto-claro);
+      }
+      
+      .input-group-icon .form-control::placeholder {
+        color: var(--cor-placeholder);
+        opacity: 0.8;
+      }
+
+      .input-group-icon .form-control:focus,
+      .input-group-icon .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-color: var(--cor-input-focus-borda);
+        box-shadow: 0 0 0 4px var(--cor-input-focus-sombra);
+      }
+
+      .input-group-icon .input-icon {
+        position: absolute;
+        left: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b0b0b0;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.3s ease;
+      }
+
+      .input-group-icon .form-control:focus + .input-icon,
+      .input-group-icon .form-select:focus + .input-icon {
+        color: var(--cor-input-focus-borda);
+      }
+
+      .form-label {
+        font-weight: 500;
+        font-size: 0.8rem;
+        color: var(--cor-texto-claro);
+        margin-bottom: 0.25rem;
+        display: block;
+      }
+
+      .btn-primary {
+        background: var(--cor-botao-primario);
+        border: none;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem; 
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        margin-top: 0.85rem;
+      }
+
+      .btn-primary:hover {
+        background: var(--cor-botao-primario-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 188, 212, 0.4);
+      }
+
+      .extra-links {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .extra-links a {
+        color: var(--cor-texto-claro);
+        text-decoration: none;
+        opacity: 0.8;
+        transition: all 0.2s ease;
+      }
+
+      .extra-links a:hover {
+        color: var(--cor-input-focus-borda);
+        opacity: 1;
+        text-decoration: underline;
+      }
+
+      .modal-content {
+        background-color: var(--cor-fundo-gradiente-1);
+        color: var(--cor-texto-claro);
+        border-radius: 12px;
+        border: 1px solid var(--cor-card-borda);
+      }
+      .modal-header { border-bottom: 1px solid var(--cor-card-borda); }
+      .modal-title { color: #ffffff; font-weight: 600; }
+      .modal-body p { color: var(--cor-texto-claro); opacity: 0.9; }
+      .btn-close { filter: invert(1) grayscale(1) brightness(2); }
+
+
+      /* ======================================= */
+      /* NOVO: CSS DE RESPONSIVIDADE PARA MOBILE */
+      /* ======================================= */
+      @media (max-width: 768px) {
+        body {
+          /* Permite rolar a tela em celulares */
+          height: auto;
+          min-height: 100vh;
+          padding: 2rem 0; /* Espaço para não colar no topo/fundo */
+          overflow: auto; /* Garante que o overflow seja visível */
+        }
+        
+        .login-container {
+          /* Empilha as colunas */
+          flex-direction: column;
+          width: 90%;
+          max-width: 450px; /* Limita a largura em tablets/celulares */
+        }
+
+        .login-info {
+          text-align: center; /* Centraliza o "Bem-vindo" */
+          padding: 2.5rem 1.5rem 1.5rem; /* Ajusta padding */
+        }
+        
+        .login-info h3 { /* Nome da empresa */
+            margin-top: 1.5rem; /* Ajusta margem */
+        }
+
+        .login-form-wrapper {
+          /* Remove a borda lateral e adiciona uma superior */
+          border-left: none;
+          border-top: 1px solid var(--cor-card-borda);
+          padding: 2rem 1.5rem; /* Ajusta padding */
+        }
+        /* ... (aqui estão seus outros estilos .login-container, .login-info, etc.) ... */
+
+  .logo-container {
+    text-align: center; /* Centraliza a logo no mobile */
+  }
+
+  .logo-empresa {
+    height: 40px; /* <<< Altura MENOR para o Mobile */
+  }
+      }
+.logo-container {
+  /* No desktop, mantém o alinhamento que .login-info já tinha */
+  text-align: left; 
+}
+
+.logo-empresa {
+  height: 50px; /* <<< Altura no Desktop (ajustei para 50px, 60 era muito) */
+  width: auto;
+  max-width: 100%; /* Garante que não transborde a coluna */
+  transition: height 0.3s ease;
+}
+    </style>
+  </head>
+  <body>
+    
+    <div class="login-container">
+      
+      <div class="login-info">
+        <h2>Bem-vindo</h2>
+        <p>Sistema de Relatorios</p>
+          <div class="mt-5 logo-container">
+  <img src="https://www.gruponew.com/logos/_img/0.png?text=Grupo_NEW" alt="Logo {{ empresa }}" class="logo-empresa">
+</div>    
+         </div>
+
+      <div class="login-form-wrapper">
+        
+        {% if error %}
+        <div class="error-alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/">
+          <div class="mb-compact">
+            <label for="usuario" class="form-label">Usuario</label>
+            <div class="input-group-icon">
+              <input
+                type="text"
+                name="usuario"
+                id="usuario"
+                class="form-control"
+                required
+                placeholder="Seu Usuario"
+              />
+              <i class="bi bi-person input-icon"></i>
+            </div>
+          </div>
+          <div class="mb-compact">
+            <label for="password" class="form-label">Senha</label>
+            <div class="input-group-icon">
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="form-control"
+                required
+                placeholder="••••••••"
+              />
+              <i class="bi bi-lock input-icon"></i>
+            </div>
+          </div>
+
+          <div class="mb-compact">
+            <label for="area" class="form-label">Área</label>
+            <div class="input-group-icon">
+              <select class="form-select" id="area" name="area" required>
+                <option value="" disabled selected>Selecionar área...</option>
+                <option value="dp">Departamento Pessoal</option>
+                <option value="rh">Recursos Humanos</option>
+                <option value="financeiro">Contabilidade</option>
+                <option value="ti">Tecnologia</option>
+              </select>
+              <i class="bi bi-diagram-3 input-icon"></i>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Entrar
+          </button>
+        </form>
+
+       
+
+      </div>
+    </div>
+
+    
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
+
+
