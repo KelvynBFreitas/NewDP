@@ -1,0 +1,11 @@
+[project]
+name = "dpnew"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiofiles>=25.1.0",
+    "fastapi>=0.120.4",
+    "uvicorn[standard]>=0.38.0",
+]
