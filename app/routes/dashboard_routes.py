@@ -5,7 +5,7 @@ from jose import JWTError, jwt
 import os
 from app.models.user import User
 from sqlalchemy.future import select
-from app.core.database import get_session
+from app.core.database import get_postgres_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Request, Form, Depends, HTTPException
 from app.core.config import SECRET_KEY
@@ -14,7 +14,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request,
-                    session: AsyncSession = Depends(get_session)
+                    session: AsyncSession = Depends(get_postgres_session)
 ):
     token = request.cookies.get("access_token")
     if not token:
@@ -68,8 +68,8 @@ async def dashboard(request: Request,
         {"title": "Contato", "url": "#"},
        
         {"title": "Area Pessoa Judica", "submenu": [
-            {"title": "Cadastro Colaborador", "url": "#"},
-            {"title": "Cadastro Aprovador", "url": "#"},
+            {"title": "Cadastro Colaborador", "url": "/prestadoresdeservico"},
+            {"title": "Cadastro Aprovador", "url": "/aprovador"},
             {"title": "E-Mail PJ", "url": "#"},
         ]}
     ]

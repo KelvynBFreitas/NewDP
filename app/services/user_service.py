@@ -1,5 +1,7 @@
-from sqlalchemy.future import select
+from sqlalchemy import func
 from app.models.user import User
+from sqlalchemy import or_
+from sqlalchemy.future import select
 
 async def get_all_users(session):
     result = await session.execute(select(User))
@@ -30,16 +32,10 @@ async def get_users_paginated(session, limit: int = 20, offset: int = 0):
     )
     return result.scalars().all()
 
-from sqlalchemy import func
-from sqlalchemy.future import select
-from app.models.user import User
 
 async def count_users(session):
     result = await session.execute(select(func.count()).select_from(User))
     return result.scalar()
-from sqlalchemy import or_
-from sqlalchemy.future import select
-from app.models.user import User
 
 async def search_users(session, query: str, limit: int = 20, offset: int = 0):
     result = await session.execute(
@@ -53,7 +49,7 @@ async def search_users(session, query: str, limit: int = 20, offset: int = 0):
     return result.scalars().all()
 
 async def count_users_filtered(session, query: str):
-    from sqlalchemy import func
+    
     result = await session.execute(
         select(func.count()).select_from(User).where(
             or_(

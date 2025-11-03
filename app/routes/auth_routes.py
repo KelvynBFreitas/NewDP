@@ -6,7 +6,7 @@ from sqlalchemy.future import select
 from jose import JWTError, jwt
 import os
 from pydantic import ValidationError
-from app.core.database import get_session
+from app.core.database import get_postgres_session
 from app.models.user import User
 from app.services.auth_service import verify_password, create_access_token
 from app.schemas.user_schema import UserLogin
@@ -21,16 +21,18 @@ async def login_page(request: Request):
 @router.post("/")
 async def login(
     request: Request,
-    username: str = Form(..., alias="usuario"),
-    perfil: str = Form(..., alias="area"),
+    username: str = Form(...),
+    perfil: str = Form(...),
     password: str = Form(...),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_postgres_session) 
 ):
     # Validação com Pydantic manual
     print(perfil)
+    print(username)
     try:
-        form_data = UserLogin(username=username, password=password)
+        form_data = UserLogin(username=username, password=password,perfil=perfil)
     except ValidationError:
+       
         # CORREÇÃO 2: Mensagem de erro atualizada
         return templates.TemplateResponse("login.html", {
             "request": request,

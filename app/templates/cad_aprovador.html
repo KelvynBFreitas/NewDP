@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cadastro de Aprovador</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ... (Todo o seu CSS existente permanece o mesmo) ... */
+      :root {
+        --cor-fundo-gradiente-1: #10161d; /* Mais escuro */
+        --cor-fundo-gradiente-2: #090e13; /* Ainda mais escuro */
+        --cor-card-fundo: rgba(255, 255, 255, 0.15); /* MENOS TRANSPARENTE */
+        --cor-card-fundo-hover: rgba(
+          255,
+          255,
+          255,
+          0.25
+        ); /* Mais visível no hover */
+        --cor-card-borda: rgba(255, 255, 255, 0.25); /* Borda mais definida */
+        --cor-texto-claro: #c2cbd6; /* Levemente mais cinza */
+        --cor-texto-branco: #e0e6ec; /* Branco mais suave */
+        --cor-destaque-primaria: #00bcd4; /* Ciano principal */
+        --cor-destaque-secundaria: #0087a3; /* Ciano mais escuro */
+        --cor-shadow-leve: rgba(0, 0, 0, 0.2);
+        --cor-shadow-media: rgba(0, 0, 0, 0.4);
+        --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
+
+        /* Cor de Sucesso para o botão Adicionar */
+        --cor-sucesso: #198754;
+        --cor-sucesso-hover: #157347;
+      }
+
+      /* ------------------------------------------- */
+      /* Estilo do Body e Efeitos de Fundo */
+      /* ------------------------------------------- */
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--cor-fundo-gradiente-1) 0%,
+          var(--cor-fundo-gradiente-2) 100%
+        );
+        min-height: 100vh;
+        font-family: "Inter", Arial, sans-serif;
+        color: var(--cor-texto-claro);
+        overflow-x: hidden;
+        position: relative;
+        padding-top: 50px; /* Para a navbar fixa */
+      }
+
+      /* Efeitos de fundo mais complexos e suaves */
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        background-size: 400% 400%;
+        animation: gradient-background 20s ease infinite; /* Animação mais lenta */
+        filter: blur(80px);
+        z-index: -2;
+        opacity: 0.15; /* Mais visível */
+        border-radius: 50%; /* Esferas */
+      }
+
+      body::before {
+        top: -20vh;
+        left: -20vw;
+        width: 60vw;
+        height: 60vw;
+        background: linear-gradient(
+          45deg,
+          var(--cor-destaque-primaria),
+          #2a52be
+        );
+        animation-delay: 0s;
+      }
+
+      body::after {
+        bottom: -20vh;
+        right: -20vw;
+        width: 70vw;
+        height: 70vw;
+        background: linear-gradient(
+          -45deg,
+          var(--cor-destaque-secundaria),
+          #4286f4
+        );
+        animation-delay: 10s;
+      }
+
+      @keyframes gradient-background {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* ------------------------------------------- */
+      /* Navbar Estilo Moderno (Glassmorphism) */
+      /* ------------------------------------------- */
+      .navbar-custom {
+        background: rgba(255, 255, 255, 0.08); /* Fundo semi-transparente */
+        backdrop-filter: blur(12px); /* Efeito de vidro mais forte */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Borda mais sutil */
+        box-shadow: 0 4px 30px var(--cor-shadow-leve); /* Sombra mais difusa */
+        padding: 0.8rem 1.5rem; /* Mais espaçamento */
+        z-index: 1040;
+      }
+
+      .navbar-custom .navbar-brand {
+        color: var(--cor-texto-branco);
+        font-weight: 700;
+        font-size: 1.3rem;
+        text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Pequena luz no texto */
+      }
+
+      .navbar-custom .nav-link {
+        color: var(--cor-texto-claro);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem; /* Padding para melhor área de clique */
+        border-radius: 8px; /* Cantos arredondados */
+      }
+
+      .navbar-custom .nav-link:hover,
+      .navbar-custom .nav-link.active {
+        color: var(--cor-texto-branco);
+        background-color: rgba(255, 255, 255, 0.05); /* Leve fundo no hover */
+        text-shadow: 0 0 3px rgba(0, 188, 212, 0.2);
+      }
+
+      .navbar-toggler {
+        border: 1px solid rgba(255, 255, 255, 0.2); /* Borda no toggler */
+      }
+      .navbar-toggler-icon {
+        filter: invert(1);
+      }
+
+      /* ------------------------------------------- */
+      /* Dropdown Estilo Moderno */
+      /* ------------------------------------------- */
+      .dropdown-menu {
+        background: rgba(
+          18,
+          28,
+          38,
+          0.9
+        ); /* Fundo quase sólido, mas ainda transparente */
+        backdrop-filter: blur(15px); /* Blur mais intenso */
+        border: 1px solid var(--cor-card-borda);
+        box-shadow: 0 15px 40px var(--cor-shadow-media);
+        border-radius: 12px;
+        padding: 0.75rem 0; /* Mais espaçamento */
+      }
+
+      .dropdown-item {
+        color: var(--cor-texto-claro) !important;
+        font-weight: 500;
+        padding: 0.6rem 1.25rem; /* Mais espaçamento */
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: rgba(0, 188, 212, 0.15); /* Fundo sutil de destaque */
+        color: var(--cor-destaque-primaria) !important;
+      }
+
+      .dropdown-item-text {
+        color: var(--cor-texto-branco) !important;
+        padding: 0.6rem 1.25rem;
+        font-weight: 600;
+      }
+
+      .dropdown-divider {
+        border-color: rgba(255, 255, 255, 0.1);
+        margin: 0.5rem 0;
+      }
+
+      /* ------------------------------------------- */
+      /* Conteúdo Principal do Dashboard */
+      /* ------------------------------------------- */
+      .dashboard-container {
+        max-width: 90%;
+        margin: 40px auto;
+        padding: 35px 30px; /* Mais padding */
+
+        background: var(--cor-card-fundo);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--cor-card-borda);
+        border-radius: 10px;
+        box-shadow: 0 15px 40px var(--cor-shadow-media);
+        position: relative;
+        overflow: hidden; /* Para o before/after não vazar */
+      }
+
+      /* Borda animada (com um toque mais sutil) */
+      .dashboard-container::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--cor-destaque-primaria) 0%,
+          #007bff 25%,
+          var(--cor-destaque-primaria) 50%,
+          #007bff 75%,
+          var(--cor-destaque-primaria) 100%
+        ); /* Gradiente mais complexo */
+        background-size: 200% 200%; /* Menor para animação mais rápida */
+        border-radius: 20px;
+        z-index: -1;
+        animation: gradient-border 10s ease infinite;
+        opacity: 0.5; /* Mais sutil */
+      }
+
+      @keyframes gradient-border {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .dashboard-container h2 {
+        color: var(--cor-texto-branco);
+        font-weight: 400;
+        text-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
+        margin-bottom: 1.5rem !important; /* Mais espaço */
+      }
+
+      .dashboard-container p {
+        color: var(--cor-texto-claro);
+        font-size: 1.05rem;
+        margin-bottom: 2rem !important; /* Mais espaço */
+      }
+      
+      /* --- NOVO: Estilo para Saudação --- */
+      #saudacao {
+        color: var(--cor-texto-branco);
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem !important;
+      }
+
+      /* ------------------------------------------- */
+      /* Tabela Customizada (Glassmorphism) */
+      /* ------------------------------------------- */
+      .table-container-custom {
+        /* O container agora tem o fundo principal */
+        background: var(--cor-card-fundo);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--cor-card-borda);
+        border-radius: 15px;
+        padding: 0; /* Padding removido para a tabela ocupar tudo */
+        box-shadow: 0 5px 20px var(--cor-shadow-leve);
+        overflow: hidden; /* Importante para o border-radius */
+      }
+
+      .table-custom {
+        background-color: transparent;
+        color: var(--cor-texto-claro);
+        border-color: var(--cor-card-borda);
+        margin-bottom: 0;
+      }
+
+      .table-custom th {
+        color: var(--cor-texto-branco);
+        font-weight: 300;
+        border-color: var(--cor-card-borda) !important;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .table-custom td {
+        border-color: var(--cor-card-borda) !important;
+        vertical-align: middle;
+      }
+
+      /* --- ESTILO ZEBRADO --- */
+      .table-custom.table-striped > tbody > tr:nth-of-type(even) {
+        /* A linha par (even) terá um fundo levemente mais escuro */
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+      .table-custom.table-striped > tbody > tr:nth-of-type(odd) {
+        /* A linha ímpar (odd) será transparente, mostrando o fundo do container */
+        background-color: transparent;
+      }
+      /* --- FIM DO ZEBRADO --- */
+
+      .table-custom tbody tr:hover {
+        background-color: var(--cor-card-fundo-hover); /* O hover sobrepõe o zebrado */
+        color: var(--cor-texto-branco);
+      }
+
+      /* Ajuste para o padding da tabela dentro do container */
+      .table-container-custom .table-responsive-lg {
+        padding: 0.5rem; /* Adiciona um respiro */
+      }
+      .table-custom th,
+      .table-custom td {
+        padding: 0.85rem 1rem; /* Aumenta o padding interno da tabela */
+      }
+
+      /* Inputs de formulário (para o filtro) */
+      .form-control-custom {
+        background: var(--cor-card-fundo);
+        border: 1px solid var(--cor-card-borda);
+        color: var(--cor-texto-branco);
+        border-radius: 0.375rem;
+        transition: all 0.3s ease; /* --- NOVO --- */
+      }
+
+      .form-control-custom:focus {
+        background: var(--cor-card-fundo);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-texto-branco);
+        box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
+      }
+
+      .form-control-custom::placeholder {
+        color: var(--cor-texto-claro);
+        opacity: 0.7;
+      }
+
+      /* Botão de busca (substitui o input-group-text) */
+      .btn-search-custom {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--cor-card-borda);
+        color: var(--cor-destaque-primaria);
+        transition: all 0.2s ease;
+      }
+      .btn-search-custom:hover {
+        background: var(--cor-destaque-primaria);
+        color: var(--cor-fundo-gradiente-1);
+        border-color: var(--cor-destaque-primaria);
+      }
+
+      /* ------------------------------------------- */
+      /* Botão Flutuante (Base) */
+      /* ------------------------------------------- */
+      .fab-base {
+        position: fixed;
+        z-index: 1050;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0.5px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 25px var(--cor-shadow-intensa);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        color: var(--cor-texto-branco);
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      /* --- AJUSTE: Hover mais suave e com 'pop' --- */
+      .fab-base:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px var(--cor-shadow-intensa);
+      }
+
+      /* ------------------------------------------- */
+      /* Botão Flutuante de Notificações */
+      /* ------------------------------------------- */
+      .notification-button {
+        bottom: 25px;
+        right: 25px;
+        font-size: 1.6rem;
+        background: rgba(0, 188, 212, 0.85); /* Ciano com transparência */
+      }
+
+      .notification-button:hover {
+        background: var(--cor-destaque-primaria); /* Ciano sólido no hover */
+        box-shadow: 0 15px 40px rgba(0, 188, 212, 0.6);
+      }
+
+      .notification-button .badge {
+        font-size: 0.7rem; /* Badge maior */
+        padding: 5px 8px;
+        position: absolute;
+        top: 0px; /* Mais para cima */
+        right: 0px; /* Mais para a direita */
+        transform: translate(25%, -25%); /* Ajuste fino */
+        border-radius: 10px; /* Mais arredondado */
+        border: 1px solid rgba(255, 255, 255, 0.2); /* Borda no badge */
+        box-shadow: 0 2px 8px var(--cor-shadow-leve);
+      }
+
+      /* ------------------------------------------- */
+      /* Botão Flutuante de Adicionar (+) */
+      /* ------------------------------------------- */
+      .fab-add-button {
+        bottom: 95px; /* Acima do botão de notificação (25 + 58 + 12) */
+        right: 25px;
+        font-size: 2.0rem; /* Ícone '+' maior */
+        background-color: var(--cor-sucesso);
+      }
+
+      .fab-add-button:hover {
+        background-color: var(--cor-sucesso-hover);
+        box-shadow: 0 15px 40px rgba(25, 135, 84, 0.6);
+      }
+
+      /* ------------------------------------------- */
+      /* Modal Customizado (Glassmorphism) */
+      /* ------------------------------------------- */
+      .modal-content-custom {
+        background: var(--cor-card-fundo);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--cor-card-borda);
+        border-radius: 15px;
+        color: var(--cor-texto-claro);
+        box-shadow: 0 15px 40px var(--cor-shadow-media);
+      }
+
+      .modal-content-custom .modal-header {
+        border-bottom: 1px solid var(--cor-card-borda);
+      }
+
+      .modal-content-custom .modal-header .modal-title {
+        color: var(--cor-texto-branco);
+        font-weight: 600;
+      }
+
+      /* Botão de fechar (X) branco */
+      .modal-content-custom .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+      }
+
+      .modal-content-custom .modal-body .form-label {
+        color: var(--cor-texto-claro);
+        font-weight: 500;
+      }
+
+      /* Reutilizar o estilo do form-control do filtro, mas com fundo mais escuro */
+      .modal-content-custom .form-control-custom {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--cor-card-borda);
+        color: var(--cor-texto-branco);
+      }
+
+      .modal-content-custom .form-control-custom:focus {
+        background: rgba(0, 0, 0, 0.25);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-texto-branco);
+        box-shadow: 0 0 0 0.25rem rgba(225, 226, 226, 0.25);
+      }
+
+      .modal-content-custom .form-control-custom::placeholder {
+        color: var(--cor-texto-claro);
+        opacity: 0.5;
+      }
+
+      .modal-content-custom .modal-footer {
+        border-top: 1px solid var(--cor-card-borda);
+      }
+      
+      /* ------------------------------------------- */
+      /* NOVO: Estilos da Paginação */
+      /* ------------------------------------------- */
+      .pagination .page-item .page-link {
+        background-color: var(--cor-card-fundo);
+        border-color: var(--cor-card-borda);
+        color: var(--cor-texto-claro);
+        margin: 0 2px;
+        border-radius: 0.375rem;
+      }
+      .pagination .page-item .page-link:hover {
+        background-color: var(--cor-card-fundo-hover);
+        color: var(--cor-texto-branco);
+      }
+      .pagination .page-item.active .page-link {
+        background-color: var(--cor-destaque-primaria);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-fundo-gradiente-1);
+        font-weight: 600;
+      }
+      .pagination .page-item.disabled .page-link {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: var(--cor-card-borda);
+        color: var(--cor-texto-claro);
+        opacity: 0.5;
+      }
+      
+      
+      /* =========================================== */
+      /* === NOVOS ESTILOS E AJUSTES (ADICIONAR) === */
+      /* =========================================== */
+      
+      /* ------------------------------------------- */
+      /* NOVO: Botões de Ação (Tabela e Modal) */
+      /* ------------------------------------------- */
+
+      /* Botões de Ação na Tabela (Melhoria do Outline) */
+      .table-custom .btn {
+        padding: 0.25rem 0.6rem; /* Um pouco mais de padding */
+        font-size: 0.9rem;
+        transition: all 0.25s ease;
+      }
+      .table-custom .btn:hover {
+        transform: scale(1.05); /* Efeito de 'pop' */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Botão de Cancelar (Modal) - Estilo Glass */
+      .modal-footer .btn-outline-secondary {
+        color: var(--cor-texto-claro);
+        border-color: var(--cor-card-borda);
+        background: transparent;
+        transition: all 0.25s ease;
+      }
+      .modal-footer .btn-outline-secondary:hover {
+        background-color: var(--cor-card-fundo-hover);
+        border-color: var(--cor-texto-claro);
+        color: var(--cor-texto-branco);
+        transform: scale(1.03);
+      }
+
+      /* Botões Primários (Modal) - Efeito de Hover */
+      .modal-footer .btn-success,
+      .modal-footer .btn-warning {
+        transition: all 0.25s ease;
+      }
+      .modal-footer .btn-success:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 20px rgba(25, 135, 84, 0.5);
+      }
+      .modal-footer .btn-warning:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+        color: var(--cor-fundo-gradiente-1) !important; /* Garantir contraste */
+      }
+      
+      /* ------------------------------------------- */
+      /* NOVO: Scrollbar Customizado */
+      /* ------------------------------------------- */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--cor-fundo-gradiente-2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--cor-card-borda);
+        border-radius: 10px;
+        border: 2px solid var(--cor-fundo-gradiente-2);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--cor-destaque-primaria);
+      }
+      
+
+      /* ------------------------------------------- */
+      /* Responsividade */
+      /* ------------------------------------------- */
+      @media (max-width: 768px) {
+        body {
+          padding-top: 70px;
+        }
+        .navbar-custom {
+          padding: 0.6rem 1rem;
+        }
+        .dashboard-container {
+          padding: 25px 15px;
+          margin: 20px auto;
+        }
+        .dashboard-container h2 {
+          font-size: 1.8rem;
+          text-align: center;
+        }
+        .dashboard-container p {
+          font-size: 0.95rem;
+          text-align: center;
+        }
+
+        #saudacao {
+          text-align: center !important;
+        }
+        
+        .notification-button,
+        .fab-add-button {
+          width: 50px;
+          height: 50px;
+          right: 15px;
+        }
+        .notification-button {
+          bottom: 15px;
+          font-size: 1.3rem;
+        }
+        .fab-add-button {
+          bottom: 75px; /* 15 + 50 + 10 */
+          font-size: 1.8rem;
+        }
+
+        .notification-button .badge {
+          font-size: 0.6rem;
+          padding: 3px 5px;
+          top: -2px;
+          right: -2px;
+        }
+        /* Centraliza a paginação em telas pequenas */
+        .pagination {
+          justify-content: center !important;
+        }
+      }
+      /* =========================================== */
+/* === NOVOS ESTILOS E AJUSTES (ADICIONAR) === */
+/* =========================================== */
+
+/* ------------------------------------------- */
+/* NOVO: Estilo para Saudação */
+/* ------------------------------------------- */
+#saudacao {
+  color: var(--cor-texto-branco);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem !important;
+}
+
+/* ------------------------------------------- */
+/* AJUSTE: Transição no Foco do Input */
+/* ------------------------------------------- */
+.form-control-custom {
+  transition: all 0.3s ease;
+}
+
+/* ------------------------------------------- */
+/* AJUSTE: Hover do FAB (Botão Flutuante) */
+/* ------------------------------------------- */
+.fab-base:hover {
+  transform: translateY(-5px) scale(1.05); /* Ajuste sutil */
+  box-shadow: 0 12px 30px var(
+    --cor-shadow-intensa
+  ); /* Sombra mais forte no hover */
+}
+
+/* ------------------------------------------- */
+/* NOVO: Botões de Ação (Tabela e Modal) */
+/* ------------------------------------------- */
+
+/* Botões de Ação na Tabela (Melhoria do Outline) */
+.table-custom .btn {
+  padding: 0.25rem 0.6rem; /* Um pouco mais de padding */
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+}
+.table-custom .btn:hover {
+  transform: scale(1.05); /* Efeito de 'pop' */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Botão de Cancelar (Modal) - Estilo Glass */
+.modal-footer .btn-outline-secondary {
+  color: var(--cor-texto-claro);
+  border-color: var(--cor-card-borda);
+  background: transparent;
+  transition: all 0.25s ease;
+}
+.modal-footer .btn-outline-secondary:hover {
+  background-color: var(--cor-card-fundo-hover);
+  border-color: var(--cor-texto-claro);
+  color: var(--cor-texto-branco);
+  transform: scale(1.03);
+}
+
+/* Botões Primários (Modal) - Efeito de Hover */
+.modal-footer .btn-success,
+.modal-footer .btn-warning {
+  transition: all 0.25s ease;
+}
+.modal-footer .btn-success:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(25, 135, 84, 0.5);
+}
+.modal-footer .btn-warning:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+  color: var(--cor-fundo-gradiente-1) !important; /* Garantir contraste */
+}
+
+/* ------------------------------------------- */
+/* NOVO: Scrollbar Customizado */
+/* ------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cor-fundo-gradiente-2);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--cor-card-borda);
+  border-radius: 10px;
+  border: 2px solid var(--cor-fundo-gradiente-2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--cor-destaque-primaria);
+}
+
+/* ------------------------------------------- */
+/* AJUSTE: Responsividade da Saudação */
+/* ------------------------------------------- */
+@media (max-width: 768px) {
+  #saudacao {
+    text-align: center !important;
+  }
+}
+/* ------------------------------------------- */
+.table-custom th,
+.table-custom td {
+ 
+  white-space: nowrap;
+}
+
+/* ------------------------------------------- */
+/* NOVO: Overlay de Carregamento (Loading) */
+/* ------------------------------------------- */
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Usando a cor de fundo principal para uma transição sólida */
+  background-color: var(--cor-fundo-gradiente-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Z-index MUITO alto para ficar sobre tudo */
+  z-index: 9999;
+
+  /* Estado inicial visível */
+  opacity: 1;
+
+  /* Transição para o 'fade-out' quando for escondido */
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* O Spinner (animação de 'rodar') */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--cor-card-borda); /* Cor base do círculo */
+  border-top-color: var(
+    --cor-destaque-primaria
+  ); /* Cor da 'ponta' que gira */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+    </style>
+  </head>
+  <body>
+    <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    </nav>
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"
+          ><i class="bi bi-speedometer2 me-2"></i>{{empresa}}</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% for item in menus %} {% if item.submenu %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{ item.title }}
+              </a>
+              <ul class="dropdown-menu">
+                {% for sub in item.submenu %}
+                <li>
+                  <a class="dropdown-item" href="{{ sub.url }}"
+                    >{{ sub.title }}</a
+                  >
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
+            </li>
+            {% endif %} {% endfor %}
+          </ul>
+
+          <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-person-circle me-1"></i> Perfil
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <span class="dropdown-item-text"
+                    ><strong>{{ username }}</strong></span
+                  >
+                </li>
+                <li>
+                  <span class="dropdown-item-text text-muted small"
+                    >{{ user_username }}</span
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="/logout"
+                    ><i class="bi bi-box-arrow-right me-2"></i> Sair</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid px-3 px-md-4">
+      <div class="dashboard-container mx-auto">
+        
+        <p id="saudacao" class="fs-5 mb-1 text-white">Carregando...</p>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+         
+
+          <form
+            method="GET"
+            action="/aprovador"
+            class="ms-md-auto"
+            style="min-width: 300px; max-width: 450px; width: 100%"
+          >
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control form-control-custom"
+                id="search"
+                name="search"
+                placeholder="Filtrar por CPF, Nome, E-mail..."
+                value="{{ search_term or '' }}"
+              />
+              <button class="btn btn-search-custom" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+       
+
+        <div class="table-container-custom">
+          <div class="table-responsive">
+            <table class="table table-custom table-striped align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">CPF</th>
+                  <th scope="col">Nome</th>
+                  <th scope="col">E-Mail</th>
+                  <th scope="col">Situação</th>
+                  <th scope="col" class="text-center">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaAprovadoresBody">
+                {% for aprovador in aprovadores %}
+                <tr>
+                  <td>{{ aprovador.cpf }}</td>
+                  <td>{{ aprovador.nome }}</td>
+                  <td>{{ aprovador.email }}</td>
+                  <td>
+                    {% if aprovador.situacao %}
+                    <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inativo</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <button
+                      class="btn btn-sm btn-outline-warning me-1"
+                      title="Alterar"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalAlterarAprovador"
+                      data-id="{{ aprovador.id }}"
+                      data-cpf="{{ aprovador.cpf }}"
+                      data-nome="{{ aprovador.nome }}"
+                      data-email="{{ aprovador.email }}"
+                      data-situacao="{% if aprovador.situacao %}ativo{% else %}inativo{% endif %}"
+                    >
+                      <i class="bi bi-pencil-square me-1"></i> Alterar
+                    </button>
+
+                    <form
+                      action="/aprovador/status/{{ aprovador.id }}"
+                      method="POST"
+                      class="d-inline"
+                    >
+                      {% if aprovador.situacao %}
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                        title="Inativar"
+                      >
+                        <i class="bi bi-toggle-off me-1"></i> Inativar
+                      </button>
+                      {% else %}
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-success"
+                        title="Ativar"
+                      >
+                        <i class="bi bi-toggle-on me-1"></i> Ativar
+                      </button>
+                      {% endif %}
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %} {% if not aprovadores %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted fst-italic">
+                    Nenhum aprovador encontrado.
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {% if total_pages > 1 %}
+        <nav aria-label="Navegação da página" class="mt-4">
+          <ul class="pagination justify-content-end">
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+              <a
+                class="page-link"
+                href="/aprovador?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
+                aria-label="Anterior"
+              >
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+
+            {% for page_num in range(1, total_pages + 1) %} {% if page_num ==
+            page %}
+            <li class="page-item active" aria-current="page">
+              <span class="page-link">{{ page_num }}</span>
+            </li>
+            {% else %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/aprovador?page={{ page_num }}{% if search_term %}&search={{ search_term }}{% endif %}"
+              >
+                {{ page_num }}
+              </a>
+            </li>
+            {% endif %} {% endfor %}
+
+            <li
+              class="page-item {% if page == total_pages %}disabled{% endif %}"
+            >
+              <a
+                class="page-link"
+                href="/aprovador?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
+                aria-label="Próximo"
+              >
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </div>
+
+    <a
+      href="#"
+      class="fab-base fab-add-button"
+      role="button"
+      title="Adicionar Novo Aprovador"
+      data-bs-toggle="modal"
+      data-bs-target="#modalAdicionarAprovador"
+    >
+      <i class="bi bi-plus-lg"></i>
+    </a>
+
+    <div class="dropdown">
+      <button
+        class="fab-base notification-button"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        aria-label="Notificações"
+      >
+        <i class="bi bi-bell-fill"></i>
+        {% if notification_count > 0 %}
+        <span class="badge bg-danger rounded-pill"
+          >{{ notification_count }}</span
+        >
+        {% endif %}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        {% if notifications %} {% for note in notifications %}
+        <li>
+          <a class="dropdown-item" href="{{ note.url }}">{{ note.title }}</a>
+        </li>
+        {% endfor %} {% else %}
+        <li>
+          <span class="dropdown-item-text text-muted">Sem notificações</span>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div
+      class="modal fade"
+      id="modalAdicionarAprovador"
+      tabindex="-1"
+      aria-labelledby="modalAdicionarAprovadorLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-custom">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalAdicionarAprovadorLabel">
+              <i class="bi bi-person-plus-fill me-2"></i>Novo Aprovador
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="formNovoAprovador" action="/aprovador/novo" method="POST">
+              <div class="mb-3">
+                <label for="inputCPF" class="form-label">CPF</label>
+                <input
+                  type="text"
+                  class="form-control form-control-custom"
+                  id="inputCPF"
+                  name="cpf"
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="inputNome" class="form-label">Nome Completo</label>
+                <input
+                  type="text"
+                  class="form-control form-control-custom"
+                  id="inputNome"
+                  name="nome"
+                  placeholder="Digite o nome"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="inputEmail" class="form-label">E-mail</label>
+                <input
+                  type="email"
+                  class="form-control form-control-custom"
+                  id="inputEmail"
+                  name="email"
+                  placeholder="nome@email.com"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-1"></i> Cancelar
+            </button>
+            <button
+              type="submit"
+              form="formNovoAprovador"
+              class="btn btn-success"
+            >
+              <i class="bi bi-check-circle me-1"></i> Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="modalAlterarAprovador"
+      tabindex="-1"
+      aria-labelledby="modalAlterarAprovadorLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-custom">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalAlterarAprovadorLabel">
+              <i class="bi bi-person-gear me-2"></i>Alterar Aprovador
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form
+              id="formAlterarAprovador"
+              action="/aprovador/alterar"
+              method="POST"
+            >
+              <input type="hidden" name="id" id="editId" />
+
+              <div class="mb-3">
+                <label for="editCPF" class="form-label">CPF</label>
+                <input
+                  type="text"
+                  class="form-control form-control-custom"
+                  id="editCPF"
+                  name="cpf"
+                  placeholder="000.000.000-00"
+                  required
+                  readonly
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editNome" class="form-label">Nome Completo</label>
+                <input
+                  type="text"
+                  class="form-control form-control-custom"
+                  id="editNome"
+                  name="nome"
+                  placeholder="Digite o nome"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editEmail" class="form-label">E-mail</label>
+                <input
+                  type="email"
+                  class="form-control form-control-custom"
+                  id="editEmail"
+                  name="email"
+                  placeholder="nome@email.com"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editSituacao" class="form-label">Situação</label>
+                <select
+                  class="form-select form-control-custom"
+                  id="editSituacao"
+                  name="situacao"
+                  required
+                >
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-1"></i> Cancelar
+            </button>
+            <button
+              type="submit"
+              form="formAlterarAprovador"
+              class="btn btn-warning"
+            >
+              <i class="bi bi-arrow-repeat me-1"></i> Atualizar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Script da Saudação
+      (function () {
+        const hora = new Date().getHours();
+        let saudacaoPrefixo = "Olá";
+        if (hora >= 5 && hora < 12) saudacaoPrefixo = "Bom dia";
+        else if (hora >= 12 && hora < 18) saudacaoPrefixo = "Boa tarde";
+        else saudacaoPrefixo = "Boa noite";
+
+        const username = "{{ username }}";
+        const saudacaoEl = document.querySelector("#saudacao");
+        if (saudacaoEl) {
+          saudacaoEl.innerHTML = `👋 ${saudacaoPrefixo}, ${username}!`;
+        }
+      })();
+
+      // <<< SCRIPT DE FILTRO FOI REMOVIDO >>>
+      // A busca agora é feita pelo formulário GET
+
+      // Script para preencher o modal de alteração
+      (function () {
+        const modalAlterarAprovador = document.getElementById(
+          "modalAlterarAprovador"
+        );
+        if (!modalAlterarAprovador) return;
+
+        modalAlterarAprovador.addEventListener("show.bs.modal", (event) => {
+          const button = event.relatedTarget;
+
+          const id = button.getAttribute("data-id");
+          const cpf = button.getAttribute("data-cpf");
+          const nome = button.getAttribute("data-nome");
+          const email = button.getAttribute("data-email");
+          const situacao = button.getAttribute("data-situacao");
+
+          const inputId = modalAlterarAprovador.querySelector("#editId");
+          const inputCPF = modalAlterarAprovador.querySelector("#editCPF");
+          const inputNome = modalAlterarAprovador.querySelector("#editNome");
+          const inputEmail = modalAlterarAprovador.querySelector("#editEmail");
+          const selectSituacao =
+            modalAlterarAprovador.querySelector("#editSituacao");
+
+          inputId.value = id;
+          inputCPF.value = cpf;
+          inputNome.value = nome;
+          inputEmail.value = email;
+          selectSituacao.value = situacao;
+        });
+      })();
+  (function () {
+  const overlay = document.getElementById("loading-overlay");
+  if (!overlay) return;
+
+  // O evento 'window.onload' espera tudo (incluindo imagens) carregar
+  window.onload = () => {
+    // 1. Inicia o 'fade-out'
+    overlay.style.opacity = "0";
+
+    // 2. Após a animação, esconde o elemento
+    // (O tempo deve ser o mesmo da transição do CSS: 0.3s = 300ms)
+    setTimeout(() => {
+      overlay.style.display = "none";
+    }, 300);
+  };
+})();
+    </script>
+  </body>
+</html>
