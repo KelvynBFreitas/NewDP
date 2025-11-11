@@ -19,198 +19,189 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
 
     <style>
-      /* ------------------------------------------- */
-      /* Variáveis de Cores e Estilos Globais */
-      /* ------------------------------------------- */
+      /* --- TEMA CIANO (Base para a Aurora) --- */
       :root {
-        --cor-fundo-gradiente-1: #10161d; /* Mais escuro */
-        --cor-fundo-gradiente-2: #090e13; /* Ainda mais escuro */
-        --cor-card-fundo: rgba(255, 255, 255, 0.08); /* Mais transparente */
-        --cor-card-fundo-hover: rgba(
-          255,
-          255,
-          255,
-          0.15
-        ); /* Mais transparente no hover */
-        --cor-card-borda: rgba(255, 255, 255, 0.15); /* Borda mais definida */
-        --cor-texto-claro: #c2cbd6; /* Levemente mais cinza */
-        --cor-texto-branco: #e0e6ec; /* Brancoo mais suave */
-        --cor-destaque-primaria: #00bcd4; /* Ciano principal */
-        --cor-destaque-secundaria: #0087a3; /* Ciano mais escuro */
+        --cor-fundo-gradiente-1: #10161d;
+        --cor-fundo-gradiente-2: #090e13; /* Fundo principal */
+        --cor-card-fundo: rgba(255, 255, 255, 0.15);
+        --cor-card-fundo-hover: rgba(255, 255, 255, 0.25);
+        --cor-card-borda: rgba(255, 255, 255, 0.25);
+        --cor-texto-claro: #c2cbd6;
+        --cor-texto-branco: #e0e6ec;
+
+        /* Cores de Destaque (Ciano) */
+        --cor-destaque-primaria: #00bcd4; /* Ciano */
+        --cor-destaque-secundaria: #0087a3; /* Ciano escuro */
+
         --cor-shadow-leve: rgba(0, 0, 0, 0.2);
         --cor-shadow-media: rgba(0, 0, 0, 0.4);
         --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
+        --cor-sucesso: #198754;
+        --cor-sucesso-hover: #157347;
       }
-
-      /* ------------------------------------------- */
-      /* Estilo do Body e Efeitos de Fundo */
-      /* ------------------------------------------- */
       body {
-        background: linear-gradient(
-          135deg,
-          var(--cor-fundo-gradiente-1) 0%,
-          var(--cor-fundo-gradiente-2) 100%
-        );
+        /* --- MUDANÇA: Fundo sólido. A animação vem dos DIVs. --- */
+        background: var(--cor-fundo-gradiente-2);
         min-height: 100vh;
         font-family: "Inter", Arial, sans-serif;
         color: var(--cor-texto-claro);
         overflow-x: hidden;
-        position: relative;
-        padding-top: 80px; /* Para a navbar fixa */
+        /* Padding aumentado para 80px do seu CSS original */
+        padding-top: 80px;
       }
 
-      /* Efeitos de fundo mais complexos e suaves */
-      body::before,
-      body::after {
-        content: "";
+      /* --- MUDANÇA: NOVO FUNDO AURORA (Estilo Trae.ai) --- */
+      .aurora-container {
         position: fixed;
-        background-size: 400% 400%;
-        animation: gradient-background 20s ease infinite; /* Animação mais lenta */
-        filter: blur(80px);
-        z-index: -2;
-        opacity: 0.15; /* Mais visível */
-        border-radius: 50%; /* Esferas */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2; /* Atrás de todo o conteúdo */
+        overflow: hidden;
+        filter: blur(90px); /* O blur pesado que faz a mágica */
+        opacity: 0.25; /* Sutil, para não cansar a vista */
       }
 
-      body::before {
-        top: -20vh;
-        left: -20vw;
-        width: 60vw;
+      .aurora-blob {
+        position: absolute;
+        width: 60vw; /* Tamanho grande */
         height: 60vw;
-        background: linear-gradient(
-          45deg,
-          var(--cor-destaque-primaria),
-          #2a52be
-        );
+        min-width: 500px;
+        min-height: 500px;
+        background-color: var(--cor-blob);
+        border-radius: 50%;
+        /* Animação complexa com bezier para suavidade */
+        animation: aurora-anim 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+      }
+
+      /* Posições e delays diferentes para cada bolha */
+      .aurora-blob:nth-child(1) {
+        top: -30vh;
+        left: -15vw;
         animation-delay: 0s;
+        animation-duration: 32s;
       }
-
-      body::after {
-        bottom: -20vh;
+      .aurora-blob:nth-child(2) {
+        top: 10vh;
         right: -20vw;
-        width: 70vw;
-        height: 70vw;
-        background: linear-gradient(
-          -45deg,
-          var(--cor-destaque-secundaria),
-          #4286f4
-        );
-        animation-delay: 10s;
+        animation-delay: -8s;
+        animation-duration: 30s;
+      }
+      .aurora-blob:nth-child(3) {
+        bottom: -25vh;
+        left: 20vw;
+        animation-delay: -16s;
+        animation-duration: 28s;
+      }
+      .aurora-blob:nth-child(4) {
+        bottom: 0vh;
+        right: 30vw;
+        animation-delay: -24s;
+        animation-duration: 34s;
       }
 
-      @keyframes gradient-background {
+      /* A animação que move, escala e gira */
+      @keyframes aurora-anim {
         0% {
-          background-position: 0% 50%;
+          transform: translate(0, 0) scale(1) rotate(0deg);
+        }
+        25% {
+          transform: translate(40vw, 30vh) scale(1.2) rotate(30deg);
         }
         50% {
-          background-position: 100% 50%;
+          transform: translate(10vw, -20vh) scale(0.8) rotate(60deg);
+        }
+        75% {
+          transform: translate(-30vw, 20vh) scale(1.1) rotate(90deg);
         }
         100% {
-          background-position: 0% 50%;
+          transform: translate(0, 0) scale(1) rotate(0deg);
         }
       }
+      /* --- FIM DO FUNDO AURORA --- */
 
-      /* ------------------------------------------- */
-      /* Navbar Estilo Moderno (Glassmorphism) */
-      /* ------------------------------------------- */
       .navbar-custom {
-        background: rgba(255, 255, 255, 0.08); /* Fundo semi-transparente */
-        backdrop-filter: blur(12px); /* Efeito de vidro mais forte */
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Borda mais sutil */
-        box-shadow: 0 4px 30px var(--cor-shadow-leve); /* Sombra mais difusa */
-        padding: 0.8rem 1.5rem; /* Mais espaçamento */
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 30px var(--cor-shadow-leve);
+        padding: 0.8rem 1.5rem;
         z-index: 1040;
       }
-
       .navbar-custom .navbar-brand {
         color: var(--cor-texto-branco);
         font-weight: 700;
         font-size: 1.3rem;
-        text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Pequena luz no texto */
+        text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Tema Ciano */
       }
-
       .navbar-custom .nav-link {
         color: var(--cor-texto-claro);
         font-weight: 500;
         transition: all 0.3s ease;
-        padding: 0.5rem 1rem; /* Padding para melhor área de clique */
-        border-radius: 8px; /* Cantos arredondados */
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
       }
-
       .navbar-custom .nav-link:hover,
       .navbar-custom .nav-link.active {
         color: var(--cor-texto-branco);
-        background-color: rgba(255, 255, 255, 0.05); /* Leve fundo no hover */
-        text-shadow: 0 0 3px rgba(0, 188, 212, 0.2);
+        background-color: rgba(255, 255, 255, 0.05);
+        text-shadow: 0 0 3px rgba(0, 188, 212, 0.2); /* Tema Ciano */
       }
-
       .navbar-toggler {
-        border: 1px solid rgba(255, 255, 255, 0.2); /* Borda no toggler */
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
       .navbar-toggler-icon {
         filter: invert(1);
       }
-
-      /* ------------------------------------------- */
-      /* Dropdown Estilo Moderno */
-      /* ------------------------------------------- */
       .dropdown-menu {
-        background: rgba(
-          18,
-          28,
-          38,
-          0.9
-        ); /* Fundo quase sólido, mas ainda transparente */
-        backdrop-filter: blur(15px); /* Blur mais intenso */
+        background: rgba(18, 28, 38, 0.9);
+        backdrop-filter: blur(15px);
         border: 1px solid var(--cor-card-borda);
         box-shadow: 0 15px 40px var(--cor-shadow-media);
         border-radius: 12px;
-        padding: 0.75rem 0; /* Mais espaçamento */
+        padding: 0.75rem 0;
       }
-
       .dropdown-item {
         color: var(--cor-texto-claro) !important;
         font-weight: 500;
-        padding: 0.6rem 1.25rem; /* Mais espaçamento */
+        padding: 0.6rem 1.25rem;
         transition: all 0.2s ease;
       }
-
       .dropdown-item:hover {
-        background-color: rgba(0, 188, 212, 0.15); /* Fundo sutil de destaque */
+        background-color: rgba(0, 188, 212, 0.15); /* Tema Ciano */
         color: var(--cor-destaque-primaria) !important;
       }
-
       .dropdown-item-text {
         color: var(--cor-texto-branco) !important;
         padding: 0.6rem 1.25rem;
         font-weight: 600;
       }
-
       .dropdown-divider {
         border-color: rgba(255, 255, 255, 0.1);
         margin: 0.5rem 0;
       }
-
-      /* ------------------------------------------- */
-      /* Conteúdo Principal do Dashboard */
-      /* ------------------------------------------- */
       .dashboard-container {
-        max-width: 1200px;
+        /* max-width: 1200px; (do seu CSS) */
+        max-width: 90%; /* (do tema anterior) - Vamos usar 90% para consistência */
         margin: 40px auto;
-        padding: 35px 30px; /* Mais padding */
-
+        padding: 35px 30px;
         background: var(--cor-card-fundo);
         backdrop-filter: blur(12px);
         border: 1px solid var(--cor-card-borda);
-        border-radius: 18px;
+        /* border-radius: 18px; (do seu CSS) */
+        border-radius: 10px; /* (do tema anterior) - Usando 10px */
         box-shadow: 0 15px 40px var(--cor-shadow-media);
         position: relative;
-        overflow: hidden; /* Para o before/after não vazar */
+        overflow: hidden;
       }
-
-      /* Borda animada (com um toque mais sutil) */
+      /* Borda animada */
       .dashboard-container::before {
         content: "";
         position: absolute;
@@ -225,14 +216,13 @@
           var(--cor-destaque-primaria) 50%,
           #007bff 75%,
           var(--cor-destaque-primaria) 100%
-        ); /* Gradiente mais complexo */
-        background-size: 200% 200%; /* Menor para animação mais rápida */
+        );
+        background-size: 200% 200%;
         border-radius: 20px;
         z-index: -1;
         animation: gradient-border 10s ease infinite;
-        opacity: 0.5; /* Mais sutil */
+        opacity: 0.5;
       }
-
       @keyframes gradient-border {
         0% {
           background-position: 0% 50%;
@@ -244,37 +234,47 @@
           background-position: 0% 50%;
         }
       }
-
       .dashboard-container h2 {
         color: var(--cor-texto-branco);
-        font-weight: 700;
-        text-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
-        margin-bottom: 1.5rem !important; /* Mais espaço */
+        /* font-weight: 700; (do seu CSS) */
+        font-weight: 400; /* (do tema anterior) */
+        text-shadow: 0 0 10px rgba(0, 188, 212, 0.4); /* Tema Ciano */
+        margin-bottom: 1.5rem !important;
       }
-
       .dashboard-container p {
         color: var(--cor-texto-claro);
         font-size: 1.05rem;
-        margin-bottom: 2rem !important; /* Mais espaço */
+        margin-bottom: 2rem !important;
+      }
+      #saudacao {
+        color: var(--cor-texto-branco);
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem !important;
+      }
+      /* Ajuste para o H2 da saudação (do seu CSS) */
+      .dashboard-container h2#saudacao {
+        font-weight: 700;
+        font-size: 1.8rem; /* Mantendo seu H2 maior */
+        margin-bottom: 0.5rem !important;
+      }
+      .dashboard-container p {
+        margin-bottom: 1rem !important; /* Menos margem para a lista de cards */
       }
 
-      /* ------------------------------------------- */
-      /* Cards Modernos */
-      /* ------------------------------------------- */
+      /* --- ESTILOS DOS CARDS (MESCLADOS DO SEU CSS) --- */
       .card {
-        background: var(--cor-card-fundo); /* Fundo transparente */
-        backdrop-filter: blur(8px); /* Blur para cards */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Borda mais leve */
-        border-radius: 15px; /* Cantos mais arredondados */
+        background: var(--cor-card-fundo);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
         transition: all 0.3s ease;
         color: var(--cor-texto-claro);
         height: 100%;
-        box-shadow: 0 5px 20px var(--cor-shadow-leve); /* Sombra inicial */
-        overflow: hidden; /* Para garantir que o pseudo-elemento não vaze */
+        box-shadow: 0 5px 20px var(--cor-shadow-leve);
+        overflow: hidden;
         position: relative;
       }
-
-      /* Efeito de brilho sutil no hover */
       .card::before {
         content: "";
         position: absolute;
@@ -291,92 +291,295 @@
         transition: opacity 0.3s ease;
         z-index: 0;
       }
-
       .card:hover {
-        transform: translateY(-5px); /* Levantar um pouco */
-        box-shadow: 0 12px 30px var(--cor-shadow-media); /* Sombra mais profunda */
-        border-color: var(
-          --cor-destaque-primaria
-        ); /* Borda colorida no hover */
-        background: var(--cor-card-fundo-hover); /* Mais visível */
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px var(--cor-shadow-media);
+        border-color: var(--cor-destaque-primaria);
+        background: var(--cor-card-fundo-hover);
       }
-
       .card:hover::before {
-        opacity: 1; /* Brilho visível no hover */
+        opacity: 1;
       }
-
       .card a {
         text-decoration: none;
         color: inherit;
         position: relative;
-        z-index: 1; /* Garante que o conteúdo fique acima do brilho */
+        z-index: 1;
       }
-
       .card-icon {
-        font-size: 2.2rem; /* Ícones maiores */
+        font-size: 2.2rem;
         color: var(--cor-destaque-primaria);
-        filter: drop-shadow(
-          0 0 5px rgba(0, 188, 212, 0.4)
-        ); /* Pequena sombra nos ícones */
+        filter: drop-shadow(0 0 5px rgba(0, 188, 212, 0.4));
       }
-
       .card h5 {
         color: var(--cor-texto-branco);
         font-weight: 600;
         margin-bottom: 0.25rem;
       }
-
       .card small {
         color: var(--cor-texto-claro);
         opacity: 0.8;
         font-size: 0.9rem;
       }
+      /* --- FIM DOS ESTILOS DOS CARDS --- */
 
-      /* ------------------------------------------- */
-      /* Botão Flutuante de Notificações */
-      /* ------------------------------------------- */
-      .notification-button {
+      /* --- ESTILOS PADRÃO DO TEMA (Tabelas, Modais, etc.) --- */
+      /* (Mantidos para consistência, mesmo que não usados nesta página) */
+      .table-container-custom {
+        background: var(--cor-card-fundo);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--cor-card-borda);
+        border-radius: 15px;
+        padding: 0;
+        box-shadow: 0 5px 20px var(--cor-shadow-leve);
+        overflow: hidden;
+      }
+      .table-custom {
+        background-color: transparent;
+        color: var(--cor-texto-claro);
+        border-color: var(--cor-card-borda);
+        margin-bottom: 0;
+      }
+      .table-custom th {
+        color: var(--cor-texto-branco);
+        font-weight: 300;
+        border-color: var(--cor-card-borda) !important;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      .table-custom td {
+        border-color: var(--cor-card-borda) !important;
+        vertical-align: middle;
+      }
+      .table-custom.table-striped > tbody > tr:nth-of-type(even) {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+      .table-custom.table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: transparent;
+      }
+      .table-custom tbody tr:hover {
+        background-color: var(--cor-card-fundo-hover);
+        color: var(--cor-texto-branco);
+      }
+      .table-container-custom .table-responsive-lg {
+        padding: 0.5rem;
+      }
+      .table-custom th,
+      .table-custom td {
+        padding: 0.85rem 1rem;
+      }
+      .form-control-custom {
+        background: var(--cor-card-fundo);
+        border: 1px solid var(--cor-card-borda);
+        color: var(--cor-texto-branco);
+        border-radius: 0.375rem;
+        transition: all 0.3s ease;
+      }
+      .form-control-custom:focus {
+        background: var(--cor-card-fundo);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-texto-branco);
+        box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25); /* Tema Ciano */
+      }
+      .form-control-custom::placeholder {
+        color: var(--cor-texto-claro);
+        opacity: 0.7;
+      }
+      .btn-search-custom {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--cor-card-borda);
+        color: var(--cor-destaque-primaria);
+        transition: all 0.2s ease;
+      }
+      .btn-search-custom:hover {
+        background: var(--cor-destaque-primaria);
+        color: var(--cor-fundo-gradiente-1);
+        border-color: var(--cor-destaque-primaria);
+      }
+      .fab-base {
         position: fixed;
-        bottom: 25px; /* Mais afastado */
-        right: 25px; /* Mais afastado */
         z-index: 1050;
-        width: 58px; /* Maior */
-        height: 58px; /* Maior */
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        font-size: 1.6rem; /* Ícone maior */
         display: flex;
         align-items: center;
         justify-content: center;
-
-        background: rgba(0, 188, 212, 0.85); /* Ciano com transparência */
-        border: 1px solid rgba(255, 255, 255, 0.2); /* Borda clara */
-        box-shadow: 0 8px 25px var(--cor-shadow-intensa); /* Sombra mais forte */
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animação mais suave */
-        color: var(--cor-texto-branco); /* Ícone branco */
+        border: 0.5px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 25px var(--cor-shadow-intensa);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        color: var(--cor-texto-branco);
         cursor: pointer;
+        text-decoration: none;
       }
-
+      .fab-base:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px var(--cor-shadow-intensa);
+      }
+      .notification-button {
+        bottom: 25px;
+        right: 25px;
+        font-size: 1.6rem;
+        background: rgba(0, 188, 212, 0.85); /* Tema Ciano */
+        /* Ajuste do seu CSS: Tamanho maior */
+        width: 58px;
+        height: 58px;
+      }
       .notification-button:hover {
-        background: var(--cor-destaque-primaria); /* Ciano sólido no hover */
-        transform: translateY(-7px); /* Levantar mais */
-        box-shadow: 0 15px 40px rgba(0, 188, 212, 0.6); /* Sombra mais pronunciada e colorida */
+        background: var(--cor-destaque-primaria);
+        box-shadow: 0 15px 40px rgba(0, 188, 212, 0.6);
+        /* Ajuste do seu CSS: Levantar mais */
+        transform: translateY(-7px) scale(1.05);
       }
-
       .notification-button .badge {
-        font-size: 0.7rem; /* Badge maior */
+        font-size: 0.7rem;
         padding: 5px 8px;
         position: absolute;
-        top: 0px; /* Mais para cima */
-        right: 0px; /* Mais para a direita */
-        transform: translate(25%, -25%); /* Ajuste fino */
-        border-radius: 10px; /* Mais arredondado */
-        border: 1px solid rgba(255, 255, 255, 0.2); /* Borda no badge */
+        top: 0px;
+        right: 0px;
+        transform: translate(25%, -25%);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 8px var(--cor-shadow-leve);
       }
+      .fab-add-button {
+        bottom: 95px; /* Acima do botão de notificação */
+        right: 25px;
+        font-size: 2rem;
+        background-color: var(--cor-sucesso);
+      }
+      .fab-add-button:hover {
+        background-color: var(--cor-sucesso-hover);
+        box-shadow: 0 15px 40px rgba(25, 135, 84, 0.6);
+      }
+      .modal-content-custom {
+        background: #0e2231b0;
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--cor-card-borda);
+        border-radius: 15px;
+        color: var(--cor-texto-claro);
+        box-shadow: 0 15px 40px var(--cor-shadow-media);
+      }
+      .modal-content-custom .modal-header {
+        border-bottom: 1px solid var(--cor-card-borda);
+      }
+      .modal-content-custom .modal-header .modal-title {
+        color: var(--cor-texto-branco);
+        font-weight: 600;
+      }
+      .modal-content-custom .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+      }
+      .modal-content-custom .modal-body .form-label {
+        color: var(--cor-texto-claro);
+        font-weight: 500;
+      }
+      .modal-content-custom .form-control-custom {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--cor-card-borda);
+        color: var(--cor-texto-branco);
+      }
+      .modal-content-custom .form-control-custom:focus {
+        background: rgba(0, 0, 0, 0.556);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-texto-branco);
+        box-shadow: 0 0 0 0.25rem rgba(213, 215, 215, 0);
+      }
+      .modal-content-custom .form-control-custom::placeholder {
+        color: var(--cor-texto-claro);
+        opacity: 0.5;
+      }
+      .modal-content-custom .modal-footer {
+        border-top: 1px solid var(--cor-card-borda);
+      }
+      .pagination .page-item .page-link {
+        background-color: var(--cor-card-fundo);
+        border-color: var(--cor-card-borda);
+        color: var(--cor-texto-claro);
+        margin: 0 2px;
+        border-radius: 0.375rem;
+      }
+      .pagination .page-item .page-link:hover {
+        background-color: var(--cor-card-fundo-hover);
+        color: var(--cor-texto-branco);
+      }
+      .pagination .page-item.active .page-link {
+        background-color: var(--cor-destaque-primaria);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-fundo-gradiente-1);
+        font-weight: 600;
+      }
+      .pagination .page-item.disabled .page-link {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: var(--cor-card-borda);
+        color: var(--cor-texto-claro);
+        opacity: 0.5;
+      }
+      .table-custom .btn {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.9rem;
+        transition: all 0.25s ease;
+      }
+      .table-custom .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .modal-footer .btn-outline-secondary {
+        color: var(--cor-texto-claro);
+        border-color: var(--cor-card-borda);
+        background: transparent;
+        transition: all 0.25s ease;
+      }
+      .modal-footer .btn-outline-secondary:hover {
+        background-color: var(--cor-card-fundo-hover);
+        border-color: var(--cor-texto-claro);
+        color: var(--cor-texto-branco);
+        transform: scale(1.03);
+      }
+      .modal-footer .btn-success,
+      .modal-footer .btn-warning {
+        transition: all 0.25s ease;
+      }
+      .modal-footer .btn-success:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 20px rgba(25, 135, 84, 0.5);
+      }
+      .modal-footer .btn-warning {
+        background-color: var(--cor-destaque-primaria);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-fundo-gradiente-1) !important;
+      }
+      .modal-footer .btn-warning:hover {
+        transform: scale(1.03);
+        background-color: var(--cor-destaque-secundaria);
+        border-color: var(--cor-destaque-secundaria);
+        box-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+      }
+      .table-custom .btn-outline-warning {
+        color: var(--cor-destaque-primaria);
+        border-color: var(--cor-destaque-primaria);
+      }
+      .table-custom .btn-outline-warning:hover {
+        background-color: var(--cor-destaque-primaria);
+        border-color: var(--cor-destaque-primaria);
+        color: var(--cor-fundo-gradiente-1) !important;
+      }
 
-      /* ------------------------------------------- */
-      /* Responsividade */
-      /* ------------------------------------------- */
+      /* Scrollbar Customizado */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--cor-fundo-gradiente-2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--cor-card-borda);
+        border-radius: 10px;
+        border: 2px solid var(--cor-fundo-gradiente-2);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--cor-destaque-primaria);
+      }
       @media (max-width: 768px) {
         body {
           padding-top: 70px;
@@ -396,6 +599,33 @@
           font-size: 0.95rem;
           text-align: center;
         }
+        #saudacao {
+          text-align: center !important;
+        }
+        .notification-button,
+        .fab-add-button {
+          width: 50px;
+          height: 50px;
+          right: 15px;
+        }
+        .notification-button {
+          bottom: 15px;
+          font-size: 1.3rem;
+        }
+        .fab-add-button {
+          bottom: 75px; /* 15 + 50 + 10 */
+          font-size: 1.8rem;
+        }
+        .notification-button .badge {
+          font-size: 0.6rem;
+          padding: 3px 5px;
+          top: -2px;
+          right: -2px;
+        }
+        .pagination {
+          justify-content: center !important;
+        }
+        /* Ajuste do card em modo mobile (do seu CSS) */
         .card .d-flex {
           flex-direction: column;
           align-items: center;
@@ -404,23 +634,107 @@
         .card-icon {
           margin-bottom: 0.5rem;
         }
-        .notification-button {
-          width: 50px;
-          height: 50px;
-          font-size: 1.3rem;
-          bottom: 15px;
-          right: 15px;
+      }
+
+      /* Overlay de Carregamento (Loading) */
+      #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: var(--cor-fundo-gradiente-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid var(--cor-card-borda);
+        border-top-color: var(--cor-destaque-primaria);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
-        .notification-button .badge {
-          font-size: 0.6rem;
-          padding: 3px 5px;
-          top: -2px;
-          right: -2px;
+        100% {
+          transform: rotate(360deg);
         }
+      }
+      /* Footer com as Marcas (Se aplicável) */
+      .brand-footer {
+        opacity: 0.3;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: var(--cor-texto-claro);
+        user-select: none; /* Não selecionável */
+        border-top: 1px solid var(--cor-card-borda);
+        padding-top: 1rem;
+      }
+      .table-custom th .bi {
+        vertical-align: -0.125em;
+        margin-right: 0.3rem;
+      }
+      /* SweetAlert2 no tema Ciano */
+      .swal2-popup {
+        background: var(--cor-fundo-gradiente-1) !important;
+        color: var(--cor-texto-branco) !important;
+        border: 1px solid var(--cor-card-borda) !important;
+        border-radius: 15px !important;
+      }
+      .swal2-title {
+        color: var(--cor-texto-branco) !important;
+      }
+      .swal2-html-container {
+        color: var(--cor-texto-claro) !important;
+      }
+      .swal2-confirm,
+      .swal2-cancel,
+      .swal2-deny {
+        border-radius: 0.375rem !important;
+        font-weight: 600 !important;
+      }
+      .swal2-confirm {
+        background-color: var(--cor-destaque-primaria) !important;
+        color: var(--cor-fundo-gradiente-1) !important;
+      }
+      .swal2-confirm:hover {
+        background-color: var(--cor-destaque-secundaria) !important;
+      }
+      .swal2-cancel {
+        background-color: transparent !important;
+        color: var(--cor-texto-claro) !important;
+        border: 1px solid var(--cor-card-borda) !important;
+      }
+      .swal2-cancel:hover {
+        background-color: var(--cor-card-fundo-hover) !important;
+        color: var(--cor-texto-branco) !important;
+      }
+      .swal2-toast {
+        border: 1px solid var(--cor-card-borda) !important;
+        box-shadow: 0 8px 25px var(--cor-shadow-intensa) !important;
       }
     </style>
   </head>
   <body>
+    <div class="aurora-container">
+      <div class="aurora-blob" style="--cor-blob: #0d47a1"></div>
+      <div class="aurora-blob" style="--cor-blob: #4a148c"></div>
+      <div class="aurora-blob" style="--cor-blob: #00bcd4"></div>
+      <div class="aurora-blob" style="--cor-blob: #ad1457"></div>
+      </div>
+
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
       <div class="container-fluid">
         <a class="navbar-brand" href="#"
@@ -537,7 +851,7 @@
 
     <div class="dropdown">
       <button
-        class="notification-button"
+        class="fab-base notification-button"
         type="button"
         data-bs-toggle="dropdown"
         aria-expanded="false"
@@ -564,16 +878,58 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      // A saudação agora é atualizada dinamicamente com o nome de usuário diretamente no H2
-      // Não é mais necessário alterar o innerText de um elemento separado, apenas o "Olá"
+      /*
+      =================================================================
+      JS DO TEMA (Funções de Toast e Loading)
+      =================================================================
+      */
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener("mouseenter", Swal.stopTimer);
+          toast.addEventListener("mouseleave", Swal.resumeTimer);
+        },
+        customClass: {
+          popup: "swal2-toast", // Usado para estilizar no CSS
+        },
+      });
+
+      function showToast(title, icon = "success") {
+        Toast.fire({
+          icon: icon,
+          title: title,
+        });
+      }
+
+      // Script do Loading Overlay
+      (function () {
+        const overlay = document.getElementById("loading-overlay");
+        if (!overlay) return;
+        window.onload = () => {
+          overlay.style.opacity = "0";
+          setTimeout(() => {
+            overlay.style.display = "none";
+          }, 300);
+        };
+      })();
+
+      /*
+      =================================================================
+      SEU SCRIPT ORIGINAL (Mantido)
+      =================================================================
+      */
       const hora = new Date().getHours();
       let saudacaoPrefixo = "Olá";
       if (hora >= 5 && hora < 12) saudacaoPrefixo = "Bom dia";
       else if (hora >= 12 && hora < 18) saudacaoPrefixo = "Boa tarde";
       else saudacaoPrefixo = "Boa noite";
 
-      // Supondo que {{ username }} seja preenchido pelo backend
       const username = "{{ username }}";
       document.querySelector(
         "#saudacao"

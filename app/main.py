@@ -1,5 +1,5 @@
 from fastapi.staticfiles import StaticFiles
-from app.routes import auth_routes,dashboard_routes,cad_aprovador,cad_pj_vinculo
+from app.routes import auth_routes,dashboard_routes,cad_aprovador,cad_pj_vinculo,pj_email
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -17,6 +17,7 @@ app.include_router(auth_routes.router)
 app.include_router(dashboard_routes.router)
 app.include_router(cad_aprovador.router)
 app.include_router(cad_pj_vinculo.router)
+app.include_router(pj_email.router)
 #uvicorn app.main:app --reload
 
 

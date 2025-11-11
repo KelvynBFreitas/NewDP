@@ -54,8 +54,8 @@ async def dashboard(
         ]},
         {"title": "Contato", "url": "#"},
         {"title": "Area Pessoa Judica", "submenu": [
-            {"title": "Cadastro Colaborador", "url": "#"},
-            {"title": "Cadastro Aprovador", "url": "#"},
+            {"title": "Cadastro Colaborador", "url": "/prestadoresdeservico"},
+            {"title": "Cadastro Aprovador", "url": "/aprovador"},
             {"title": "E-Mail PJ", "url": "#"},
         ]}
     ]

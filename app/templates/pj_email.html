@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ajuste para Email PJ</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+        /* --- TEMA REVERTIDO PARA CIANO (Combina com a Aurora) --- */
+        :root {
+         --cor-fundo-gradiente-1: #10161d;
+         --cor-fundo-gradiente-2: #090e13; /* Fundo principal */
+         --cor-card-fundo: rgba(255, 255, 255, 0.15);
+         --cor-card-fundo-hover: rgba(255, 255, 255, 0.25);
+         --cor-card-borda: rgba(255, 255, 255, 0.25);
+         --cor-texto-claro: #c2cbd6;
+         --cor-texto-branco: #e0e6ec;
+
+         /* Cores de Destaque (Ciano Original) */
+         --cor-destaque-primaria: #00bcd4; /* Ciano */
+         --cor-destaque-secundaria: #0087a3; /* Ciano escuro */
+
+         --cor-shadow-leve: rgba(0, 0, 0, 0.2);
+         --cor-shadow-media: rgba(0, 0, 0, 0.4);
+         --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
+         --cor-sucesso: #198754;
+         --cor-sucesso-hover: #157347;
+         --cor-perigo: #dc3545;
+         --cor-perigo-claro: #ffbaba;
+        }
+
+        /* --- NOVO: Body (Estilo Aurora) --- */
+        body {
+         background: var(--cor-fundo-gradiente-2);
+         min-height: 100vh;
+         font-family: "Inter", Arial, sans-serif;
+         color: var(--cor-texto-claro);
+         overflow-x: hidden;
+         /* Adiciona padding para a navbar fixa */
+         padding-top: 80px; /* Ajustado para a altura da nova navbar */
+         padding-bottom: 50px;
+        }
+        
+        /* --- NOVO: FUNDO AURORA (Estilo Trae.ai) --- */
+        .aurora-container {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100vw;
+         height: 100vh;
+         z-index: -2; /* Atrás de todo o conteúdo */
+         overflow: hidden;
+         filter: blur(90px); /* O blur pesado que faz a mágica */
+         opacity: 0.25; /* Sutil, para não cansar a vista */
+        }
+
+        .aurora-blob {
+         position: absolute;
+         width: 60vw; /* Tamanho grande */
+         height: 60vw;
+         min-width: 500px;
+         min-height: 500px;
+         background-color: var(--cor-blob);
+         border-radius: 50%;
+         /* Animação complexa com bezier para suavidade */
+         animation: aurora-anim 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+        }
+
+        /* Posições e delays diferentes para cada bolha */
+        .aurora-blob:nth-child(1) {
+         top: -30vh;
+         left: -15vw;
+         animation-delay: 0s;
+         animation-duration: 32s;
+        }
+        .aurora-blob:nth-child(2) {
+         top: 10vh;
+         right: -20vw;
+         animation-delay: -8s;
+         animation-duration: 30s;
+        }
+        .aurora-blob:nth-child(3) {
+         bottom: -25vh;
+         left: 20vw;
+         animation-delay: -16s;
+         animation-duration: 28s;
+        }
+        .aurora-blob:nth-child(4) {
+         bottom: 0vh;
+         right: 30vw;
+         animation-delay: -24s;
+         animation-duration: 34s;
+        }
+
+        /* A animação que move, escala e gira */
+        @keyframes aurora-anim {
+         0% {
+           transform: translate(0, 0) scale(1) rotate(0deg);
+         }
+         25% {
+           transform: translate(40vw, 30vh) scale(1.2) rotate(30deg);
+         }
+         50% {
+           transform: translate(10vw, -20vh) scale(0.8) rotate(60deg);
+         }
+         75% {
+           transform: translate(-30vw, 20vh) scale(1.1) rotate(90deg);
+         }
+         100% {
+           transform: translate(0, 0) scale(1) rotate(0deg);
+         }
+        }
+        /* --- FIM DO FUNDO AURORA --- */
+
+        /* --- NOVO: Estilos da Navbar Custom --- */
+        .navbar-custom {
+         background: rgba(255, 255, 255, 0.08);
+         backdrop-filter: blur(12px);
+         border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+         box-shadow: 0 4px 30px var(--cor-shadow-leve);
+         padding: 0.8rem 1.5rem;
+         z-index: 1040;
+        }
+        .navbar-custom .navbar-brand {
+         color: var(--cor-texto-branco);
+         font-weight: 700;
+         font-size: 1.3rem;
+         text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Tema Ciano */
+        }
+        .navbar-custom .nav-link {
+         color: var(--cor-texto-claro);
+         font-weight: 500;
+         transition: all 0.3s ease;
+         padding: 0.5rem 1rem;
+         border-radius: 8px;
+        }
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active {
+         color: var(--cor-texto-branco);
+         background-color: rgba(255, 255, 255, 0.05);
+         text-shadow: 0 0 3px rgba(0, 188, 212, 0.2); /* Tema Ciano */
+        }
+        .navbar-toggler {
+         border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .navbar-toggler-icon {
+         /* Usa o filtro do Bootstrap 5.3 para o ícone do toggler */
+         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        .dropdown-menu {
+         background: rgba(18, 28, 38, 0.9);
+         backdrop-filter: blur(15px);
+         border: 1px solid var(--cor-card-borda);
+         box-shadow: 0 15px 40px var(--cor-shadow-media);
+         border-radius: 12px;
+         padding: 0.75rem 0;
+        }
+        .dropdown-item {
+         color: var(--cor-texto-claro) !important;
+         font-weight: 500;
+         padding: 0.6rem 1.25rem;
+         transition: all 0.2s ease;
+        }
+        .dropdown-item:hover {
+         background-color: rgba(0, 188, 212, 0.15); /* Tema Ciano */
+         color: var(--cor-destaque-primaria) !important;
+        }
+        .dropdown-item-text {
+         color: var(--cor-texto-branco) !important;
+         padding: 0.6rem 1.25rem;
+         font-weight: 600;
+        }
+        .dropdown-divider {
+         border-color: rgba(255, 255, 255, 0.1);
+         margin: 0.5rem 0;
+        }
+        /* --- FIM Estilos Navbar --- */
+        
+        /* --- Contêiner principal (Corrigido) --- */
+        .dashboard-container {
+         width: 90%;
+         margin: 0 auto; /* Margin-top é controlado pelo padding-top do body */
+         padding: 35px 30px;
+         background: var(--cor-card-fundo);
+         backdrop-filter: blur(12px);
+         border: 1px solid var(--cor-card-borda);
+         border-radius: 10px;
+         box-shadow: 0 15px 40px var(--cor-shadow-media);
+         position: relative;
+         overflow: hidden;
+         min-height: 400px;
+        }
+
+        /* --- NOVO: Borda Animada --- */
+        .dashboard-container::before {
+         content: "";
+         position: absolute;
+         top: -2px;
+         left: -2px;
+         right: -2px;
+         bottom: -2px;
+         background: linear-gradient(
+           45deg,
+           var(--cor-destaque-primaria) 0%,
+           #007bff 25%,
+           var(--cor-destaque-primaria) 50%,
+           #007bff 75%,
+           var(--cor-destaque-primaria) 100%
+         );
+         background-size: 200% 200%;
+         border-radius: 10px; /* Bate com o border-radius do container */
+         z-index: -1;
+         animation: gradient-border 10s ease infinite;
+         opacity: 0.5;
+        }
+        @keyframes gradient-border {
+         0% {
+           background-position: 0% 50%;
+         }
+         50% {
+           background-position: 100% 50%;
+         }
+         100% {
+           background-position: 0% 50%;
+         }
+        }
+        /* --- FIM Borda Animada --- */
+
+        .dashboard-container h3 {
+           color: var(--cor-texto-branco);
+           font-weight: 400;
+           text-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
+           margin-bottom: 0.5rem !important;
+        }
+         .dashboard-container p {
+           color: var(--cor-texto-claro);
+           font-size: 1.05rem;
+           margin-bottom: 1rem !important;
+         }
+
+        /* --- Animação de Fade (Transição de Página) --- */
+        .page-fade-enter-active,
+        .page-fade-leave-active {
+         transition: opacity 0.3s ease;
+        }
+        .page-fade-enter-from,
+        .page-fade-leave-to {
+         opacity: 0;
+        }
+
+        /* --- Stepper (Com melhorias) --- */
+        .stepper-wrapper {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 30px;
+        }
+        .stepper-item {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           text-align: center;
+           flex-basis: 0;
+           flex-grow: 1;
+        }
+        .step-counter {
+           width: 40px;
+           height: 40px;
+           border-radius: 50%;
+           background-color: #333;
+           color: #888;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           font-weight: bold;
+           font-size: 1.2rem;
+           transition: all 0.3s ease;
+        }
+        .step-name {
+           margin-top: 8px;
+           color: #888;
+           font-size: 0.9rem;
+           transition: all 0.3s ease;
+        }
+        .stepper-line {
+           flex-grow: 1;
+           height: 3px;
+           background-color: #333; /* Cor de fundo (vazio) */
+           margin: 0 10px;
+           position: relative; 
+           transition: all 0.3s ease;
+        }
+
+        .stepper-line::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           height: 100%;
+           width: 0%; /* Começa vazio */
+           background-color: var(--cor-sucesso);
+           transition: width 0.5s ease-out; /* A animação! */
+        }
+
+        /* Estado ATIVO */
+         .stepper-item.active .step-counter {
+           background-color: var(--cor-destaque-primaria);
+           color: white;
+           transform: scale(1.15);
+           box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
+         }
+         .stepper-item.active .step-name {
+           color: var(--cor-destaque-primaria);
+           font-weight: bold;
+         }
+         /* Estado CONCLUÍDO */
+         .stepper-item.completed .step-counter {
+           background-color: var(--cor-sucesso);
+           color: white;
+           font-size: 1.5rem;
+         }
+         .stepper-item.completed .step-name {
+           color: var(--cor-texto-claro);
+         }
+         
+         .stepper-line.completed::before {
+           width: 100%;
+         }
+        
+        /* --- Estilos da Tabela --- */
+        .table-container-custom {
+           background: var(--cor-card-fundo);
+           backdrop-filter: blur(8px);
+           border: 1px solid var(--cor-card-borda);
+           border-radius: 15px;
+           padding: 0;
+           box-shadow: 0 5px 20px var(--cor-shadow-leve);
+           overflow: hidden;
+        }
+        .table-custom {
+           background-color: transparent;
+           color: var(--cor-texto-claro);
+           border-color: var(--cor-card-borda);
+           margin-bottom: 0;
+        }
+        .table-custom th {
+           color: var(--cor-texto-branco);
+           font-weight: 500;
+           text-transform: uppercase;
+           letter-spacing: 0.5px;
+           font-size: 0.85rem;
+           border-color: var(--cor-card-borda) !important;
+           background-color: rgba(255, 255, 255, 0.05);
+        }
+        .table-custom td {
+           border-color: var(--cor-card-borda) !important;
+           vertical-align: middle;
+        }
+        .table-custom.table-striped > tbody > tr:nth-of-type(even) {
+           background-color: rgba(0, 0, 0, 0.15);
+        }
+        .table-custom.table-striped > tbody > tr:nth-of-type(odd) {
+           background-color: transparent;
+        }
+        .table-custom tbody tr {
+           transition: all 0.2s ease-out;
+        }
+        .table-custom tbody tr:hover {
+           background-color: var(--cor-card-fundo-hover);
+           color: var(--cor-texto-branco);
+           transform: translateY(-2px);
+        }
+        .table-container-custom .table-responsive {
+           padding: 0.5rem;
+        }
+        .table-custom th,
+        .table-custom td {
+           padding: 0.85rem 1rem;
+        }
+        .table-custom .btn {
+           padding: 0.25rem 0.6rem;
+           font-size: 0.9rem;
+        }
+
+        .btn {
+           transition: all 0.2s ease-out;
+        }
+        .btn:hover:not(:disabled) {
+           transform: scale(1.03);
+           box-shadow: 0 4px 15px var(--cor-shadow-leve);
+        }
+
+        /* --- Estilos de Formulário --- */
+        .form-control-custom, .form-select-custom {
+           background: var(--cor-card-fundo);
+           border: 1px solid var(--cor-card-borda);
+           color: var(--cor-texto-branco);
+           border-radius: 0.375rem;
+           transition: all 0.3s ease;
+        }
+        .form-control-custom:focus, .form-select-custom:focus {
+           background: var(--cor-card-fundo);
+           border-color: var(--cor-destaque-primaria);
+           color: var(--cor-texto-branco);
+           box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
+        }
+        .form-control-custom::placeholder {
+           color: var(--cor-texto-claro);
+           opacity: 0.7;
+        }
+        
+        /* Estilos específicos para o <select> */
+        .form-select-custom {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c2cbd6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            padding-right: 2.5rem; /* Espaço para a seta */
+        }
+        .form-select-custom option {
+            background-color: #090e13;
+            color: var(--cor-texto-branco);
+        }
+        
+        /* Desabilita a aparência padrão de 'disabled' */
+        .form-control-custom:disabled, .form-control-custom[readonly],
+        .form-select-custom:disabled, .form-select-custom[readonly] {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: var(--cor-texto-claro);
+            opacity: 0.7;
+            border-color: var(--cor-card-borda);
+        }
+        
+        /* --- ESTILOS DE VALIDAÇÃO --- */
+        .form-control-custom.is-invalid, 
+        .form-select-custom.is-invalid {
+            border-color: var(--cor-perigo) !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+        .text-danger {
+            color: var(--cor-perigo-claro) !important; /* Vermelho claro para fundos escuros */
+            font-size: 0.875em;
+        }
+        /* --- Fim Estilos Validação --- */
+
+        .input-group-glass .form-control-custom {
+           border-right: 0;
+        }
+        .input-group-glass .form-control-custom:focus {
+           border-right: 0;
+        }
+        .input-group-glass .input-group-text {
+           background: var(--cor-card-fundo);
+           border: 1px solid var(--cor-card-borda);
+           color: var(--cor-destaque-primaria);
+           border-left: 0;
+           border-radius: 0.375rem;
+        }
+        .form-control-custom:focus + .input-group-text {
+           border-color: var(--cor-destaque-primaria);
+           border-left: 0;
+        }
+
+        /* --- Estilos do Modal --- */
+         .modal-content-custom {
+           background: #0e2231b0;
+           backdrop-filter: blur(15px);
+           border: 1px solid var(--cor-card-borda);
+           border-radius: 15px;
+           color: var(--cor-texto-claro);
+           box-shadow: 0 15px 40px var(--cor-shadow-media);
+         }
+         .modal-content-custom .modal-header {
+           border-bottom: 1px solid var(--cor-card-borda);
+         }
+         .modal-content-custom .modal-header .modal-title {
+           color: var(--cor-texto-branco);
+           font-weight: 600;
+         }
+         .modal-content-custom .btn-close {
+           filter: invert(1) grayscale(100%) brightness(200%);
+         }
+         .modal-content-custom .modal-body .form-label {
+           color: var(--cor-texto-claro);
+           font-weight: 500;
+         }
+         .modal-content-custom .form-control-custom,
+         .modal-content-custom .form-select-custom {
+           background: rgba(0, 0, 0, 0.2);
+         }
+         .modal-content-custom .modal-footer {
+           border-top: 1px solid var(--cor-card-borda);
+         }
+         .modal-footer .btn-outline-secondary {
+           color: var(--cor-texto-claro);
+           border-color: var(--cor-card-borda);
+           background: transparent;
+         }
+         .modal-footer .btn-outline-secondary:hover {
+           background-color: var(--cor-card-fundo-hover);
+           border-color: var(--cor-texto-claro);
+           color: var(--cor-texto-branco);
+         }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar {
+           width: 8px;
+           height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+           background: var(--cor-fundo-gradiente-2);
+        }
+        ::-webkit-scrollbar-thumb {
+           background-color: var(--cor-card-borda);
+           border-radius: 10px;
+           border: 2px solid var(--cor-fundo-gradiente-2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+           background-color: var(--cor-destaque-primaria);
+        }
+        
+        /* --- Loading Overlay --- */
+         #loading-overlay {
+           /* MODIFICADO: Não mais 'fixed', para ficar dentro do #app */
+           position: absolute; 
+           top: 0;
+           left: 0;
+           width: 100%; /* Ocupa 100% do #app */
+           height: 100%; /* Ocupa 100% do #app */
+           background-color: var(--cor-fundo-gradiente-2);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           z-index: 9999;
+           opacity: 1;
+           transition: opacity 0.3s ease-in-out;
+           border-radius: 10px; /* Para bater com o dashboard-container */
+         }
+         .spinner {
+           width: 50px;
+           height: 50px;
+           border: 5px solid var(--cor-card-borda);
+           border-top-color: var(--cor-destaque-primaria);
+           border-radius: 50%;
+           animation: spin 1s linear infinite;
+         }
+         @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+         }
+
+        /* --- Estilo para a paginação --- */
+        .pagination-custom {
+            --bs-pagination-color: var(--cor-destaque-primaria);
+            --bs-pagination-active-bg: var(--cor-destaque-primaria);
+            --bs-pagination-active-border-color: var(--cor-destaque-primaria);
+            --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
+            --bs-pagination-disabled-color: var(--cor-card-borda);
+            --bs-pagination-bg: var(--cor-card-fundo);
+            --bs-pagination-border-color: var(--cor-card-borda);
+        }
+        .pagination-custom .page-link {
+            background-color: var(--bs-pagination-bg);
+            border-color: var(--bs-pagination-border-color);
+            color: var(--bs-pagination-color);
+        }
+        .pagination-custom .page-item.active .page-link {
+            background-color: var(--bs-pagination-active-bg);
+            border-color: var(--bs-pagination-active-border-color);
+            color: white;
+        }
+         .pagination-custom .page-item.disabled .page-link {
+            color: var(--bs-pagination-disabled-color);
+            background-color: transparent;
+            border-color: var(--bs-pagination-border-color);
+        }
+        .pagination-custom .page-link:hover {
+            background-color: var(--cor-card-fundo-hover);
+            color: var(--cor-texto-branco);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-container">
+        <div class="aurora-blob" style="--cor-blob: #0d47a1"></div>
+        <div class="aurora-blob" style="--cor-blob: #4a148c"></div>
+        <div class="aurora-blob" style="--cor-blob: #00bcd4"></div>
+        <div class="aurora-blob" style="--cor-blob: #ad1457"></div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"
+          ><i class="bi bi-person-vcard me-2"></i>{{empresa}}</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% for item in menus %} {% if item.submenu %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{ item.title }}
+              </a>
+              <ul class="dropdown-menu">
+                {% for sub in item.submenu %}
+                <li>
+                  <a class="dropdown-item" href="{{ sub.url }}"
+                    >{{ sub.title }}</a
+                  >
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
+            </li>
+            {% endif %} {% endfor %}
+          </ul>
+          <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-person-circle me-1"></i> Perfil
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <span class="dropdown-item-text"
+                    ><strong>{{ username }}</strong></span
+                  >
+                </li>
+                <li>
+                  <span class="dropdown-item-text text-muted small"
+                    >{{ user_username }}</span
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="/logout"
+                    ><i class="bi bi-box-arrow-right me-2"></i> Sair</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% raw %}
+    <div id="app" class="dashboard-container mx-auto">
+        
+        <div id="loading-overlay" v-if="isLoading">
+            <div class="spinner"></div>
+        </div>
+    
+        <div v-else>
+            <div class="stepper-wrapper">
+                <div class="stepper-item" :class="{ 'active': currentStep === 1, 'completed': currentStep > 1 }">
+                    <div class="step-counter">
+                        <i v-if="currentStep > 1" class="bi bi-check-lg"></i>
+                        <span v-else>1</span>
+                    </div>
+                    <div class="step-name">Verificação</div>
+                </div>
+                <div class="stepper-line" :class="{ 'completed': currentStep > 1 }"></div>
+                <div class="stepper-item" :class="{ 'active': currentStep === 2, 'completed': currentStep > 2 }">
+                    <div class="step-counter">
+                        <i v-if="currentStep > 2" class="bi bi-check-lg"></i>
+                        <span v-else>2</span>
+                    </div>
+                    <div class="step-name">Validação</div>
+                </div>
+                <div class="stepper-line" :class="{ 'completed': currentStep > 2 }"></div>
+                <div class="stepper-item" :class="{ 'active': currentStep === 3 }">
+                    <div class="step-counter">
+                        <i v-if="currentStep === 3 && selecaoFinal.length > 0" class="bi bi-send"></i>
+                        <span v-else>3</span>
+                    </div>
+                    <div class="step-name">Envio de E-mail</div>
+                </div>
+            </div>
+    
+            <Transition name="page-fade" mode="out-in">
+    
+                <div v-if="currentStep === 1" key="step1">
+                    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                        <div>
+                            <h3>Etapa 1: Verificação</h3>
+                            <p>Confira os dados da fonte principal e faça os ajustes necessários.</p>
+                        </div>
+                        <div class="input-group input-group-glass" style="max-width: 320px;">
+                             <input type="text" v-model="search1" class="form-control form-control-custom" placeholder="Pesquisar na Etapa 1...">
+                             <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container-custom">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>CPF</th>
+                                        <th>Nome</th>
+                                        <th>Cidade</th>
+                                        <th>Centro de Custo</th>
+                                        <th>Descontos</th>
+                                        <th>Ressarcimento</th>
+                                        <th>Vale Refeição</th>
+                                        <th>Outros</th>
+                                        <th>Ação</th>
+                                        <th>Total</th>
+                                        <th>Ação</th> </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in paginatedEtapa1" :key="item.cpf">
+                                        <td>{{ item.cpf }}</td>
+                                        <td>{{ (item.nome) }}</td>
+                                        <td>{{ item.cidade }}</td>
+                                        <td>{{ item.centro }}</td>
+                                        <td>{{ item.planos }}</td>
+                                        <td>{{ item.ressarcimento }}</td>
+                                        <td>{{ item.vr }}</td>
+                                        <td>{{ item.outros }}</td>
+                                        <td>{{ item.acao_ }}</td>
+                                        <td>{{ item.resultado }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" @click="abrirModal(item, 1)">
+                                                <i class="bi bi-pencil-square me-1"></i> Alterar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="filteredEtapa1.length === 0">
+                                        <td :colspan="11" class="text-center" style="padding: 2rem;">
+                                            <i class="bi bi-search me-2"></i> Nenhum item encontrado.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+    
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="filteredEtapa1.length > 0">
+                        <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
+                            Página {{ etapa1Page }} de {{ totalPage1 }}. (Mostrando {{ paginatedEtapa1.length }} de {{ filteredEtapa1.length }} itens)
+                        </span>
+                        <nav aria-label="Paginação Etapa 1" v-if="totalPage1 > 1">
+                            <ul class="pagination pagination-sm mb-0 pagination-custom">
+                                <li class="page-item" :class="{ 'disabled': etapa1Page === 1 }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage1(etapa1Page - 1)"><i class="bi bi-chevron-left"></i></a>
+                                </li>
+                                
+                                <li class="page-item" v-for="page in visiblePages1" :key="'1-'+page" :class="{ 'active': page === etapa1Page, 'disabled': page === '...' }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage1(page)">{{ page }}</a>
+                                </li>
+    
+                                <li class="page-item" :class="{ 'disabled': etapa1Page === totalPage1 }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage1(etapa1Page + 1)"><i class="bi bi-chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    
+                    <button @click="currentStep = 2" class="btn btn-primary float-end mt-3">Próximo</button>
+                </div>
+    
+                <div v-if="currentStep === 2" key="step2">
+                    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                        <div>
+                            <h3>Etapa 2: Validação</h3>
+                            <p>Confira os dados da fonte secundária (ex: produtos, status).</p>
+                        </div>
+                        <div class="input-group input-group-glass" style="max-width: 320px;">
+                             <input type="text" v-model="search2" class="form-control form-control-custom" placeholder="Pesquisar na Etapa 2...">
+                             <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container-custom">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-striped align-middle">
+                                <thead>
+                                    <tr><th>ID</th><th>Produto</th><th>Status</th><th>Ação</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in paginatedEtapa2" :key="item.id">
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.nome }}</td>
+                                        <td>{{ item.email }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" @click="abrirModal(item, 2)">
+                                                <i class="bi bi-pencil-square me-1"></i> Alterar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="filteredEtapa2.length === 0">
+                                        <td :colspan="4" class="text-center" style="padding: 2rem;">
+                                            <i class="bi bi-search me-2"></i> Nenhum item encontrado.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+    
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="filteredEtapa2.length > 0">
+                        <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
+                            Página {{ etapa2Page }} de {{ totalPage2 }}. (Mostrando {{ paginatedEtapa2.length }} de {{ filteredEtapa2.length }} itens)
+                        </span>
+                        <nav aria-label="Paginação Etapa 2" v-if="totalPage2 > 1">
+                            <ul class="pagination pagination-sm mb-0 pagination-custom">
+                                <li class="page-item" :class="{ 'disabled': etapa2Page === 1 }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage2(etapa2Page - 1)"><i class="bi bi-chevron-left"></i></a>
+                                </li>
+                                <li class="page-item" v-for="page in visiblePages2" :key="'2-'+page" :class="{ 'active': page === etapa2Page, 'disabled': page === '...' }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage2(page)">{{ page }}</a>
+                                </li>
+                                <li class="page-item" :class="{ 'disabled': etapa2Page === totalPage2 }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage2(etapa2Page + 1)"><i class="bi bi-chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+    
+                    <button @click="currentStep = 1" class="btn btn-secondary mt-3">Voltar</button>
+                    <button @click="currentStep = 3" class="btn btn-primary float-end mt-3">Próximo</button>
+                </div>
+    
+                <div v-if="currentStep === 3" key="step3">
+                    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                        <div>
+                            <h3>Etapa 3: Envio de E-mail</h3>
+                            <p>Selecione quais itens devem ser incluídos no disparo de e-mail.</p>
+                        </div>
+                        <div class="input-group input-group-glass" style="max-width: 320px;">
+                             <input type="text" v-model="search3" class="form-control form-control-custom" placeholder="Pesquisar na Etapa Final...">
+                             <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container-custom">
+                         <div class="table-responsive">
+                            <table class="table table-custom table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th width="5%"><input type="checkbox" @change="selecionarTodos" v-model="todosSelecionados" class="form-check-input"></th>
+                                        <th width="10%">ID</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in paginatedEtapa3" :key="item.id">
+                                        <td><input type="checkbox" :value="item.id" v-model="selecaoFinal" class="form-check-input"></td>
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.nome }}</td>
+                                    </tr>
+                                    <tr v-if="filteredEtapa3.length === 0">
+                                        <td :colspan="3" class="text-center" style="padding: 2rem;">
+                                            <i class="bi bi-search me-2"></i> Nenhum item encontrado.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+    
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="filteredEtapa3.length > 0">
+                        <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
+                            Página {{ etapa3Page }} de {{ totalPage3 }}. (Mostrando {{ paginatedEtapa3.length }} de {{ filteredEtapa3.length }} itens)
+                        </span>
+                        <nav aria-label="Paginação Etapa 3" v-if="totalPage3 > 1">
+                            <ul class="pagination pagination-sm mb-0 pagination-custom">
+                                <li class="page-item" :class="{ 'disabled': etapa3Page === 1 }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage3(etapa3Page - 1)"><i class="bi bi-chevron-left"></i></a>
+                                </li>
+                                <li class="page-item" v-for="page in visiblePages3" :key="'3-'+page" :class="{ 'active': page === etapa3Page, 'disabled': page === '...' }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage3(page)">{{ page }}</a>
+                                </li>
+                                <li class="page-item" :class="{ 'disabled': etapa3Page === totalPage3 }">
+                                    <a class="page-link" href="#" @click.prevent="goToPage3(etapa3Page + 1)"><i class="bi bi-chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+    
+                    <button @click="currentStep = 2" class="btn btn-secondary mt-3">Voltar</button>
+                    <button @click="enviarFinal" class="btn btn-success float-end mt-3" :disabled="selecaoFinal.length === 0 || isSending">
+                        <span v-if="isSending" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        <i v-else class="bi bi-send"></i>
+                        {{ isSending ? 'Enviando...' : `Enviar E-mails (${selecaoFinal.length})` }}
+                    </button>
+                </div>
+            
+            </Transition> 
+    
+            <teleport to="body">
+                <div class="modal fade" id="modalEdicao" ref="modalEdicao" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content modal-content-custom">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Item</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                
+                                <div v-if="etapaItemSelecionado === 1">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">CPF</label>
+                                            <input type="text" :value="itemSelecionado.cpf" class="form-control form-control-custom" disabled>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Nome</label>
+                                            <input type="text" :value="itemSelecionado.nome" class="form-control form-control-custom" disabled>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Desconto PS/Odonto (Planos)</label>
+                                            <input type="number" v-model.number="itemSelecionado.planos" class="form-control form-control-custom">
+                                        </div>
+                                         <div class="col-md-6 mb-3">
+                                            <label class="form-label">Ressarcimento</label>
+                                            <input type="number" v-model.number="itemSelecionado.ressarcimento" class="form-control form-control-custom">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Vale Refeição (VR)</label>
+                                            <input type="number" v-model.number="itemSelecionado.vr" class="form-control form-control-custom">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Outros</label>
+                                            <input type="number" v-model.number="itemSelecionado.outros" class="form-control form-control-custom">
+                                        </div>
+                                    </div>
+                                    
+                                    <hr style="border-color: var(--cor-card-borda);">
+    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                             <label class="form-label">Ação (Automática)</label>
+                                             <input type="text" :value="itemSelecionado.acao_" class="form-control form-control-custom" disabled>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Resultado (Automático)</label>
+                                            <input type="number" :value="itemSelecionado.resultado" class="form-control form-control-custom" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="modal-motivo" class="form-label">Motivo</label>
+                                            <select class="form-select form-select-custom" id="modal-motivo" 
+                                                    v-model="itemSelecionado.motivo"
+                                                    :class="{ 'is-invalid': outrosSemMotivo }">
+                                                <option value="" selected>Sem motivo</option>
+                                                <option value="Ferias">Férias</option>
+                                                <option value="Retroativo">Retroativo</option>
+                                                <option value="Outros">Outros</option>
+                                            </select>
+                                            <small v-if="outrosSemMotivo" class="text-danger d-block mt-1">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> Motivo obrigatório (pois 'Outros' está preenchido).
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <label for="modal-justificativa" class="form-label">Justificativa</label>
+                                            <textarea id="modal-justificativa" class="form-control form-control-custom" rows="3" 
+                                                      placeholder="Se 'Outros', justifique..." 
+                                                      v-model="itemSelecionado.justificativa"
+                                                      :class="{ 'is-invalid': motivoOutrosSemJustificativa }"></textarea>
+                                            <small v-if="motivoOutrosSemJustificativa" class="text-danger d-block mt-1">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> Justificativa obrigatória (pois motivo é 'Outros').
+                                            </small>
+                                        </div>
+                                    </div>
+                                    </div>
+    
+                                <div v-if="etapaItemSelecionado === 2">
+                                     <div class="form-group mb-3">
+                                        <label class="form-label">Produto</label>
+                                        <input type="text" v-model="itemSelecionado.nome" class="form-control form-control-custom">
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Status</label>
+                                        <input type="text" v-model="itemSelecionado.email" class="form-control form-control-custom">
+                                    </div>
+                                </div>
+    
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                                </button>
+                                <button type="button" @click="salvarModal" class="btn btn-primary" :disabled="isModalSalvarDisabled">
+                                    <span v-if="isSaving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                    <i v-else class="bi bi-save me-1"></i>
+                                    {{ isSaving ? 'Salvando...' : 'Salvar' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </teleport>
+
+        </div> </div> {% endraw %}
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        
+        const { createApp, ref, computed, onMounted } = Vue
+        
+        createApp({
+            data() {
+                return {
+                    // Controla o spinner inicial
+                    isLoading: true, 
+                    
+                    currentStep: 1,
+                    etapa1Data: [],
+                    etapa2Data: [],
+                    etapa3Data: [],
+                    search1: '',
+                    search2: '',
+                    search3: '',
+                    selecaoFinal: [],
+                    todosSelecionados: false,
+                    itemSelecionado: {}, // Começa como objeto vazio
+                    etapaItemSelecionado: null,
+                    modalInstance: null,
+                    isSaving: false,
+                    isSending: false,
+                    
+                    // Variáveis de Paginação
+                    etapa1Page: 1,
+                    etapa1Limit: 10, // Itens por página
+                    etapa2Page: 1,
+                    etapa2Limit: 10,
+                    etapa3Page: 1,
+                    etapa3Limit: 10,
+                }
+            },
+            
+            watch: {
+                search1(newVal, oldVal) {
+                    if (newVal !== oldVal) this.etapa1Page = 1;
+                },
+                search2(newVal, oldVal) {
+                    if (newVal !== oldVal) this.etapa2Page = 1;
+                },
+                search3(newVal, oldVal) {
+                    if (newVal !== oldVal) this.etapa3Page = 1;
+                },
+
+                // Watcher para calcular o resultado no modal
+                itemSelecionado: {
+                    handler(newItem) {
+                        // Só executa se estivermos editando a Etapa 1
+                        if (this.etapaItemSelecionado === 1) {
+                            
+                            // Garante que os valores sejam números (similar ao parseFloat || 0)
+                            const planos = Number(newItem.planos) || 0;
+                            const vr = Number(newItem.vr) || 0;
+                            const outros = Number(newItem.outros) || 0;
+                            const ressarcimento = Number(newItem.ressarcimento) || 0;
+
+                            // 1. Calcula o Resultado
+                            // Fórmula: ressarcimento + vr - planos + outros
+                            const resultadoCalc = ressarcimento + vr - planos + outros;
+                            
+                            // Atualiza o 'resultado' no itemSelecionado
+                            // Usamos toFixed(2) para arredondar corretamente
+                            this.itemSelecionado.resultado = parseFloat(resultadoCalc.toFixed(2));
+
+                            // 2. Calcula a Ação
+                            if (resultadoCalc < 0) {
+                                this.itemSelecionado.acao_ = 'Descontar na Nota >>>>>';
+                            } else {
+                                this.itemSelecionado.acao_ = 'Adicionar na Nota >>>>>';
+                            }
+                        }
+                    },
+                    deep: true // Precisa ser 'deep' para 'ouvir' mudanças dentro do objeto
+                }
+            },
+            computed: {
+                // Filtros (inalterados)
+                filteredEtapa1() {
+                    if (!this.search1) return this.etapa1Data;
+                    const s = this.search1.toLowerCase();
+                    return this.etapa1Data.filter(item => 
+                        (item.nome && item.nome.toLowerCase().includes(s)) || 
+                        (item.centro && item.centro.toLowerCase().includes(s)) ||
+                        (item.cpf && item.cpf.toLowerCase().includes(s)) ||
+                        (item.cidade && item.cidade.toLowerCase().includes(s))
+                    );
+                },
+                filteredEtapa2() {
+                    if (!this.search2) return this.etapa2Data;
+                    const s = this.search2.toLowerCase();
+                    return this.etapa2Data.filter(item => 
+                        (item.nome && item.nome.toLowerCase().includes(s)) || 
+                        (item.email && item.email.toLowerCase().includes(s))
+                    );
+                },
+                filteredEtapa3() {
+                    if (!this.search3) return this.etapa3Data;
+                    const s = this.search3.toLowerCase();
+                    return this.etapa3Data.filter(item => 
+                        (item.nome && item.nome.toLowerCase().includes(s))
+                    );
+                },
+
+                // Paginação (inalterada)
+                totalPage1() { return Math.ceil(this.filteredEtapa1.length / this.etapa1Limit); },
+                paginatedEtapa1() {
+                    const start = (this.etapa1Page - 1) * this.etapa1Limit;
+                    const end = start + this.etapa1Limit;
+                    return this.filteredEtapa1.slice(start, end);
+                },
+                visiblePages1() { return this.getVisiblePages(this.etapa1Page, this.totalPage1); },
+                totalPage2() { return Math.ceil(this.filteredEtapa2.length / this.etapa2Limit); },
+                paginatedEtapa2() {
+                    const start = (this.etapa2Page - 1) * this.etapa2Limit;
+                    const end = start + this.etapa2Limit;
+                    return this.filteredEtapa2.slice(start, end);
+                },
+                 visiblePages2() { return this.getVisiblePages(this.etapa2Page, this.totalPage2); },
+                totalPage3() { return Math.ceil(this.filteredEtapa3.length / this.etapa3Limit); },
+                paginatedEtapa3() {
+                    const start = (this.etapa3Page - 1) * this.etapa3Limit;
+                    const end = start + this.etapa3Limit;
+                    return this.filteredEtapa3.slice(start, end);
+                },
+                visiblePages3() { return this.getVisiblePages(this.etapa3Page, this.totalPage3); },
+
+                // ==========================================
+                //      Computed Properties de Validação
+                // ==========================================
+                outrosSemMotivo() {
+                    // Regra 1: Se 'Outros' > 0, 'Motivo' não pode ser ""
+                    if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('outros')) return false;
+                    
+                    const outrosPreenchido = this.itemSelecionado.outros && Number(this.itemSelecionado.outros) !== 0;
+                    const motivoVazio = !this.itemSelecionado.motivo || this.itemSelecionado.motivo === "";
+                    
+                    return outrosPreenchido && motivoVazio;
+                },
+                
+                motivoOutrosSemJustificativa() {
+                    // Regra 2: Se 'Motivo' === 'Outros', 'Justificativa' não pode ser ""
+                    if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('motivo')) return false;
+
+                    const motivoEOutros = this.itemSelecionado.motivo === "Outros";
+                    const justificativaVazia = !this.itemSelecionado.justificativa || this.itemSelecionado.justificativa.trim() === "";
+                    
+                    return motivoEOutros && justificativaVazia;
+                },
+
+                isModalSalvarDisabled() {
+                    // O botão 'Salvar' é desabilitado se 'isSaving' for true OU se qualquer regra de validação falhar
+                    return this.isSaving || this.outrosSemMotivo || this.motivoOutrosSemJustificativa;
+                }
+            },
+            methods: {
+                
+                // MÉTODO FETCHDATA COM TIMEOUT (PARA ROBUSTEZ)
+                fetchData(etapa) {
+                    
+                    const controller = new AbortController();
+                    // Define um timeout de 15 segundos
+                    const timeoutId = setTimeout(() => {
+                        console.error(`TIMEOUT na Etapa ${etapa}!`);
+                        controller.abort();
+                    }, 15000); // 15 segundos
+
+                    try {
+                        const endpoint = etapa === '3' ? 'etapa_final' : `dados_etapa${etapa}`;
+                        
+                        // Retorna a promise do fetch
+                        return fetch(`/api/${endpoint}`, { signal: controller.signal }) // Passa o 'signal'
+                            .then(response => {
+                                clearTimeout(timeoutId); // Limpa o timeout se a resposta chegar
+                                if (!response.ok) {
+                                    throw new Error(`Falha na API: ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data && data.data) {
+                                    this[`etapa${etapa}Data`] = data.data;
+                                } else {
+                                     this[`etapa${etapa}Data`] = []; // Garante que seja um array
+                                }
+                            })
+                            .catch(error => {
+                                clearTimeout(timeoutId); // Limpa o timeout em caso de erro
+                                if (error.name === 'AbortError') {
+                                    console.error(`Erro: Timeout ao buscar dados da etapa ${etapa}.`);
+                                } else {
+                                    console.error(`Erro ao buscar dados da etapa ${etapa}:`, error);
+                                }
+                                this[`etapa${etapa}Data`] = []; // Define como vazio em caso de erro
+                            });
+                    } catch (error) {
+                        clearTimeout(timeoutId); // Limpa o timeout se o 'try' falhar
+                        console.error(`Erro ao buscar dados da etapa ${etapa}:`, error);
+                        this[`etapa${etapa}Data`] = [];
+                        return Promise.resolve(); // Resolve a promise para não parar o Promise.all
+                    }
+                },
+                
+                // ==========================================
+                //      abrirModal atualizado
+                // ==========================================
+                abrirModal(item, etapa) {
+                    // Cria uma cópia profunda do item
+                    let novoItem = { ...item };
+
+                    // GARANTE que os campos existam para o v-model (caso a API não os envie)
+                    if (etapa === 1) {
+                        novoItem.motivo = item.motivo || ''; // Usa o da API ou um padrão
+                        novoItem.justificativa = item.justificativa || ''; // Usa o da API ou um padrão
+                    }
+
+                    this.itemSelecionado = novoItem; 
+                    this.etapaItemSelecionado = etapa;
+                    if (this.modalInstance) {
+                        this.modalInstance.show();
+                    }
+                },
+
+                async salvarModal() {
+                    // A validação já foi feita pelo :disabled no botão,
+                    // então podemos salvar com segurança.
+                    this.isSaving = true;
+                    const etapa = this.etapaItemSelecionado;
+                    const item = this.itemSelecionado; // 'item' agora contém os dados calculados
+                    
+                    const keyApi = etapa === 1 ? item.cpf : item.id;
+                    const findKey = etapa === 1 ? 'cpf' : 'id';
+
+                    try {
+                        // A API /api/item/{key} precisa ser atualizada no seu backend
+                        // para aceitar 'motivo' e 'justificativa'
+                        const response = await fetch(`/api/item/${keyApi}?etapa=${etapa}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(item)
+                        });
+
+                        if (response.ok) {
+                            const dataKey = etapa === 1 ? 'etapa1Data' : 'etapa2Data';
+                            const index = this[dataKey].findIndex(i => i[findKey] === item[findKey]);
+                            if (index !== -1) {
+                                this[dataKey][index] = { ...item };
+                            }
+                            this.modalInstance.hide();
+                        } else {
+                            alert("Erro ao salvar. Verifique o console.");
+                            console.error(await response.json());
+                        }
+                    } catch (error) {
+                        console.error('Erro ao salvar:', error);
+                        alert("Erro de conexão ao salvar.");
+                    } finally {
+                        this.isSaving = false;
+                    }
+                },
+
+                selecionarTodos() {
+                    if (this.todosSelecionados) {
+                        this.selecaoFinal = this.paginatedEtapa3.map(item => item.id);
+                    } else {
+                        this.selecaoFinal = [];
+                    }
+                },
+
+                async enviarFinal() {
+                    if (this.selecaoFinal.length === 0) {
+                        alert("Selecione ao menos um item.");
+                        return;
+                    }
+                    this.isSending = true;
+                    try {
+                        const response = await fetch('/api/enviar_final', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ids: this.selecaoFinal })
+                        });
+                        const data = await response.json();
+                        alert(`E-mails enviados com sucesso! ${data.recebidos} itens processados.`);
+                        this.selecaoFinal = [];
+                        this.todosSelecionados = false;
+                        this.currentStep = 1; 
+                    } catch (error) {
+                        console.error('Erro ao enviar:', error);
+                        alert("Erro de conexão ao enviar.");
+                    } finally {
+                        this.isSending = false;
+                    }
+                },
+
+                // Métodos de Paginação
+                goToPage1(page) {
+                    if (page >= 1 && page <= this.totalPage1 && page !== '...') this.etapa1Page = page;
+                },
+                goToPage2(page) {
+                    if (page >= 1 && page <= this.totalPage2 && page !== '...') this.etapa2Page = page;
+                },
+                goToPage3(page) {
+                    if (page >= 1 && page <= this.totalPage3 && page !== '...') this.etapa3Page = page;
+                },
+
+                // Função utilitária para gerar os botões de página
+                getVisiblePages(currentPage, totalPages) {
+                    const maxVisible = 5; 
+                    if (totalPages <= maxVisible) {
+                        return Array.from({ length: totalPages }, (_, i) => i + 1);
+                    }
+                    let start = Math.max(1, currentPage - 2);
+                    let end = Math.min(totalPages, currentPage + 2);
+                    if (currentPage <= 3) {
+                        end = maxVisible;
+                    } else if (currentPage >= totalPages - 2) {
+                        start = totalPages - maxVisible + 1;
+                    }
+                    const pages = [];
+                    if (start > 1) {
+                        pages.push(1);
+                        if (start > 2) pages.push('...');
+                    }
+                    for (let i = start; i <= end; i++) {
+                        pages.push(i);
+                    }
+                    if (end < totalPages) {
+                        if (end < totalPages - 1) pages.push('...');
+                        pages.push(totalPages);
+                    }
+                    return pages;
+                }
+            },
+            
+            // MÉTODO MOUNTED ATUALIZADO (ABORDAGEM DIRETA)
+            mounted() {
+                // 1. Esconde o spinner IMEDIATAMENTE.
+                this.isLoading = false; 
+                
+                // 2. Espera o Vue atualizar o DOM (para o v-else aparecer)
+                //    e então inicializa o modal.
+                this.$nextTick(() => {
+                    if (this.$refs.modalEdicao) {
+                         this.modalInstance = new bootstrap.Modal(this.$refs.modalEdicao);
+                    } else {
+                        console.warn("Referência do modal não encontrada.");
+                    }
+                });
+
+                // 3. AGORA, busca os dados em segundo plano.
+                // O app já está "vivo" e o usuário pode ver a tela.
+                this.fetchData('1');
+                this.fetchData('2');
+                this.fetchData('3');
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
