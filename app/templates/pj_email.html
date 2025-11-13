@@ -23,579 +23,612 @@
     <style>
         /* --- TEMA REVERTIDO PARA CIANO (Combina com a Aurora) --- */
         :root {
-         --cor-fundo-gradiente-1: #10161d;
-         --cor-fundo-gradiente-2: #090e13; /* Fundo principal */
-         --cor-card-fundo: rgba(255, 255, 255, 0.15);
-         --cor-card-fundo-hover: rgba(255, 255, 255, 0.25);
-         --cor-card-borda: rgba(255, 255, 255, 0.25);
-         --cor-texto-claro: #c2cbd6;
-         --cor-texto-branco: #e0e6ec;
+          --cor-fundo-gradiente-1: #10161d;
+          --cor-fundo-gradiente-2: #090e13; /* Fundo principal */
+          --cor-card-fundo: rgba(255, 255, 255, 0.15);
+          --cor-card-fundo-hover: rgba(255, 255, 255, 0.25);
+          --cor-card-borda: rgba(255, 255, 255, 0.25);
+          --cor-texto-claro: #c2cbd6;
+          --cor-texto-branco: #e0e6ec;
 
-         /* Cores de Destaque (Ciano Original) */
-         --cor-destaque-primaria: #00bcd4; /* Ciano */
-         --cor-destaque-secundaria: #0087a3; /* Ciano escuro */
+          /* Cores de Destaque (Ciano Original) */
+          --cor-destaque-primaria: #00bcd4; /* Ciano */
+          --cor-destaque-secundaria: #0087a3; /* Ciano escuro */
 
-         --cor-shadow-leve: rgba(0, 0, 0, 0.2);
-         --cor-shadow-media: rgba(0, 0, 0, 0.4);
-         --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
-         --cor-sucesso: #198754;
-         --cor-sucesso-hover: #157347;
-         --cor-perigo: #dc3545;
-         --cor-perigo-claro: #ffbaba;
+          --cor-shadow-leve: rgba(0, 0, 0, 0.2);
+          --cor-shadow-media: rgba(0, 0, 0, 0.4);
+          --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
+          --cor-sucesso: #198754;
+          --cor-sucesso-hover: #157347;
+          --cor-perigo: #dc3545;
+          --cor-perigo-claro: #ffbaba;
+          
+          /* 🟢 NOVO: Cor de Alerta/Info */
+          --cor-info: #0dcaf0; 
         }
 
         /* --- NOVO: Body (Estilo Aurora) --- */
         body {
-         background: var(--cor-fundo-gradiente-2);
-         min-height: 100vh;
-         font-family: "Inter", Arial, sans-serif;
-         color: var(--cor-texto-claro);
-         overflow-x: hidden;
-         /* Adiciona padding para a navbar fixa */
-         padding-top: 80px; /* Ajustado para a altura da nova navbar */
-         padding-bottom: 50px;
+          background: var(--cor-fundo-gradiente-2);
+          min-height: 100vh;
+          font-family: "Inter", Arial, sans-serif;
+          color: var(--cor-texto-claro);
+          overflow-x: hidden;
+          /* Adiciona padding para a navbar fixa */
+          padding-top: 80px; /* Ajustado para a altura da nova navbar */
+          padding-bottom: 50px;
         }
         
         /* --- NOVO: FUNDO AURORA (Estilo Trae.ai) --- */
         .aurora-container {
-         position: fixed;
-         top: 0;
-         left: 0;
-         width: 100vw;
-         height: 100vh;
-         z-index: -2; /* Atrás de todo o conteúdo */
-         overflow: hidden;
-         filter: blur(90px); /* O blur pesado que faz a mágica */
-         opacity: 0.25; /* Sutil, para não cansar a vista */
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: -2; /* Atrás de todo o conteúdo */
+          overflow: hidden;
+          filter: blur(90px); /* O blur pesado que faz a mágica */
+          opacity: 0.25; /* Sutil, para não cansar a vista */
         }
 
         .aurora-blob {
-         position: absolute;
-         width: 60vw; /* Tamanho grande */
-         height: 60vw;
-         min-width: 500px;
-         min-height: 500px;
-         background-color: var(--cor-blob);
-         border-radius: 50%;
-         /* Animação complexa com bezier para suavidade */
-         animation: aurora-anim 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+          position: absolute;
+          width: 60vw; /* Tamanho grande */
+          height: 60vw;
+          min-width: 500px;
+          min-height: 500px;
+          background-color: var(--cor-blob);
+          border-radius: 50%;
+          /* Animação complexa com bezier para suavidade */
+          animation: aurora-anim 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
         }
 
         /* Posições e delays diferentes para cada bolha */
         .aurora-blob:nth-child(1) {
-         top: -30vh;
-         left: -15vw;
-         animation-delay: 0s;
-         animation-duration: 32s;
+          top: -30vh;
+          left: -15vw;
+          animation-delay: 0s;
+          animation-duration: 32s;
         }
         .aurora-blob:nth-child(2) {
-         top: 10vh;
-         right: -20vw;
-         animation-delay: -8s;
-         animation-duration: 30s;
+          top: 10vh;
+          right: -20vw;
+          animation-delay: -8s;
+          animation-duration: 30s;
         }
         .aurora-blob:nth-child(3) {
-         bottom: -25vh;
-         left: 20vw;
-         animation-delay: -16s;
-         animation-duration: 28s;
+          bottom: -25vh;
+          left: 20vw;
+          animation-delay: -16s;
+          animation-duration: 28s;
         }
         .aurora-blob:nth-child(4) {
-         bottom: 0vh;
-         right: 30vw;
-         animation-delay: -24s;
-         animation-duration: 34s;
+          bottom: 0vh;
+          right: 30vw;
+          animation-delay: -24s;
+          animation-duration: 34s;
         }
 
         /* A animação que move, escala e gira */
         @keyframes aurora-anim {
-         0% {
-           transform: translate(0, 0) scale(1) rotate(0deg);
-         }
-         25% {
-           transform: translate(40vw, 30vh) scale(1.2) rotate(30deg);
-         }
-         50% {
-           transform: translate(10vw, -20vh) scale(0.8) rotate(60deg);
-         }
-         75% {
-           transform: translate(-30vw, 20vh) scale(1.1) rotate(90deg);
-         }
-         100% {
-           transform: translate(0, 0) scale(1) rotate(0deg);
-         }
+          0% {
+            transform: translate(0, 0) scale(1) rotate(0deg);
+          }
+          25% {
+            transform: translate(40vw, 30vh) scale(1.2) rotate(30deg);
+          }
+          50% {
+            transform: translate(10vw, -20vh) scale(0.8) rotate(60deg);
+          }
+          75% {
+            transform: translate(-30vw, 20vh) scale(1.1) rotate(90deg);
+          }
+          100% {
+            transform: translate(0, 0) scale(1) rotate(0deg);
+          }
         }
         /* --- FIM DO FUNDO AURORA --- */
 
         /* --- NOVO: Estilos da Navbar Custom --- */
         .navbar-custom {
-         background: rgba(255, 255, 255, 0.08);
-         backdrop-filter: blur(12px);
-         border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-         box-shadow: 0 4px 30px var(--cor-shadow-leve);
-         padding: 0.8rem 1.5rem;
-         z-index: 1040;
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 4px 30px var(--cor-shadow-leve);
+          padding: 0.8rem 1.5rem;
+          z-index: 1040;
         }
         .navbar-custom .navbar-brand {
-         color: var(--cor-texto-branco);
-         font-weight: 700;
-         font-size: 1.3rem;
-         text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Tema Ciano */
+          color: var(--cor-texto-branco);
+          font-weight: 700;
+          font-size: 1.3rem;
+          text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Tema Ciano */
         }
         .navbar-custom .nav-link {
-         color: var(--cor-texto-claro);
-         font-weight: 500;
-         transition: all 0.3s ease;
-         padding: 0.5rem 1rem;
-         border-radius: 8px;
+          color: var(--cor-texto-claro);
+          font-weight: 500;
+          transition: all 0.3s ease;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
         }
         .navbar-custom .nav-link:hover,
         .navbar-custom .nav-link.active {
-         color: var(--cor-texto-branco);
-         background-color: rgba(255, 255, 255, 0.05);
-         text-shadow: 0 0 3px rgba(0, 188, 212, 0.2); /* Tema Ciano */
+          color: var(--cor-texto-branco);
+          background-color: rgba(255, 255, 255, 0.05);
+          text-shadow: 0 0 3px rgba(0, 188, 212, 0.2); /* Tema Ciano */
         }
         .navbar-toggler {
-         border: 1px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .navbar-toggler-icon {
-         /* Usa o filtro do Bootstrap 5.3 para o ícone do toggler */
-         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+          /* Usa o filtro do Bootstrap 5.3 para o ícone do toggler */
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
         .dropdown-menu {
-         background: rgba(18, 28, 38, 0.9);
-         backdrop-filter: blur(15px);
-         border: 1px solid var(--cor-card-borda);
-         box-shadow: 0 15px 40px var(--cor-shadow-media);
-         border-radius: 12px;
-         padding: 0.75rem 0;
+          background: rgba(18, 28, 38, 0.9);
+          backdrop-filter: blur(15px);
+          border: 1px solid var(--cor-card-borda);
+          box-shadow: 0 15px 40px var(--cor-shadow-media);
+          border-radius: 12px;
+          padding: 0.75rem 0;
         }
         .dropdown-item {
-         color: var(--cor-texto-claro) !important;
-         font-weight: 500;
-         padding: 0.6rem 1.25rem;
-         transition: all 0.2s ease;
+          color: var(--cor-texto-claro) !important;
+          font-weight: 500;
+          padding: 0.6rem 1.25rem;
+          transition: all 0.2s ease;
         }
         .dropdown-item:hover {
-         background-color: rgba(0, 188, 212, 0.15); /* Tema Ciano */
-         color: var(--cor-destaque-primaria) !important;
+          background-color: rgba(0, 188, 212, 0.15); /* Tema Ciano */
+          color: var(--cor-destaque-primaria) !important;
         }
         .dropdown-item-text {
-         color: var(--cor-texto-branco) !important;
-         padding: 0.6rem 1.25rem;
-         font-weight: 600;
+          color: var(--cor-texto-branco) !important;
+          padding: 0.6rem 1.25rem;
+          font-weight: 600;
         }
         .dropdown-divider {
-         border-color: rgba(255, 255, 255, 0.1);
-         margin: 0.5rem 0;
+          border-color: rgba(255, 255, 255, 0.1);
+          margin: 0.5rem 0;
         }
         /* --- FIM Estilos Navbar --- */
         
         /* --- Contêiner principal (Corrigido) --- */
         .dashboard-container {
-         width: 90%;
-         margin: 0 auto; /* Margin-top é controlado pelo padding-top do body */
-         padding: 35px 30px;
-         background: var(--cor-card-fundo);
-         backdrop-filter: blur(12px);
-         border: 1px solid var(--cor-card-borda);
-         border-radius: 10px;
-         box-shadow: 0 15px 40px var(--cor-shadow-media);
-         position: relative;
-         overflow: hidden;
-         min-height: 400px;
+          width: 90%;
+          margin: 0 auto; /* Margin-top é controlado pelo padding-top do body */
+          padding: 35px 30px;
+          background: var(--cor-card-fundo);
+          backdrop-filter: blur(12px);
+          border: 1px solid var(--cor-card-borda);
+          border-radius: 10px;
+          box-shadow: 0 15px 40px var(--cor-shadow-media);
+          position: relative;
+          overflow: hidden;
+          min-height: 400px;
         }
 
         /* --- NOVO: Borda Animada --- */
         .dashboard-container::before {
-         content: "";
-         position: absolute;
-         top: -2px;
-         left: -2px;
-         right: -2px;
-         bottom: -2px;
-         background: linear-gradient(
-           45deg,
-           var(--cor-destaque-primaria) 0%,
-           #007bff 25%,
-           var(--cor-destaque-primaria) 50%,
-           #007bff 75%,
-           var(--cor-destaque-primaria) 100%
-         );
-         background-size: 200% 200%;
-         border-radius: 10px; /* Bate com o border-radius do container */
-         z-index: -1;
-         animation: gradient-border 10s ease infinite;
-         opacity: 0.5;
+          content: "";
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          background: linear-gradient(
+            45deg,
+            var(--cor-destaque-primaria) 0%,
+            #007bff 25%,
+            var(--cor-destaque-primaria) 50%,
+            #007bff 75%,
+            var(--cor-destaque-primaria) 100%
+          );
+          background-size: 200% 200%;
+          border-radius: 10px; /* Bate com o border-radius do container */
+          z-index: -1;
+          animation: gradient-border 10s ease infinite;
+          opacity: 0.5;
         }
         @keyframes gradient-border {
-         0% {
-           background-position: 0% 50%;
-         }
-         50% {
-           background-position: 100% 50%;
-         }
-         100% {
-           background-position: 0% 50%;
-         }
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
         }
         /* --- FIM Borda Animada --- */
 
         .dashboard-container h3 {
-           color: var(--cor-texto-branco);
-           font-weight: 400;
-           text-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
-           margin-bottom: 0.5rem !important;
+            color: var(--cor-texto-branco);
+            font-weight: 400;
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
+            margin-bottom: 0.5rem !important;
         }
-         .dashboard-container p {
-           color: var(--cor-texto-claro);
-           font-size: 1.05rem;
-           margin-bottom: 1rem !important;
-         }
+          .dashboard-container p {
+            color: var(--cor-texto-claro);
+            font-size: 1.05rem;
+            margin-bottom: 1rem !important;
+          }
 
         /* --- Animação de Fade (Transição de Página) --- */
         .page-fade-enter-active,
         .page-fade-leave-active {
-         transition: opacity 0.3s ease;
+          transition: opacity 0.3s ease;
         }
         .page-fade-enter-from,
         .page-fade-leave-to {
-         opacity: 0;
+          opacity: 0;
         }
 
         /* --- Stepper (Com melhorias) --- */
         .stepper-wrapper {
-           display: flex;
-           justify-content: space-between;
-           align-items: center;
-           margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
         .stepper-item {
-           display: flex;
-           flex-direction: column;
-           align-items: center;
-           text-align: center;
-           flex-basis: 0;
-           flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex-basis: 0;
+            flex-grow: 1;
         }
         .step-counter {
-           width: 40px;
-           height: 40px;
-           border-radius: 50%;
-           background-color: #333;
-           color: #888;
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           font-weight: bold;
-           font-size: 1.2rem;
-           transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #333;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
         }
         .step-name {
-           margin-top: 8px;
-           color: #888;
-           font-size: 0.9rem;
-           transition: all 0.3s ease;
+            margin-top: 8px;
+            color: #888;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
         .stepper-line {
-           flex-grow: 1;
-           height: 3px;
-           background-color: #333; /* Cor de fundo (vazio) */
-           margin: 0 10px;
-           position: relative; 
-           transition: all 0.3s ease;
+            flex-grow: 1;
+            height: 3px;
+            background-color: #333; /* Cor de fundo (vazio) */
+            margin: 0 10px;
+            position: relative; 
+            transition: all 0.3s ease;
         }
 
         .stepper-line::before {
-           content: '';
-           position: absolute;
-           top: 0;
-           left: 0;
-           height: 100%;
-           width: 0%; /* Começa vazio */
-           background-color: var(--cor-sucesso);
-           transition: width 0.5s ease-out; /* A animação! */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%; /* Começa vazio */
+            background-color: var(--cor-sucesso);
+            transition: width 0.5s ease-out; /* A animação! */
         }
 
         /* Estado ATIVO */
-         .stepper-item.active .step-counter {
-           background-color: var(--cor-destaque-primaria);
-           color: white;
-           transform: scale(1.15);
-           box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
-         }
-         .stepper-item.active .step-name {
-           color: var(--cor-destaque-primaria);
-           font-weight: bold;
-         }
-         /* Estado CONCLUÍDO */
-         .stepper-item.completed .step-counter {
-           background-color: var(--cor-sucesso);
-           color: white;
-           font-size: 1.5rem;
-         }
-         .stepper-item.completed .step-name {
-           color: var(--cor-texto-claro);
-         }
-         
-         .stepper-line.completed::before {
-           width: 100%;
-         }
+          .stepper-item.active .step-counter {
+            background-color: var(--cor-destaque-primaria);
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
+          }
+          .stepper-item.active .step-name {
+            color: var(--cor-destaque-primaria);
+            font-weight: bold;
+          }
+          /* Estado CONCLUÍDO */
+          .stepper-item.completed .step-counter {
+            background-color: var(--cor-sucesso);
+            color: white;
+            font-size: 1.5rem;
+          }
+          .stepper-item.completed .step-name {
+            color: var(--cor-texto-claro);
+          }
+          
+          .stepper-line.completed::before {
+            width: 100%;
+          }
         
         /* --- Estilos da Tabela --- */
         .table-container-custom {
-           background: var(--cor-card-fundo);
-           backdrop-filter: blur(8px);
-           border: 1px solid var(--cor-card-borda);
-           border-radius: 15px;
-           padding: 0;
-           box-shadow: 0 5px 20px var(--cor-shadow-leve);
-           overflow: hidden;
+            background: var(--cor-card-fundo);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--cor-card-borda);
+            border-radius: 15px;
+            padding: 0;
+            box-shadow: 0 5px 20px var(--cor-shadow-leve);
+            overflow: hidden;
         }
         .table-custom {
-           background-color: transparent;
-           color: var(--cor-texto-claro);
-           border-color: var(--cor-card-borda);
-           margin-bottom: 0;
+            background-color: transparent;
+            color: var(--cor-texto-claro);
+            border-color: var(--cor-card-borda);
+            margin-bottom: 0;
         }
         .table-custom th {
-           color: var(--cor-texto-branco);
-           font-weight: 500;
-           text-transform: uppercase;
-           letter-spacing: 0.5px;
-           font-size: 0.85rem;
-           border-color: var(--cor-card-borda) !important;
-           background-color: rgba(255, 255, 255, 0.05);
+            color: var(--cor-texto-branco);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+            border-color: var(--cor-card-borda) !important;
+            background-color: rgba(255, 255, 255, 0.05);
         }
         .table-custom td {
-           border-color: var(--cor-card-borda) !important;
-           vertical-align: middle;
+            border-color: var(--cor-card-borda) !important;
+            vertical-align: middle;
         }
         .table-custom.table-striped > tbody > tr:nth-of-type(even) {
-           background-color: rgba(0, 0, 0, 0.15);
+            background-color: rgba(0, 0, 0, 0.15);
         }
         .table-custom.table-striped > tbody > tr:nth-of-type(odd) {
-           background-color: transparent;
+            background-color: transparent;
         }
         .table-custom tbody tr {
-           transition: all 0.2s ease-out;
+            transition: all 0.2s ease-out;
         }
         .table-custom tbody tr:hover {
-           background-color: var(--cor-card-fundo-hover);
-           color: var(--cor-texto-branco);
-           transform: translateY(-2px);
+            background-color: var(--cor-card-fundo-hover);
+            color: var(--cor-texto-branco);
+            transform: translateY(-2px);
         }
         .table-container-custom .table-responsive {
-           padding: 0.5rem;
+            padding: 0.5rem;
         }
         .table-custom th,
         .table-custom td {
-           padding: 0.85rem 1rem;
+            padding: 0.85rem 1rem;
         }
         .table-custom .btn {
-           padding: 0.25rem 0.6rem;
-           font-size: 0.9rem;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.9rem;
         }
 
         .btn {
-           transition: all 0.2s ease-out;
+            transition: all 0.2s ease-out;
         }
         .btn:hover:not(:disabled) {
-           transform: scale(1.03);
-           box-shadow: 0 4px 15px var(--cor-shadow-leve);
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px var(--cor-shadow-leve);
         }
 
         /* --- Estilos de Formulário --- */
         .form-control-custom, .form-select-custom {
-           background: var(--cor-card-fundo);
-           border: 1px solid var(--cor-card-borda);
-           color: var(--cor-texto-branco);
-           border-radius: 0.375rem;
-           transition: all 0.3s ease;
+            background: var(--cor-card-fundo);
+            border: 1px solid var(--cor-card-borda);
+            color: var(--cor-texto-branco);
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
         }
         .form-control-custom:focus, .form-select-custom:focus {
-           background: var(--cor-card-fundo);
-           border-color: var(--cor-destaque-primaria);
-           color: var(--cor-texto-branco);
-           box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
+            background: var(--cor-card-fundo);
+            border-color: var(--cor-destaque-primaria);
+            color: var(--cor-texto-branco);
+            box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
         }
         .form-control-custom::placeholder {
-           color: var(--cor-texto-claro);
-           opacity: 0.7;
+            color: var(--cor-texto-claro);
+            opacity: 0.7;
         }
         
         /* Estilos específicos para o <select> */
         .form-select-custom {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c2cbd6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            padding-right: 2.5rem; /* Espaço para a seta */
+             -webkit-appearance: none;
+             -moz-appearance: none;
+             appearance: none;
+             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c2cbd6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+             background-repeat: no-repeat;
+             background-position: right 0.75rem center;
+             background-size: 16px 12px;
+             padding-right: 2.5rem; /* Espaço para a seta */
         }
         .form-select-custom option {
-            background-color: #090e13;
-            color: var(--cor-texto-branco);
+             background-color: #090e13;
+             color: var(--cor-texto-branco);
         }
         
         /* Desabilita a aparência padrão de 'disabled' */
         .form-control-custom:disabled, .form-control-custom[readonly],
         .form-select-custom:disabled, .form-select-custom[readonly] {
-            background-color: rgba(0, 0, 0, 0.1);
-            color: var(--cor-texto-claro);
-            opacity: 0.7;
-            border-color: var(--cor-card-borda);
+             background-color: rgba(0, 0, 0, 0.1);
+             color: var(--cor-texto-claro);
+             opacity: 0.7;
+             border-color: var(--cor-card-borda);
         }
         
         /* --- ESTILOS DE VALIDAÇÃO --- */
         .form-control-custom.is-invalid, 
         .form-select-custom.is-invalid {
-            border-color: var(--cor-perigo) !important;
-            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+             border-color: var(--cor-perigo) !important;
+             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
         }
         .text-danger {
-            color: var(--cor-perigo-claro) !important; /* Vermelho claro para fundos escuros */
-            font-size: 0.875em;
+             color: var(--cor-perigo-claro) !important; /* Vermelho claro para fundos escuros */
+             font-size: 0.875em;
         }
         /* --- Fim Estilos Validação --- */
 
         .input-group-glass .form-control-custom {
-           border-right: 0;
+            border-right: 0;
         }
         .input-group-glass .form-control-custom:focus {
-           border-right: 0;
+            border-right: 0;
         }
         .input-group-glass .input-group-text {
-           background: var(--cor-card-fundo);
-           border: 1px solid var(--cor-card-borda);
-           color: var(--cor-destaque-primaria);
-           border-left: 0;
-           border-radius: 0.375rem;
+            background: var(--cor-card-fundo);
+            border: 1px solid var(--cor-card-borda);
+            color: var(--cor-destaque-primaria);
+            border-left: 0;
+            border-radius: 0.375rem;
         }
         .form-control-custom:focus + .input-group-text {
-           border-color: var(--cor-destaque-primaria);
-           border-left: 0;
+            border-color: var(--cor-destaque-primaria);
+            border-left: 0;
         }
 
         /* --- Estilos do Modal --- */
-         .modal-content-custom {
-           background: #0e2231b0;
-           backdrop-filter: blur(15px);
-           border: 1px solid var(--cor-card-borda);
-           border-radius: 15px;
-           color: var(--cor-texto-claro);
-           box-shadow: 0 15px 40px var(--cor-shadow-media);
-         }
-         .modal-content-custom .modal-header {
-           border-bottom: 1px solid var(--cor-card-borda);
-         }
-         .modal-content-custom .modal-header .modal-title {
-           color: var(--cor-texto-branco);
-           font-weight: 600;
-         }
-         .modal-content-custom .btn-close {
-           filter: invert(1) grayscale(100%) brightness(200%);
-         }
-         .modal-content-custom .modal-body .form-label {
-           color: var(--cor-texto-claro);
-           font-weight: 500;
-         }
-         .modal-content-custom .form-control-custom,
-         .modal-content-custom .form-select-custom {
-           background: rgba(0, 0, 0, 0.2);
-         }
-         .modal-content-custom .modal-footer {
-           border-top: 1px solid var(--cor-card-borda);
-         }
-         .modal-footer .btn-outline-secondary {
-           color: var(--cor-texto-claro);
-           border-color: var(--cor-card-borda);
-           background: transparent;
-         }
-         .modal-footer .btn-outline-secondary:hover {
-           background-color: var(--cor-card-fundo-hover);
-           border-color: var(--cor-texto-claro);
-           color: var(--cor-texto-branco);
-         }
+          .modal-content-custom {
+            background: #0e2231b0;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--cor-card-borda);
+            border-radius: 15px;
+            color: var(--cor-texto-claro);
+            box-shadow: 0 15px 40px var(--cor-shadow-media);
+          }
+          .modal-content-custom .modal-header {
+            border-bottom: 1px solid var(--cor-card-borda);
+          }
+          .modal-content-custom .modal-header .modal-title {
+            color: var(--cor-texto-branco);
+            font-weight: 600;
+          }
+          .modal-content-custom .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+          }
+          .modal-content-custom .modal-body .form-label {
+            color: var(--cor-texto-claro);
+            font-weight: 500;
+          }
+          .modal-content-custom .form-control-custom,
+          .modal-content-custom .form-select-custom {
+            background: rgba(0, 0, 0, 0.2);
+          }
+          .modal-content-custom .modal-footer {
+            border-top: 1px solid var(--cor-card-borda);
+          }
+          .modal-footer .btn-outline-secondary {
+            color: var(--cor-texto-claro);
+            border-color: var(--cor-card-borda);
+            background: transparent;
+          }
+          .modal-footer .btn-outline-secondary:hover {
+            background-color: var(--cor-card-fundo-hover);
+            border-color: var(--cor-texto-claro);
+            color: var(--cor-texto-branco);
+          }
 
         /* --- Scrollbar --- */
         ::-webkit-scrollbar {
-           width: 8px;
-           height: 8px;
+            width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
-           background: var(--cor-fundo-gradiente-2);
+            background: var(--cor-fundo-gradiente-2);
         }
         ::-webkit-scrollbar-thumb {
-           background-color: var(--cor-card-borda);
-           border-radius: 10px;
-           border: 2px solid var(--cor-fundo-gradiente-2);
+            background-color: var(--cor-card-borda);
+            border-radius: 10px;
+            border: 2px solid var(--cor-fundo-gradiente-2);
         }
         ::-webkit-scrollbar-thumb:hover {
-           background-color: var(--cor-destaque-primaria);
+            background-color: var(--cor-destaque-primaria);
         }
         
         /* --- Loading Overlay --- */
-         #loading-overlay {
-           /* MODIFICADO: Não mais 'fixed', para ficar dentro do #app */
-           position: absolute; 
-           top: 0;
-           left: 0;
-           width: 100%; /* Ocupa 100% do #app */
-           height: 100%; /* Ocupa 100% do #app */
-           background-color: var(--cor-fundo-gradiente-2);
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           z-index: 9999;
-           opacity: 1;
-           transition: opacity 0.3s ease-in-out;
-           border-radius: 10px; /* Para bater com o dashboard-container */
-         }
-         .spinner {
-           width: 50px;
-           height: 50px;
-           border: 5px solid var(--cor-card-borda);
-           border-top-color: var(--cor-destaque-primaria);
-           border-radius: 50%;
-           animation: spin 1s linear infinite;
-         }
-         @keyframes spin {
-           0% { transform: rotate(0deg); }
-           100% { transform: rotate(360deg); }
-         }
+          #loading-overlay {
+            /* MODIFICADO: Não mais 'fixed', para ficar dentro do #app */
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%; /* Ocupa 100% do #app */
+            height: 100%; /* Ocupa 100% do #app */
+            background-color: var(--cor-fundo-gradiente-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+            border-radius: 10px; /* Para bater com o dashboard-container */
+          }
+          .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--cor-card-borda);
+            border-top-color: var(--cor-destaque-primaria);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
 
         /* --- Estilo para a paginação --- */
         .pagination-custom {
-            --bs-pagination-color: var(--cor-destaque-primaria);
-            --bs-pagination-active-bg: var(--cor-destaque-primaria);
-            --bs-pagination-active-border-color: var(--cor-destaque-primaria);
-            --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
-            --bs-pagination-disabled-color: var(--cor-card-borda);
-            --bs-pagination-bg: var(--cor-card-fundo);
-            --bs-pagination-border-color: var(--cor-card-borda);
+             --bs-pagination-color: var(--cor-destaque-primaria);
+             --bs-pagination-active-bg: var(--cor-destaque-primaria);
+             --bs-pagination-active-border-color: var(--cor-destaque-primaria);
+             --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
+             --bs-pagination-disabled-color: var(--cor-card-borda);
+             --bs-pagination-bg: var(--cor-card-fundo);
+             --bs-pagination-border-color: var(--cor-card-borda);
         }
         .pagination-custom .page-link {
-            background-color: var(--bs-pagination-bg);
-            border-color: var(--bs-pagination-border-color);
-            color: var(--bs-pagination-color);
+             background-color: var(--bs-pagination-bg);
+             border-color: var(--bs-pagination-border-color);
+             color: var(--bs-pagination-color);
         }
         .pagination-custom .page-item.active .page-link {
-            background-color: var(--bs-pagination-active-bg);
-            border-color: var(--bs-pagination-active-border-color);
-            color: white;
+             background-color: var(--bs-pagination-active-bg);
+             border-color: var(--bs-pagination-active-border-color);
+             color: white;
         }
-         .pagination-custom .page-item.disabled .page-link {
-            color: var(--bs-pagination-disabled-color);
-            background-color: transparent;
-            border-color: var(--bs-pagination-border-color);
+          .pagination-custom .page-item.disabled .page-link {
+             color: var(--bs-pagination-disabled-color);
+             background-color: transparent;
+             border-color: var(--bs-pagination-border-color);
         }
         .pagination-custom .page-link:hover {
-            background-color: var(--cor-card-fundo-hover);
-            color: var(--cor-texto-branco);
+             background-color: var(--cor-card-fundo-hover);
+             color: var(--cor-texto-branco);
         }
+
+        /* 🟢 CORRIGIDO: Estilos do Toast (Notificação) - Fixado no canto INFERIOR DIREITO */
+        .toast-container {
+            position: fixed;
+            bottom: 20px; 
+            right: 20px;
+            z-index: 1050;
+        }
+        .toast-custom {
+            background-color: rgba(20, 30, 40, 0.95);
+            color: var(--cor-texto-branco);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px var(--cor-shadow-media);
+            transition: all 0.3s ease-in-out;
+        }
+        .toast-custom .toast-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--cor-texto-branco);
+            background-color: transparent;
+        }
+        .toast-custom .toast-body {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        /* Icones e Cores do Header do Toast */
+        .toast-header .text-success { color: var(--cor-sucesso) !important; }
+        .toast-header .text-danger { color: var(--cor-perigo-claro) !important; }
+        .toast-header .text-info { color: var(--cor-destaque-primaria) !important; }
+        
     </style>
 </head>
 <body>
@@ -737,13 +770,20 @@
                             <table class="table table-custom table-striped align-middle">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>CPF</th>
-                                        <th>Nome</th>
+                                        <th @click="sortBy('nome')" style="cursor: pointer;">
+                                        Nome 
+                                        <i v-if="sortKey === 'nome'" 
+                                            :class="{'bi-arrow-up': sortOrder === 1, 'bi-arrow-down': sortOrder === -1}" 
+                                            class="bi bi-sort-down ms-1"></i>
+                                        <i v-else class="bi bi-filter"></i>
+                                    </th>
                                         <th>Cidade</th>
                                         <th>Centro de Custo</th>
-                                        <th>Descontos</th>
+                                        <th>PS/Odonto</th>
                                         <th>Ressarcimento</th>
-                                        <th>Vale Refeição</th>
+                                        <th>V. Refeição</th>
                                         <th>Outros</th>
                                         <th>Ação</th>
                                         <th>Total</th>
@@ -751,6 +791,13 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="item in paginatedEtapa1" :key="item.cpf">
+                                       <td>
+                                            <span v-if="item.status === 0" style="color: green;">🟢 </span>
+                                            
+                                            <span v-else-if="item.status === 1" style="color: gold;">🟡 </span>
+                                            
+                                            <span v-else>❓</span>
+                                        </td>
                                         <td>{{ item.cpf }}</td>
                                         <td>{{ (item.nome) }}</td>
                                         <td>{{ item.cidade }}</td>
@@ -777,9 +824,9 @@
                         </div>
                     </div>
     
-                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="filteredEtapa1.length > 0">
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="totalItems1 > 0">
                         <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
-                            Página {{ etapa1Page }} de {{ totalPage1 }}. (Mostrando {{ paginatedEtapa1.length }} de {{ filteredEtapa1.length }} itens)
+                            Página {{ etapa1Page }} de {{ totalPage1 }}. (Total geral: {{ totalItems1 }} itens)
                         </span>
                         <nav aria-label="Paginação Etapa 1" v-if="totalPage1 > 1">
                             <ul class="pagination pagination-sm mb-0 pagination-custom">
@@ -876,8 +923,8 @@
                     </div>
                     
                     <div class="table-container-custom">
-                         <div class="table-responsive">
-                            <table class="table table-custom table-striped align-middle">
+                           <div class="table-responsive">
+                             <table class="table table-custom table-striped align-middle">
                                 <thead>
                                     <tr>
                                         <th width="5%"><input type="checkbox" @change="selecionarTodos" v-model="todosSelecionados" class="form-check-input"></th>
@@ -987,8 +1034,8 @@
                                         <div class="col-md-6 mb-3">
                                             <label for="modal-motivo" class="form-label">Motivo</label>
                                             <select class="form-select form-select-custom" id="modal-motivo" 
-                                                    v-model="itemSelecionado.motivo"
-                                                    :class="{ 'is-invalid': outrosSemMotivo }">
+                                                     v-model="itemSelecionado.motivo"
+                                                     :class="{ 'is-invalid': outrosSemMotivo }">
                                                 <option value="" selected>Sem motivo</option>
                                                 <option value="Ferias">Férias</option>
                                                 <option value="Retroativo">Retroativo</option>
@@ -1014,14 +1061,14 @@
                                     </div>
     
                                 <div v-if="etapaItemSelecionado === 2">
-                                     <div class="form-group mb-3">
-                                        <label class="form-label">Produto</label>
-                                        <input type="text" v-model="itemSelecionado.nome" class="form-control form-control-custom">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">Status</label>
-                                        <input type="text" v-model="itemSelecionado.email" class="form-control form-control-custom">
-                                    </div>
+                                       <div class="form-group mb-3">
+                                            <label class="form-label">Produto</label>
+                                            <input type="text" v-model="itemSelecionado.nome" class="form-control form-control-custom">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Status</label>
+                                            <input type="text" v-model="itemSelecionado.email" class="form-control form-control-custom">
+                                        </div>
                                 </div>
     
                             </div>
@@ -1040,368 +1087,431 @@
                 </div>
             </teleport>
 
+            <!-- 🟢 NOVO: TOAST CONTAINER (Contêiner fixo para as notificações) -->
+            <teleport to="body">
+                <div class="toast-container">
+                    <div v-for="(toast, index) in toastMessages" :key="index" :id="'toast-'+index" class="toast toast-custom" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                        <div class="toast-header">
+                            <i :class="toast.icon" class="rounded me-2" :style="{ 'color': toast.color }"></i>
+                            <strong class="me-auto">{{ toast.title }}</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            {{ toast.message }}
+                        </div>
+                    </div>
+                </div>
+            </teleport>
+
         </div> </div> {% endraw %}
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
+    
         
-        const { createApp, ref, computed, onMounted } = Vue
+        <script>
+    const { createApp, ref, computed, onMounted } = Vue
+    
+    // Objeto global para armazenar instâncias de Toast
+    const toastInstances = [];
+
+    createApp({
+        data() {
+            return {
+                // Controla o spinner inicial
+                isLoading: true, 
+                
+                currentStep: 1,
+                
+                // DADOS
+                etapa1Data: [], 
+                etapa2Data: [],
+                etapa3Data: [],
+
+                // PESQUISA
+                search1: '',
+                search2: '',
+                search3: '',
+
+                // SELEÇÃO E MODAL
+                selecaoFinal: [],
+                todosSelecionados: false,
+                itemSelecionado: {}, 
+                etapaItemSelecionado: null,
+                modalInstance: null,
+                isSaving: false,
+                isSending: false,
+                
+                // PAGINAÇÃO
+                etapa1Page: 1,
+                etapa1Limit: 10,
+                totalItems1: 0, // Total vindo do backend (Oracle + Postgres)
+
+                etapa2Page: 1,
+                etapa2Limit: 10,
+                etapa3Page: 1,
+                etapa3Limit: 10,
+
+                // 🟢 NOVO: Mensagens de Notificação
+                toastMessages: [],
+            }
+        },
         
-        createApp({
-            data() {
-                return {
-                    // Controla o spinner inicial
-                    isLoading: true, 
-                    
-                    currentStep: 1,
-                    etapa1Data: [],
-                    etapa2Data: [],
-                    etapa3Data: [],
-                    search1: '',
-                    search2: '',
-                    search3: '',
-                    selecaoFinal: [],
-                    todosSelecionados: false,
-                    itemSelecionado: {}, // Começa como objeto vazio
-                    etapaItemSelecionado: null,
-                    modalInstance: null,
-                    isSaving: false,
-                    isSending: false,
-                    
-                    // Variáveis de Paginação
-                    etapa1Page: 1,
-                    etapa1Limit: 10, // Itens por página
-                    etapa2Page: 1,
-                    etapa2Limit: 10,
-                    etapa3Page: 1,
-                    etapa3Limit: 10,
-                }
+        watch: {
+            // Quando mudar a pesquisa da Etapa 1, volta pra pág 1 e busca no backend
+            search1(newVal) {
+                this.etapa1Page = 1;
+                this.fetchData('1'); 
+            },
+            // Quando mudar a página da Etapa 1, busca no backend
+            etapa1Page(newVal) {
+                this.fetchData('1'); 
             },
             
-            watch: {
-                search1(newVal, oldVal) {
-                    if (newVal !== oldVal) this.etapa1Page = 1;
-                },
-                search2(newVal, oldVal) {
-                    if (newVal !== oldVal) this.etapa2Page = 1;
-                },
-                search3(newVal, oldVal) {
-                    if (newVal !== oldVal) this.etapa3Page = 1;
-                },
+            search2(newVal) { if (newVal !== this.search2) this.etapa2Page = 1; },
+            search3(newVal) { if (newVal !== this.search3) this.etapa3Page = 1; },
 
-                // Watcher para calcular o resultado no modal
-                itemSelecionado: {
-                    handler(newItem) {
-                        // Só executa se estivermos editando a Etapa 1
-                        if (this.etapaItemSelecionado === 1) {
-                            
-                            // Garante que os valores sejam números (similar ao parseFloat || 0)
-                            const planos = Number(newItem.planos) || 0;
-                            const vr = Number(newItem.vr) || 0;
-                            const outros = Number(newItem.outros) || 0;
-                            const ressarcimento = Number(newItem.ressarcimento) || 0;
+            // Watcher para calcular valores no Modal em tempo real
+            itemSelecionado: {
+                handler(newItem) {
+                     if (this.etapaItemSelecionado === 1) {
+                         // Garantindo que os valores são números
+                        const planos = Number(newItem.planos) || 0;
+                        const vr = Number(newItem.vr) || 0;
+                        const outros = Number(newItem.outros) || 0;
+                        const ressarcimento = Number(newItem.ressarcimento) || 0;
 
-                            // 1. Calcula o Resultado
-                            // Fórmula: ressarcimento + vr - planos + outros
-                            const resultadoCalc = ressarcimento + vr - planos + outros;
-                            
-                            // Atualiza o 'resultado' no itemSelecionado
-                            // Usamos toFixed(2) para arredondar corretamente
-                            this.itemSelecionado.resultado = parseFloat(resultadoCalc.toFixed(2));
-
-                            // 2. Calcula a Ação
-                            if (resultadoCalc < 0) {
-                                this.itemSelecionado.acao_ = 'Descontar na Nota >>>>>';
-                            } else {
-                                this.itemSelecionado.acao_ = 'Adicionar na Nota >>>>>';
-                            }
-                        }
-                    },
-                    deep: true // Precisa ser 'deep' para 'ouvir' mudanças dentro do objeto
-                }
-            },
-            computed: {
-                // Filtros (inalterados)
-                filteredEtapa1() {
-                    if (!this.search1) return this.etapa1Data;
-                    const s = this.search1.toLowerCase();
-                    return this.etapa1Data.filter(item => 
-                        (item.nome && item.nome.toLowerCase().includes(s)) || 
-                        (item.centro && item.centro.toLowerCase().includes(s)) ||
-                        (item.cpf && item.cpf.toLowerCase().includes(s)) ||
-                        (item.cidade && item.cidade.toLowerCase().includes(s))
-                    );
-                },
-                filteredEtapa2() {
-                    if (!this.search2) return this.etapa2Data;
-                    const s = this.search2.toLowerCase();
-                    return this.etapa2Data.filter(item => 
-                        (item.nome && item.nome.toLowerCase().includes(s)) || 
-                        (item.email && item.email.toLowerCase().includes(s))
-                    );
-                },
-                filteredEtapa3() {
-                    if (!this.search3) return this.etapa3Data;
-                    const s = this.search3.toLowerCase();
-                    return this.etapa3Data.filter(item => 
-                        (item.nome && item.nome.toLowerCase().includes(s))
-                    );
-                },
-
-                // Paginação (inalterada)
-                totalPage1() { return Math.ceil(this.filteredEtapa1.length / this.etapa1Limit); },
-                paginatedEtapa1() {
-                    const start = (this.etapa1Page - 1) * this.etapa1Limit;
-                    const end = start + this.etapa1Limit;
-                    return this.filteredEtapa1.slice(start, end);
-                },
-                visiblePages1() { return this.getVisiblePages(this.etapa1Page, this.totalPage1); },
-                totalPage2() { return Math.ceil(this.filteredEtapa2.length / this.etapa2Limit); },
-                paginatedEtapa2() {
-                    const start = (this.etapa2Page - 1) * this.etapa2Limit;
-                    const end = start + this.etapa2Limit;
-                    return this.filteredEtapa2.slice(start, end);
-                },
-                 visiblePages2() { return this.getVisiblePages(this.etapa2Page, this.totalPage2); },
-                totalPage3() { return Math.ceil(this.filteredEtapa3.length / this.etapa3Limit); },
-                paginatedEtapa3() {
-                    const start = (this.etapa3Page - 1) * this.etapa3Limit;
-                    const end = start + this.etapa3Limit;
-                    return this.filteredEtapa3.slice(start, end);
-                },
-                visiblePages3() { return this.getVisiblePages(this.etapa3Page, this.totalPage3); },
-
-                // ==========================================
-                //      Computed Properties de Validação
-                // ==========================================
-                outrosSemMotivo() {
-                    // Regra 1: Se 'Outros' > 0, 'Motivo' não pode ser ""
-                    if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('outros')) return false;
-                    
-                    const outrosPreenchido = this.itemSelecionado.outros && Number(this.itemSelecionado.outros) !== 0;
-                    const motivoVazio = !this.itemSelecionado.motivo || this.itemSelecionado.motivo === "";
-                    
-                    return outrosPreenchido && motivoVazio;
-                },
-                
-                motivoOutrosSemJustificativa() {
-                    // Regra 2: Se 'Motivo' === 'Outros', 'Justificativa' não pode ser ""
-                    if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('motivo')) return false;
-
-                    const motivoEOutros = this.itemSelecionado.motivo === "Outros";
-                    const justificativaVazia = !this.itemSelecionado.justificativa || this.itemSelecionado.justificativa.trim() === "";
-                    
-                    return motivoEOutros && justificativaVazia;
-                },
-
-                isModalSalvarDisabled() {
-                    // O botão 'Salvar' é desabilitado se 'isSaving' for true OU se qualquer regra de validação falhar
-                    return this.isSaving || this.outrosSemMotivo || this.motivoOutrosSemJustificativa;
-                }
-            },
-            methods: {
-                
-                // MÉTODO FETCHDATA COM TIMEOUT (PARA ROBUSTEZ)
-                fetchData(etapa) {
-                    
-                    const controller = new AbortController();
-                    // Define um timeout de 15 segundos
-                    const timeoutId = setTimeout(() => {
-                        console.error(`TIMEOUT na Etapa ${etapa}!`);
-                        controller.abort();
-                    }, 15000); // 15 segundos
-
-                    try {
-                        const endpoint = etapa === '3' ? 'etapa_final' : `dados_etapa${etapa}`;
+                        const resultadoCalc = ressarcimento + vr - planos + outros;
                         
-                        // Retorna a promise do fetch
-                        return fetch(`/api/${endpoint}`, { signal: controller.signal }) // Passa o 'signal'
-                            .then(response => {
-                                clearTimeout(timeoutId); // Limpa o timeout se a resposta chegar
-                                if (!response.ok) {
-                                    throw new Error(`Falha na API: ${response.status}`);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data && data.data) {
-                                    this[`etapa${etapa}Data`] = data.data;
-                                } else {
-                                     this[`etapa${etapa}Data`] = []; // Garante que seja um array
-                                }
-                            })
-                            .catch(error => {
-                                clearTimeout(timeoutId); // Limpa o timeout em caso de erro
-                                if (error.name === 'AbortError') {
-                                    console.error(`Erro: Timeout ao buscar dados da etapa ${etapa}.`);
-                                } else {
-                                    console.error(`Erro ao buscar dados da etapa ${etapa}:`, error);
-                                }
-                                this[`etapa${etapa}Data`] = []; // Define como vazio em caso de erro
-                            });
-                    } catch (error) {
-                        clearTimeout(timeoutId); // Limpa o timeout se o 'try' falhar
-                        console.error(`Erro ao buscar dados da etapa ${etapa}:`, error);
-                        this[`etapa${etapa}Data`] = [];
-                        return Promise.resolve(); // Resolve a promise para não parar o Promise.all
-                    }
-                },
-                
-                // ==========================================
-                //      abrirModal atualizado
-                // ==========================================
-                abrirModal(item, etapa) {
-                    // Cria uma cópia profunda do item
-                    let novoItem = { ...item };
+                        // Atualiza o resultado com 2 casas decimais
+                        this.itemSelecionado.resultado = parseFloat(resultadoCalc.toFixed(2));
 
-                    // GARANTE que os campos existam para o v-model (caso a API não os envie)
-                    if (etapa === 1) {
-                        novoItem.motivo = item.motivo || ''; // Usa o da API ou um padrão
-                        novoItem.justificativa = item.justificativa || ''; // Usa o da API ou um padrão
-                    }
-
-                    this.itemSelecionado = novoItem; 
-                    this.etapaItemSelecionado = etapa;
-                    if (this.modalInstance) {
-                        this.modalInstance.show();
-                    }
-                },
-
-                async salvarModal() {
-                    // A validação já foi feita pelo :disabled no botão,
-                    // então podemos salvar com segurança.
-                    this.isSaving = true;
-                    const etapa = this.etapaItemSelecionado;
-                    const item = this.itemSelecionado; // 'item' agora contém os dados calculados
-                    
-                    const keyApi = etapa === 1 ? item.cpf : item.id;
-                    const findKey = etapa === 1 ? 'cpf' : 'id';
-
-                    try {
-                        // A API /api/item/{key} precisa ser atualizada no seu backend
-                        // para aceitar 'motivo' e 'justificativa'
-                        const response = await fetch(`/api/item/${keyApi}?etapa=${etapa}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(item)
-                        });
-
-                        if (response.ok) {
-                            const dataKey = etapa === 1 ? 'etapa1Data' : 'etapa2Data';
-                            const index = this[dataKey].findIndex(i => i[findKey] === item[findKey]);
-                            if (index !== -1) {
-                                this[dataKey][index] = { ...item };
-                            }
-                            this.modalInstance.hide();
+                        // Atualiza a Ação
+                        if (resultadoCalc < 0) {
+                            this.itemSelecionado.acao_ = 'Descontar na Nota >>>>>';
                         } else {
-                            alert("Erro ao salvar. Verifique o console.");
-                            console.error(await response.json());
+                            this.itemSelecionado.acao_ = 'Adicionar na Nota >>>>>';
                         }
-                    } catch (error) {
-                        console.error('Erro ao salvar:', error);
-                        alert("Erro de conexão ao salvar.");
-                    } finally {
-                        this.isSaving = false;
                     }
                 },
+                deep: true
+            }
+        },
 
-                selecionarTodos() {
-                    if (this.todosSelecionados) {
-                        this.selecaoFinal = this.paginatedEtapa3.map(item => item.id);
-                    } else {
-                        this.selecaoFinal = [];
-                    }
-                },
+        computed: {
+            // --- ETAPA 1 (Server-Side) ---
+            // Como a API já traz filtrado e paginado, aqui só retornamos os dados
+            filteredEtapa1() { return this.etapa1Data; },
+            paginatedEtapa1() { return this.etapa1Data; },
+            
+            // O total de páginas agora usa o totalItems1 vindo do banco
+            totalPage1() { 
+                if (this.totalItems1 === 0) return 1;
+                return Math.ceil(this.totalItems1 / this.etapa1Limit); 
+            },
+            visiblePages1() { return this.getVisiblePages(this.etapa1Page, this.totalPage1); },
 
-                async enviarFinal() {
-                    if (this.selecaoFinal.length === 0) {
-                        alert("Selecione ao menos um item.");
-                        return;
-                    }
-                    this.isSending = true;
-                    try {
-                        const response = await fetch('/api/enviar_final', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ids: this.selecaoFinal })
+            // --- ETAPA 2 (Client-Side) ---
+            filteredEtapa2() {
+                if (!this.search2) return this.etapa2Data;
+                const s = this.search2.toLowerCase();
+                return this.etapa2Data.filter(item => 
+                    (item.nome && item.nome.toLowerCase().includes(s)) || 
+                    (item.email && item.email.toLowerCase().includes(s))
+                );
+            },
+            paginatedEtapa2() {
+                const start = (this.etapa2Page - 1) * this.etapa2Limit;
+                return this.filteredEtapa2.slice(start, start + this.etapa2Limit);
+            },
+            totalPage2() { return Math.ceil(this.filteredEtapa2.length / this.etapa2Limit); },
+            visiblePages2() { return this.getVisiblePages(this.etapa2Page, this.totalPage2); },
+
+            // --- ETAPA 3 (Client-Side) ---
+            filteredEtapa3() {
+                if (!this.search3) return this.etapa3Data;
+                const s = this.search3.toLowerCase();
+                return this.etapa3Data.filter(item => 
+                    (item.nome && item.nome.toLowerCase().includes(s))
+                );
+            },
+            paginatedEtapa3() {
+                const start = (this.etapa3Page - 1) * this.etapa3Limit;
+                return this.filteredEtapa3.slice(start, start + this.etapa3Limit);
+            },
+            totalPage3() { return Math.ceil(this.filteredEtapa3.length / this.etapa3Limit); },
+            visiblePages3() { return this.getVisiblePages(this.etapa3Page, this.totalPage3); },
+
+            // --- VALIDAÇÕES ---
+            outrosSemMotivo() {
+                if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('outros')) return false;
+                const outrosPreenchido = this.itemSelecionado.outros && Number(this.itemSelecionado.outros) !== 0;
+                const motivoVazio = !this.itemSelecionado.motivo || this.itemSelecionado.motivo === "";
+                return outrosPreenchido && motivoVazio;
+            },
+            motivoOutrosSemJustificativa() {
+                if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('motivo')) return false;
+                const motivoEOutros = this.itemSelecionado.motivo === "Outros";
+                const justificativaVazia = !this.itemSelecionado.justificativa || this.itemSelecionado.justificativa.trim() === "";
+                return motivoEOutros && justificativaVazia;
+            },
+            isModalSalvarDisabled() {
+                return this.isSaving || this.outrosSemMotivo || this.motivoOutrosSemJustificativa;
+            }
+        },
+
+        methods: {
+            // 🟢 NOVO: Método para exibir Toast
+            showToast(type, title, message) {
+                const colors = {
+                    success: '#198754',
+                    error: '#dc3545',
+                    info: '#00bcd4' // Usando ciano para 'info'
+                };
+                const icons = {
+                    success: 'bi bi-check-circle-fill text-success',
+                    error: 'bi bi-x-circle-fill text-danger',
+                    info: 'bi bi-info-circle-fill text-info'
+                };
+
+                const newToast = {
+                    title: title,
+                    message: message,
+                    icon: icons[type],
+                    color: colors[type]
+                };
+                
+                // Adiciona a mensagem e espera o DOM renderizar
+                this.toastMessages.push(newToast);
+
+                this.$nextTick(() => {
+                    const newToastElement = document.getElementById('toast-' + (this.toastMessages.length - 1));
+                    if (newToastElement) {
+                         // Cria a instância do Bootstrap Toast
+                        const bsToast = new bootstrap.Toast(newToastElement);
+                        
+                        // Garante que o toast seja removido do array após ser escondido
+                        newToastElement.addEventListener('hidden.bs.toast', () => {
+                            this.toastMessages.shift(); // Remove o primeiro (o mais antigo)
                         });
+
+                        bsToast.show();
+                    }
+                });
+            },
+
+            // 🟢 MODIFICADO: Função para buscar dados
+            fetchData(etapa) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    this.showToast('error', 'Erro de Conexão', `A requisição da Etapa ${etapa} excedeu o tempo limite.`);
+                }, 15000); // 15s timeout
+
+                let url = `/api/dados_etapa${etapa}`;
+                if (etapa === '3') url = '/api/etapa_final';
+                
+                // Se for Etapa 1, adiciona paginação e busca na URL para o Python processar
+                if (etapa === '1') {
+                    url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}`;
+                }
+
+                return fetch(url, { signal: controller.signal })
+                    .then(res => {
+                        clearTimeout(timeoutId);
+                        if (!res.ok) throw new Error(res.status);
+                        return res.json();
+                    })
+                    .then(data => {
+                        // ETAPA 1: Lógica Server-Side (recebe data e total)
+                        if (etapa === '1') {
+                            if (data && data.data) {
+                                this.etapa1Data = data.data;
+                                this.totalItems1 = data.total || 0;
+                            } else {
+                                this.etapa1Data = [];
+                                this.totalItems1 = 0;
+                            }
+                        } 
+                        // ETAPA 2 e 3: Lógica antiga
+                        else {
+                            if (data && data.data) {
+                                this[`etapa${etapa}Data`] = data.data;
+                            } else {
+                                this[`etapa${etapa}Data`] = [];
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        clearTimeout(timeoutId);
+                        console.error(`Erro fetch etapa ${etapa}`, err);
+                        if (err.name !== 'AbortError') {
+                            this.showToast('error', 'Erro na API', `Falha ao carregar dados da Etapa ${etapa}. Status: ${err.message || 'Desconhecido'}`);
+                        }
+                        this[`etapa${etapa}Data`] = [];
+                    });
+            },
+
+            abrirModal(item, etapa) {
+                let novoItem = { ...item };
+                if (etapa === 1) {
+                    // Inicializa campos de controle para o modal (mesmo que sejam vazios no backend)
+                    novoItem.motivo = item.motivo || ''; 
+                    novoItem.justificativa = item.justificativa || '';
+                }
+                this.itemSelecionado = novoItem; 
+                this.etapaItemSelecionado = etapa;
+                if (this.modalInstance) this.modalInstance.show();
+            },
+
+            // 🟢 MODIFICADO: Função para salvar com Toast
+            async salvarModal() {
+                this.isSaving = true;
+                const etapa = this.etapaItemSelecionado;
+                const item = this.itemSelecionado;
+                const keyApi = etapa === 1 ? item.cpf : item.id;
+                const findKey = etapa === 1 ? 'cpf' : 'id';
+                
+                try {
+                    const response = await fetch(`/api/item/${keyApi}?etapa=${etapa}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+
+                    if (response.ok) {
+                        // 1. Atualiza o dado na memória
+                        const dataKey = etapa === 1 ? 'etapa1Data' : 'etapa2Data';
+                        const index = this[dataKey].findIndex(i => i[findKey] === item[findKey]);
+                        if (index !== -1) {
+                            this[dataKey][index] = { ...item };
+                        }
+                        
+                        // 2. Notificação de Sucesso
+                        this.showToast('success', 'Sucesso!', `Item de CPF ${item.cpf || item.id} alterado com sucesso.`);
+
+                        // 3. Fecha o modal
+                        this.modalInstance.hide();
+
+                        // 4. Se for Etapa 1, recarrega a página atual para refletir as mudanças do backend (Postgres)
+                        if (etapa === 1) {
+                            this.fetchData('1');
+                        }
+
+                    } else {
+                        // Trata erros da API
+                        const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido.' }));
+                        this.showToast('error', 'Falha ao Salvar', `Erro: ${response.status}. Detalhe: ${errorData.detail || 'Verifique o console para mais informações.'}`);
+                    }
+                } catch (error) {
+                    console.error("Erro de conexão ao salvar:", error);
+                    this.showToast('error', 'Erro de Conexão', "Falha ao se comunicar com o servidor.");
+                } finally {
+                    this.isSaving = false;
+                }
+            },
+
+            selecionarTodos() {
+                 if (this.todosSelecionados) {
+                     // Pega todos os IDs da página atual (pois estamos em client-side para a Etapa 3)
+                     this.paginatedEtapa3.forEach(item => {
+                        if (!this.selecaoFinal.includes(item.id)) {
+                             this.selecaoFinal.push(item.id);
+                        }
+                     });
+                 } else {
+                     // Remove apenas os IDs da página atual da seleção
+                     const idsPaginaAtual = this.paginatedEtapa3.map(item => item.id);
+                     this.selecaoFinal = this.selecaoFinal.filter(id => !idsPaginaAtual.includes(id));
+                 }
+            },
+
+            // 🟢 MODIFICADO: Função para enviar com Toast
+            async enviarFinal() {
+                if (this.selecaoFinal.length === 0) { 
+                    this.showToast('info', 'Atenção', 'Selecione pelo menos um item para envio.');
+                    return; 
+                }
+                
+                this.isSending = true;
+                
+                try {
+                    const response = await fetch('/api/enviar_final', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids: this.selecaoFinal })
+                    });
+
+                    if (response.ok) {
                         const data = await response.json();
-                        alert(`E-mails enviados com sucesso! ${data.recebidos} itens processados.`);
+                        this.showToast('success', 'Envio Concluído!', `${data.recebidos} itens processados e e-mails enviados com sucesso.`);
                         this.selecaoFinal = [];
                         this.todosSelecionados = false;
                         this.currentStep = 1; 
-                    } catch (error) {
-                        console.error('Erro ao enviar:', error);
-                        alert("Erro de conexão ao enviar.");
-                    } finally {
-                        this.isSending = false;
+                        this.fetchData('1'); // Recarrega os dados da Etapa 1
+                        this.fetchData('3'); // Recarrega os dados da Etapa 3
+                    } else {
+                        const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido.' }));
+                        this.showToast('error', 'Falha no Envio', `Erro: ${response.status}. Detalhe: ${errorData.detail || 'Verifique o console para mais informações.'}`);
                     }
-                },
 
-                // Métodos de Paginação
-                goToPage1(page) {
-                    if (page >= 1 && page <= this.totalPage1 && page !== '...') this.etapa1Page = page;
-                },
-                goToPage2(page) {
-                    if (page >= 1 && page <= this.totalPage2 && page !== '...') this.etapa2Page = page;
-                },
-                goToPage3(page) {
-                    if (page >= 1 && page <= this.totalPage3 && page !== '...') this.etapa3Page = page;
-                },
-
-                // Função utilitária para gerar os botões de página
-                getVisiblePages(currentPage, totalPages) {
-                    const maxVisible = 5; 
-                    if (totalPages <= maxVisible) {
-                        return Array.from({ length: totalPages }, (_, i) => i + 1);
-                    }
-                    let start = Math.max(1, currentPage - 2);
-                    let end = Math.min(totalPages, currentPage + 2);
-                    if (currentPage <= 3) {
-                        end = maxVisible;
-                    } else if (currentPage >= totalPages - 2) {
-                        start = totalPages - maxVisible + 1;
-                    }
-                    const pages = [];
-                    if (start > 1) {
-                        pages.push(1);
-                        if (start > 2) pages.push('...');
-                    }
-                    for (let i = start; i <= end; i++) {
-                        pages.push(i);
-                    }
-                    if (end < totalPages) {
-                        if (end < totalPages - 1) pages.push('...');
-                        pages.push(totalPages);
-                    }
-                    return pages;
+                } catch (error) {
+                    console.error("Erro de conexão ao enviar:", error);
+                    this.showToast('error', 'Erro de Conexão', "Falha ao se comunicar com o servidor para o envio final.");
+                } finally {
+                    this.isSending = false;
                 }
             },
-            
-            // MÉTODO MOUNTED ATUALIZADO (ABORDAGEM DIRETA)
-            mounted() {
-                // 1. Esconde o spinner IMEDIATAMENTE.
-                this.isLoading = false; 
-                
-                // 2. Espera o Vue atualizar o DOM (para o v-else aparecer)
-                //    e então inicializa o modal.
-                this.$nextTick(() => {
-                    if (this.$refs.modalEdicao) {
-                         this.modalInstance = new bootstrap.Modal(this.$refs.modalEdicao);
-                    } else {
-                        console.warn("Referência do modal não encontrada.");
-                    }
-                });
 
-                // 3. AGORA, busca os dados em segundo plano.
-                // O app já está "vivo" e o usuário pode ver a tela.
-                this.fetchData('1');
-                this.fetchData('2');
-                this.fetchData('3');
+            goToPage1(page) {
+                if (page >= 1 && page <= this.totalPage1 && page !== '...') {
+                    this.etapa1Page = page;
+                }
+            },
+            goToPage2(page) { if (page >= 1 && page <= this.totalPage2 && page !== '...') this.etapa2Page = page; },
+            goToPage3(page) { if (page >= 1 && page <= this.totalPage3 && page !== '...') this.etapa3Page = page; },
+
+            getVisiblePages(currentPage, totalPages) {
+                 const maxVisible = 5; 
+                 if (totalPages <= maxVisible) return Array.from({ length: totalPages }, (_, i) => i + 1);
+                 
+                 let start = Math.max(1, currentPage - 2);
+                 let end = Math.min(totalPages, currentPage + 2);
+                 
+                 if (currentPage <= 3) {
+                      end = maxVisible;
+                 } else if (currentPage >= totalPages - 2) {
+                      start = totalPages - maxVisible + 1;
+                 }
+                 
+                 const pages = [];
+                 if (start > 1) { pages.push(1); if (start > 2) pages.push('...'); }
+                 for (let i = start; i <= end; i++) pages.push(i);
+                 if (end < totalPages) { if (end < totalPages - 1) pages.push('...'); pages.push(totalPages); }
+                 return pages;
             }
-        }).mount('#app')
+        }, // <--- FIM DO METHODS
+
+        // MOUNTED FORA DO METHODS!
+        mounted() {
+            console.log("Aplicação Vue Montada!");
+            this.isLoading = false; // Desativa o spinner imediatamente
+
+            // Inicializa o Modal do Bootstrap
+            this.$nextTick(() => {
+                if (this.$refs.modalEdicao) {
+                     this.modalInstance = new bootstrap.Modal(this.$refs.modalEdicao);
+                }
+            });
+
+            // Busca dados iniciais
+            this.fetchData('1');
+            this.fetchData('2');
+            this.fetchData('3');
+        }
+    }).mount('#app')
+
     </script>
 </body>
 </html>

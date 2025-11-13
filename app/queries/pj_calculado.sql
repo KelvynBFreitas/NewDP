@@ -217,7 +217,8 @@ SELECT
          else 0 
          end ressarcimento,
     ps.VALOR_DESCONTA_NV,
-    ps.METODO
+    ps.METODO,
+    null AS justificativa
 FROM 
     DADOS_FUNCIONARIOS P
 JOIN 
