@@ -22,4 +22,6 @@ class AppDpAjustesValoresPj(Base):
     outros = Column(Float)
     justificativa = Column(String)
     ressarcimento = Column(Float)
+    cnpj = Column(String)
+    razao_social = Column(String,)
 

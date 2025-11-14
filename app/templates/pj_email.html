@@ -373,6 +373,7 @@
         .table-custom td {
             border-color: var(--cor-card-borda) !important;
             vertical-align: middle;
+            font-size: 0.85rem;
         }
         .table-custom.table-striped > tbody > tr:nth-of-type(even) {
             background-color: rgba(0, 0, 0, 0.15);
@@ -397,7 +398,7 @@
         }
         .table-custom .btn {
             padding: 0.25rem 0.6rem;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .btn {
@@ -759,10 +760,18 @@
                             <h3>Etapa 1: Verificação</h3>
                             <p>Confira os dados da fonte principal e faça os ajustes necessários.</p>
                         </div>
-                        <div class="input-group input-group-glass" style="max-width: 320px;">
+                        <div class="input-group input-group-glass" style="max-width: 410px;">
+                             <select v-model="filtroStatus" class="form-select form-select-custom" style="max-width: 165px;">
+                                <option value="">Todos</option>
+                                <option value="1">🟡 Pendentes</option>
+                                <option value="0">🟢 Ajustados</option>
+                             </select>
+                                                        
                              <input type="text" v-model="search1" class="form-control form-control-custom" placeholder="Pesquisar na Etapa 1...">
                              <span class="input-group-text"><i class="bi bi-search"></i></span>
+                             
                         </div>
+                        
                     </div>
                     
                     <div class="table-container-custom">
@@ -772,13 +781,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>CPF</th>
-                                        <th @click="sortBy('nome')" style="cursor: pointer;">
-                                        Nome 
-                                        <i v-if="sortKey === 'nome'" 
-                                            :class="{'bi-arrow-up': sortOrder === 1, 'bi-arrow-down': sortOrder === -1}" 
-                                            class="bi bi-sort-down ms-1"></i>
-                                        <i v-else class="bi bi-filter"></i>
-                                    </th>
+                                       <th>Nome</th>
                                         <th>Cidade</th>
                                         <th>Centro de Custo</th>
                                         <th>PS/Odonto</th>
@@ -793,24 +796,30 @@
                                     <tr v-for="item in paginatedEtapa1" :key="item.cpf">
                                        <td>
                                             <span v-if="item.status === 0" style="color: green;">🟢 </span>
-                                            
-                                            <span v-else-if="item.status === 1" style="color: gold;">🟡 </span>
-                                            
+                                            <span v-else-if="item.status === 1" style="color: gold;">🟡</span>       
                                             <span v-else>❓</span>
                                         </td>
                                         <td>{{ item.cpf }}</td>
                                         <td>{{ (item.nome) }}</td>
                                         <td>{{ item.cidade }}</td>
                                         <td>{{ item.centro }}</td>
-                                        <td>{{ item.planos }}</td>
-                                        <td>{{ item.ressarcimento }}</td>
-                                        <td>{{ item.vr }}</td>
-                                        <td>{{ item.outros }}</td>
+                                        <td class="text-end">{{ formatCurrency(item.planos) }}</td>                                        
+                                        <td class="text-end">{{ formatCurrency(item.ressarcimento) }}</td>
+                                        <td class="text-end">{{ formatCurrency(item.vr) }}</td>
+                                            
+                                        <td class="text-end">{{ formatCurrency(item.outros) }}</td>
+                                  
                                         <td>{{ item.acao_ }}</td>
-                                        <td>{{ item.resultado }}</td>
+                                      
+                                            <td  class="text-end">
+                                            <span v-if="item.resultado < 0" style="color: rgb(233, 8, 8); font-weight: bold;">{{ formatCurrency(item.resultado) }}</span>
+                                            <span v-else-if="item.resultado >= 0 " style="color: rgb(6, 100, 6); font-weight: bold;">{{ formatCurrency(item.resultado) }}</span>
+                                            <span v-else>❓</span>
+                                            </td>
+                                        
                                         <td>
                                             <button class="btn btn-sm btn-warning" @click="abrirModal(item, 1)">
-                                                <i class="bi bi-pencil-square me-1"></i> Alterar
+                                                <i class="bi bi-pencil-square me-1"></i> 
                                             </button>
                                         </td>
                                     </tr>
@@ -1121,7 +1130,7 @@
             return {
                 // Controla o spinner inicial
                 isLoading: true, 
-                
+                filtroStatus: '',
                 currentStep: 1,
                 
                 // DADOS
@@ -1168,7 +1177,10 @@
             etapa1Page(newVal) {
                 this.fetchData('1'); 
             },
-            
+            filtroStatus(newVal) {
+                this.etapa1Page = 1;
+                this.fetchData('1');
+            },
             search2(newVal) { if (newVal !== this.search2) this.etapa2Page = 1; },
             search3(newVal) { if (newVal !== this.search3) this.etapa3Page = 1; },
 
@@ -1269,6 +1281,7 @@
                     error: '#dc3545',
                     info: '#00bcd4' // Usando ciano para 'info'
                 };
+                
                 const icons = {
                     success: 'bi bi-check-circle-fill text-success',
                     error: 'bi bi-x-circle-fill text-danger',
@@ -1300,7 +1313,17 @@
                     }
                 });
             },
-
+            formatCurrency(value) {
+                if (value === null || value === undefined) return 'R$ 0,00';
+                const numberValue = Number(value);
+                if (isNaN(numberValue)) return 'R$ 0,00';
+                
+                // Formata para o padrão monetário brasileiro (BRL)
+                return numberValue.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+            },    
             // 🟢 MODIFICADO: Função para buscar dados
             fetchData(etapa) {
                 const controller = new AbortController();
@@ -1314,7 +1337,8 @@
                 
                 // Se for Etapa 1, adiciona paginação e busca na URL para o Python processar
                 if (etapa === '1') {
-                    url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}`;
+                    //url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}`;
+                    url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}&status=${this.filtroStatus}`;
                 }
 
                 return fetch(url, { signal: controller.signal })
@@ -1389,7 +1413,7 @@
                         }
                         
                         // 2. Notificação de Sucesso
-                        this.showToast('success', 'Sucesso!', `Item de CPF ${item.cpf || item.id} alterado com sucesso.`);
+                        this.showToast('success', 'Sucesso!', `Colaborador ${item.nome || item.id} alterado com sucesso.`);
 
                         // 3. Fecha o modal
                         this.modalInstance.hide();

@@ -34,6 +34,7 @@ class PrestadorNotasUpdate(BaseModel):
     outros: Optional[float] = None
     justificativa: Optional[str] = None
     ressarcimento: Optional[float] = None
-
+    cnpj: Optional[str] = None
+    razao_social: Optional[str] = None
 
     

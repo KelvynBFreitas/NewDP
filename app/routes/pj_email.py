@@ -14,12 +14,14 @@ from app.core.config import SECRET_KEY
 import pathlib
 from typing import Optional # <<< NOVO IMPORT
 from sqlalchemy.future import select
-from sqlalchemy import func, or_, text # 'text' ainda é necessário para o Oracle
+from sqlalchemy import func, or_, text,and_ # 'text' ainda é necessário para o Oracle
 from app.models.app_dp_ajustes_valores_pj_postgres import AppDpAjustesValoresPj 
 from app.schemas.dados_pj import PrestadorNotasUpdate
 from app.models.user import User
 from datetime  import datetime,date
 from sqlalchemy.sql.expression import literal_column
+from datetime import date, timedelta
+from app.models.funcionarios_pj_postgres import app_dp_pj_aprovador_x_prestado
 # --- Modelos de Dados (Inalterados) ---
 
 
@@ -122,169 +124,111 @@ async def get_homepage(
         "notifications": notifications,
     })
 
-# --- Endpoints de API (Inalterados) ---
-
-
-# Defina a variável global SECRET_KEY, QUERY_COLABORADORES, get_postgres_session, get_oracle_session e AppDpAjustesValoresPj
-# Exemplo (se não estiverem em outro arquivo):
-# router = APIRouter()
-# SECRET_KEY = "sua_chave_secreta"
-# QUERY_COLABORADORES = "SELECT * FROM colaboradores_oracle"
-# class AppDpAjustesValoresPj: ... # Seu modelo
-# async def get_postgres_session(): ...
-# async def get_oracle_session(): ...
-
 @router.get("/api/dados_etapa1")
 async def get_dados_etapa1(
     request: Request,
-    page: int = Query(1, ge=1),      # Recebe a página da URL (padrão 1)
-    limit: int = Query(10, ge=1),    # Recebe o limite por página (padrão 10)
-    search: str = Query(""),         # Recebe a busca da URL
-    # Mantemos o 'kw' para satisfazer dependências internas obrigatórias (se aplicável)
-    kw: str = Query(None), 
-    session_postgres: AsyncSession = Depends(get_postgres_session), 
-    session_oracle: AsyncSession = Depends(get_oracle_session),   
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1),
+    search: str = Query(""),
+    status: str = Query(""),
+    kw: str = Query(None),
+    session_postgres: AsyncSession = Depends(get_postgres_session),
+    session_oracle: AsyncSession = Depends(get_oracle_session),
 ):
     """
-    Busca dados de funcionários no Oracle (excluindo cadastrados) com paginação,
-    e concatena com os dados já ajustados do Postgres, com contagem total unificada.
+    Busca dados de funcionários no Oracle (excluindo cadastrados) e concatena com Postgres.
+    Faz o merge com a tabela de prestadores para trazer CNPJ e Razão Social.
     """
-    # 1. Validação e Token (Mantido)
-    token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(status_code=401, detail="Não autorizado")
-    try:
-        # Lembre-se de usar sua SECRET_KEY real
-        jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Token inválido")
-
-    # 2. Buscar CPFs já cadastrados no Postgres
-    cpfs_cadastrados = set()
-    try:
-        stmt_cadastrados = select(AppDpAjustesValoresPj.cpf) 
-        result_cadastrados = await session_postgres.execute(stmt_cadastrados)
-        # Garante que CPF seja string e removido espaços
-        cpfs_cadastrados = {str(cpf).strip() for cpf in result_cadastrados.scalars().all()} 
-    except Exception as e:
-        print(f"Erro Postgres ao buscar CPFs cadastrados: {e}")
+    # 1. Configuração de Datas e Filtros
+    hoje = date.today()
+    primeiro_dia_mes_atual = hoje.replace(day=1)
+    ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
     
-    # 3. Montar Query Oracle Dinâmica (para dados pendentes)
-    if not QUERY_COLABORADORES:
-        raise HTTPException(status_code=500, detail="Query não carregada")
+    search_term = search.strip()
+    filtro_data_ref = AppDpAjustesValoresPj.datareferencia == ultimo_dia_mes_anterior
 
-    base_sql = f"({QUERY_COLABORADORES}) A"
-    params = {}
-    
-    # Filtro de Busca
-    search_like = f"%{search.strip().upper()}%"
-    where_parts = ["(UPPER(A.NOME) LIKE :search_like OR A.CPF LIKE :search_like)"]
-    params["search_like"] = search_like
+    # ==============================================================================
+    # 🛠️ FUNÇÃO AUXILIAR: MERGE COM DADOS DO PRESTADOR (POSTGRES)
+    # ==============================================================================
+    async def enrich_with_prestador_data(lista_colaboradores: List[Dict[str, Any]]):
+        """
+        Recebe lista do Oracle, busca CNPJ/Razão na tabela app_dp_pj_aprovador_x_prestado
+        e enriquece os dicionários.
+        """
+        if not lista_colaboradores:
+            return
 
-    # Filtro de Exclusão (NOT IN)
-    if cpfs_cadastrados:
-        # Apenas CPFs alfanuméricos para evitar injeção e erro de sintaxe
-        cpfs_formatted = ", ".join([f"'{c}'" for c in cpfs_cadastrados if c.isalnum()]) 
-        if cpfs_formatted:
-            where_parts.append(f"A.CPF NOT IN ({cpfs_formatted})")
+        # A. Coletar CPFs da página atual (limpa espaços e converte para string)
+        cpfs_para_buscar = {
+            str(row.get("cpf")).strip() 
+            for row in lista_colaboradores 
+            if row.get("cpf")
+        }
 
-    where_sql = "WHERE " + " AND ".join(where_parts)
+        if not cpfs_para_buscar:
+            return
 
-    # 4. Contagens e Total Geral (Mantido)
-    
-    # 4. Contagem do Oracle (PENDENTES)
-    count_sql = f"SELECT COUNT(*) FROM {base_sql} {where_sql}"
-    total_oracle_pendentes = 0
-    try:
-        count_result = await session_oracle.execute(text(count_sql), params)
-        total_oracle_pendentes = count_result.scalar() or 0
-    except Exception as e:
-        print(f"Erro Count Oracle: {e}")
-
-
-    # 4.5. Contagem do Postgres (AJUSTADOS)
-    total_postgres_ajustados = 0
-    try:
-        count_stmt_ajustes = select(func.count()).select_from(AppDpAjustesValoresPj)
-        
-        search_term = search.strip()
-        if search_term:
-            count_stmt_ajustes = count_stmt_ajustes.where(
-                (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
-                (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+        try:
+            # B. Buscar no Postgres apenas os CPFs desta página
+            stmt = select(
+                app_dp_pj_aprovador_x_prestado.cpf_prestador,
+                app_dp_pj_aprovador_x_prestado.cnpj,
+                app_dp_pj_aprovador_x_prestado.razao_social
+            ).where(
+                app_dp_pj_aprovador_x_prestado.cpf_prestador.in_(cpfs_para_buscar)
             )
-        
-        total_postgres_ajustados = await session_postgres.scalar(count_stmt_ajustes) or 0
-          
-    except Exception as e:
-        print(f"Erro Count Postgres: {e}")
-        total_postgres_ajustados = 0
 
-    # 4.6. Cálculo do Total Geral (Para a Paginação do Frontend)
-    total_registros_geral = total_oracle_pendentes + total_postgres_ajustados
+            result = await session_postgres.execute(stmt)
+            prestadores = result.all()
+           
+            # C. Criar Mapa para acesso rápido: {'12345678900': {'cnpj': '...', 'razao': '...'}}
+            mapa_prestadores = {
+                str(p.cpf_prestador).strip(): {"cnpj": p.cnpj, "razao_social": p.razao_social}
+                for p in prestadores
+            }
 
+            # D. Injetar os dados na lista original
+            for colab in lista_colaboradores:
+                cpf_key = str(colab.get("cpf")).strip()
+                dados_extra = mapa_prestadores.get(cpf_key)
+                
+                if dados_extra:
+                    colab["cnpj"] = dados_extra["cnpj"]
+                    colab["razao_social"] = dados_extra["razao_social"]
+                else:
+                    colab["cnpj"] = None
+                    colab["razao_social"] = None
 
-    # 5. Lógica de Busca e Paginação Unificada
-    funcionarios_oracle = []
-    ajustes_postgres = []
-    
-    # Índice onde a página atual começa no dataset combinado
-    start_index = (page - 1) * limit
+        except Exception as e:
+            print(f"Erro ao fazer merge com prestadores: {e}")
+            # Fallback: garante as chaves nulas para não quebrar o front
+            for colab in lista_colaboradores:
+                colab.setdefault("cnpj", None)
+                colab.setdefault("razao_social", None)
 
-    # --- 5.1 Busca no Oracle (Bloco 1: Registros Pendentes) ---
-    # Só busca no Oracle se a página começar antes do total de pendentes
-    if start_index < total_oracle_pendentes:
-        
-        # Calcula o OFFSET e LIMIT para o Oracle
-        offset_oracle = start_index
-        # O limite é o menor entre o 'limit' da página e quantos registros restam no Oracle
-        limit_oracle = min(limit, total_oracle_pendentes - offset_oracle) 
-        
-        if limit_oracle > 0:
-            query_sql = f"""
-                SELECT 
-                    CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
-                    ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA,
-                    1 AS STATUS 
-                FROM {base_sql}
-                {where_sql}
-                ORDER BY A.NOME
-                OFFSET :offset_val ROWS FETCH NEXT :limit_val ROWS ONLY
-            """
-            params["offset_val"] = offset_oracle
-            params["limit_val"] = limit_oracle
+    # ==========================================================
+    # LÓGICA DE FILTRO POR STATUS
+    # ==========================================================
 
-            try:
-                oracle_result = await session_oracle.execute(text(query_sql), params)
-                # Converte para dict() para garantir modificabilidade (embora não mais necessário para o status)
-                funcionarios_oracle = [dict(r) for r in oracle_result.mappings().all()] 
-            except Exception as e:
-                print(f"Erro Query Oracle: {e}")
-                raise HTTPException(status_code=500, detail="Erro no banco Oracle")
+    # --- CASO A: STATUS 0 (JÁ AJUSTADOS / APENAS POSTGRES) ---
+    if status == "0":
+        try:
+            count_stmt_ajustes = select(func.count()).select_from(AppDpAjustesValoresPj)
+            conditions = [filtro_data_ref]
 
+            if search_term:
+                conditions.append(
+                    (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
+                    (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+                )
 
-    # --- 5.2 Busca no Postgres (Bloco 2: Registros Ajustados) ---
-
-    # Calcula quantos slots (registros) faltam para completar a página
-    slots_restantes = limit - len(funcionarios_oracle)
-    
-    # Se há slots restantes E a página não está além do total geral
-    if slots_restantes > 0 and start_index < total_registros_geral:
-        
-        # O bloco do Postgres começa no índice 'total_oracle_pendentes'.
-        offset_postgres = 0
-
-        # Se a página atual está totalmente dentro ou começou no bloco do Postgres (ex: P6, P7...)
-        if start_index >= total_oracle_pendentes:
-            # Calcula o OFFSET do Postgres relativo ao total de registros ajustados
-            offset_postgres = start_index - total_oracle_pendentes
-        
-        # O limite real a buscar no Postgres é o menor entre slots_restantes e o que resta no Postgres
-        limit_postgres = min(slots_restantes, total_postgres_ajustados - offset_postgres)
-
-        if limit_postgres > 0:
-            try:
-                # Seleciona as colunas do modelo Postgres, garantindo nomes em MAIÚSCULO
+            count_stmt_ajustes = count_stmt_ajustes.where(and_(*conditions))
+            total_registros = await session_postgres.scalar(count_stmt_ajustes) or 0
+            
+            dados_combinados = []
+            if total_registros > 0:
+                offset = (page - 1) * limit
+                
                 stmt_ajustes = select(
                     AppDpAjustesValoresPj.cpf.label("cpf"),
                     AppDpAjustesValoresPj.nome.label("nome"),
@@ -294,49 +238,220 @@ async def get_dados_etapa1(
                     AppDpAjustesValoresPj.vr.label("vr"),
                     AppDpAjustesValoresPj.ressarcimento.label("ressarcimento"),
                     AppDpAjustesValoresPj.outros.label("outros"),
-                    # Assumindo que 'acao_anterior' é o campo que mapeia para 'ACAO_'
                     AppDpAjustesValoresPj.acao.label("acao_"),
                     AppDpAjustesValoresPj.resultado.label("resultado"),
                     AppDpAjustesValoresPj.motivo_tab.label("motivo"),
                     AppDpAjustesValoresPj.justificativa.label("justificativa"),
                     AppDpAjustesValoresPj.dataadmissao.label("dataadmissao"),
                     AppDpAjustesValoresPj.email_colaborador.label("email_colaborador"),
-                    # 🟢 BOLA VERDE PARA POSTGRES (AJUSTADOS)
+                    AppDpAjustesValoresPj.cnpj.label("cnpj"),
+                    AppDpAjustesValoresPj.razao_social.label("razao_social"),
                     literal_column("0").label("status")
-                )
+                    
+                ).select_from(AppDpAjustesValoresPj)
+
+                stmt_ajustes = stmt_ajustes.where(and_(*conditions))
+                stmt_ajustes = stmt_ajustes.order_by(AppDpAjustesValoresPj.nome).offset(offset).limit(limit)
                 
-                # Aplica o filtro de busca ('search')
-                search_term = search.strip()
-                if search_term:
-                    stmt_ajustes = stmt_ajustes.where(
-                        (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
-                        (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
-                    )
-                
-                # Aplica OFFSET e LIMIT para buscar o bloco exato de registros ajustados
-                stmt_ajustes = stmt_ajustes.order_by(AppDpAjustesValoresPj.nome).offset(offset_postgres).limit(limit_postgres)
-        
                 result_ajustes = await session_postgres.execute(stmt_ajustes)
-                # Converte para dict() para garantir compatibilidade e modificabilidade (se precisar)
-                ajustes_postgres = [dict(r) for r in result_ajustes.mappings().all()]
+                dados_combinados = [dict(r) for r in result_ajustes.mappings().all()]
+            
+            return {"data": dados_combinados, "total": total_registros, "page": page, "limit": limit}
+            
+        except Exception as e:
+            print(f"Erro Status 0: {e}")
+            raise HTTPException(status_code=500, detail="Erro no banco Postgres")
+
+    # --- CASO B: STATUS 1 (PENDENTES / ORACLE) ---
+    elif status == "1":
+        try:
+            # 1. Buscar CPFs já cadastrados no Postgres (Exclusão)
+            stmt_cadastrados = select(AppDpAjustesValoresPj.cpf).where(filtro_data_ref)
+            result_cadastrados = await session_postgres.execute(stmt_cadastrados)
+            cpfs_cadastrados = {str(cpf).strip() for cpf in result_cadastrados.scalars().all()} 
+
+            # 2. Query Oracle
+            if not QUERY_COLABORADORES: raise HTTPException(status_code=500, detail="Query vazia")
+            
+            base_sql = f"({QUERY_COLABORADORES}) A"
+            params = {}
+            search_like = f"%{search_term.upper()}%"
+            where_parts = ["(UPPER(A.NOME) LIKE :search_like OR A.CPF LIKE :search_like)"]
+            params["search_like"] = search_like
+
+            if cpfs_cadastrados:
+                cpfs_clean = [c for c in cpfs_cadastrados if c.isalnum()]
+                if cpfs_clean:
+                    # Formata lista para o NOT IN do SQL
+                    cpfs_formatted = ", ".join([f"'{c}'" for c in cpfs_clean])
+                    where_parts.append(f"A.CPF NOT IN ({cpfs_formatted})")
+            
+            where_sql = "WHERE " + " AND ".join(where_parts)
+
+            # 3. Count Oracle
+            count_sql = f"SELECT COUNT(*) FROM {base_sql} {where_sql}"
+            total_registros = (await session_oracle.execute(text(count_sql), params)).scalar() or 0
+            
+            dados_combinados = []
+            if total_registros > 0:
+                offset = (page - 1) * limit
+                params["offset_val"] = offset
+                params["limit_val"] = limit
                 
-            except Exception as e:
-                print(f"Erro ao buscar ajustes Postgres: {e}")
-                ajustes_postgres = [] 
+                query_sql = f"""
+                    SELECT CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
+                           ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA,
+                           1 AS STATUS 
+                    FROM {base_sql} {where_sql}
+                    ORDER BY A.NOME
+                    OFFSET :offset_val ROWS FETCH NEXT :limit_val ROWS ONLY
+                """
+                
+                oracle_result = await session_oracle.execute(text(query_sql), params)
+                dados_combinados = [dict(r) for r in oracle_result.mappings().all()]
 
-    
-    # 6. CONCATENAR os resultados
-    dados_combinados = funcionarios_oracle + ajustes_postgres
-    dados_combinados.sort(key=lambda item: item.get('NOME', '').upper())
+                # >>> AQUI: Injeta CNPJ e Razão Social <<<
+                await enrich_with_prestador_data(dados_combinados)
 
-    # Retorna estrutura pronta para o Frontend
-    return {
-        "data": dados_combinados,
-        # NOVO TOTAL: Total geral (Oracle Pendentes + Postgres Ajustados)
-        "total": total_registros_geral, 
-        "page": page,
-        "limit": limit
-    }
+            return {"data": dados_combinados, "total": total_registros, "page": page, "limit": limit}
+            
+        except Exception as e:
+            print(f"Erro Status 1: {e}")
+            raise HTTPException(status_code=500, detail="Erro no Oracle ou processamento")
+
+    # --- CASO C: STATUS VAZIO (MISTO / TODOS) ---
+    else:
+        # 1. Preparar filtros e CPFs cadastrados
+        cpfs_cadastrados = set()
+        try:
+            stmt_cadastrados = select(AppDpAjustesValoresPj.cpf).where(filtro_data_ref)
+            result_cadastrados = await session_postgres.execute(stmt_cadastrados)
+            cpfs_cadastrados = {str(cpf).strip() for cpf in result_cadastrados.scalars().all()} 
+        except Exception as e:
+            print(f"Erro CPFs cadastrados: {e}")
+        
+        # 2. Configurar Oracle Query
+        if not QUERY_COLABORADORES: raise HTTPException(status_code=500, detail="Query vazia")
+        base_sql = f"({QUERY_COLABORADORES}) A"
+        params = {}
+        search_like = f"%{search_term.upper()}%"
+        where_parts = ["(UPPER(A.NOME) LIKE :search_like OR A.CPF LIKE :search_like)"]
+        params["search_like"] = search_like
+
+        if cpfs_cadastrados:
+            cpfs_clean = [c for c in cpfs_cadastrados if c.isalnum()]
+            if cpfs_clean:
+                cpfs_formatted = ", ".join([f"'{c}'" for c in cpfs_clean])
+                where_parts.append(f"A.CPF NOT IN ({cpfs_formatted})")
+
+        where_sql = "WHERE " + " AND ".join(where_parts)
+
+        # 3. Contagens (Oracle Pendentes + Postgres Ajustados)
+        total_oracle_pendentes = 0
+        try:
+            count_sql = f"SELECT COUNT(*) FROM {base_sql} {where_sql}"
+            total_oracle_pendentes = (await session_oracle.execute(text(count_sql), params)).scalar() or 0
+        except Exception as e:
+            print(f"Erro Count Oracle: {e}")
+
+        total_postgres_ajustados = 0
+        try:
+            count_pg = select(func.count()).select_from(AppDpAjustesValoresPj).where(filtro_data_ref)
+            if search_term:
+                count_pg = count_pg.where(
+                    (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
+                    (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+                )
+            total_postgres_ajustados = await session_postgres.scalar(count_pg) or 0
+        except Exception as e:
+            print(f"Erro Count Postgres: {e}")
+
+        total_registros_geral = total_oracle_pendentes + total_postgres_ajustados
+
+        # 4. Busca e Paginação Unificada
+        funcionarios_oracle = []
+        ajustes_postgres = []
+        start_index = (page - 1) * limit
+
+        # 4.1 Busca Oracle
+        if start_index < total_oracle_pendentes:
+            offset_oracle = start_index
+            limit_oracle = min(limit, total_oracle_pendentes - offset_oracle)
+            
+            if limit_oracle > 0:
+                params["offset_val"] = offset_oracle
+                params["limit_val"] = limit_oracle
+                query_sql = f"""
+                    SELECT CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
+                           ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA,
+                           1 AS STATUS 
+                    FROM {base_sql} {where_sql}
+                    ORDER BY A.NOME
+                    OFFSET :offset_val ROWS FETCH NEXT :limit_val ROWS ONLY
+                """
+                try:
+                    oracle_result = await session_oracle.execute(text(query_sql), params)
+                    funcionarios_oracle = [dict(r) for r in oracle_result.mappings().all()]
+                    
+                    # >>> AQUI: Injeta CNPJ e Razão Social no Oracle <<<
+                    await enrich_with_prestador_data(funcionarios_oracle)
+
+                except Exception as e:
+                    print(f"Erro Fetch Oracle: {e}")
+
+        # 4.2 Busca Postgres
+        slots_restantes = limit - len(funcionarios_oracle)
+        if slots_restantes > 0 and start_index < total_registros_geral:
+            offset_postgres = 0
+            if start_index >= total_oracle_pendentes:
+                offset_postgres = start_index - total_oracle_pendentes
+            
+            limit_postgres = min(slots_restantes, total_postgres_ajustados - offset_postgres)
+
+            if limit_postgres > 0:
+                try:
+                    stmt_pg = select(
+                        AppDpAjustesValoresPj.cpf.label("cpf"),
+                        AppDpAjustesValoresPj.nome.label("nome"),
+                        AppDpAjustesValoresPj.cidade.label("cidade"),
+                        AppDpAjustesValoresPj.centro_de_custo.label("centro"),
+                        AppDpAjustesValoresPj.desconto_plano.label("planos"),
+                        AppDpAjustesValoresPj.vr.label("vr"),
+                        AppDpAjustesValoresPj.ressarcimento.label("ressarcimento"),
+                        AppDpAjustesValoresPj.outros.label("outros"),
+                        AppDpAjustesValoresPj.acao.label("acao_"),
+                        AppDpAjustesValoresPj.resultado.label("resultado"),
+                        AppDpAjustesValoresPj.motivo_tab.label("motivo"),
+                        AppDpAjustesValoresPj.justificativa.label("justificativa"),
+                        AppDpAjustesValoresPj.dataadmissao.label("dataadmissao"),
+                        AppDpAjustesValoresPj.email_colaborador.label("email_colaborador"),
+                        AppDpAjustesValoresPj.cnpj.label("cnpj"),
+                        AppDpAjustesValoresPj.razao_social.label("razao_social"),
+                        literal_column("0").label("status")
+                    ).select_from(AppDpAjustesValoresPj).where(filtro_data_ref)
+                    
+                    if search_term:
+                        stmt_pg = stmt_pg.where(
+                            (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
+                            (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+                        )
+
+                    stmt_pg = stmt_pg.order_by(AppDpAjustesValoresPj.nome).offset(offset_postgres).limit(limit_postgres)
+                    result_pg = await session_postgres.execute(stmt_pg)
+                    ajustes_postgres = [dict(r) for r in result_pg.mappings().all()]
+                    
+                except Exception as e:
+                    print(f"Erro Fetch Postgres: {e}")
+
+        # 5. Retorno
+        dados_combinados = funcionarios_oracle + ajustes_postgres
+        
+        return {
+            "data": dados_combinados,
+            "total": total_registros_geral,
+            "page": page,
+            "limit": limit
+        }
 @router.get("/api/dados_etapa2")
 async def get_dados_etapa2(request: Request,):
     token = request.cookies.get("access_token")
@@ -377,14 +492,19 @@ async def update_item(item_id: str,
         
     except JWTError:
         return RedirectResponse(url="/", status_code=302)
+    hoje = date.today()
+    primeiro_dia_mes_atual = hoje.replace(day=1)
+    ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
+    if etapa == 1:
+        pass  # Lógica específica da etapa 1, se necessário
     result = await session.execute(
         select(AppDpAjustesValoresPj).where(
-            (AppDpAjustesValoresPj.cpf == item.cpf )            
+            (AppDpAjustesValoresPj.cpf == item.cpf) & 
+            (AppDpAjustesValoresPj.datareferencia == ultimo_dia_mes_anterior)
         )
     )
     atualiza_registro = result.scalar()
     if atualiza_registro:
-        
         atualiza_registro.cpf=item.cpf
         atualiza_registro.nome=item.nome
         atualiza_registro.cidade=item.cidade
@@ -407,6 +527,8 @@ async def update_item(item_id: str,
         print(f"[LOG] Registro já existe para CPF {item.cpf} e Data Referência {item.datareferencia}.")
         return {"status": "error", "message": "Atualização efetuada com sucesso."}
     else:
+        #Pegar o último dia do mês anterior
+        
         novo_registro = AppDpAjustesValoresPj(
             cpf=item.cpf,
             nome=item.nome,
@@ -416,7 +538,7 @@ async def update_item(item_id: str,
             vr=item.vr,
             resultado=item.resultado,
             motivo_tab=item.motivo,
-            datareferencia= date.today(),
+            datareferencia= ultimo_dia_mes_anterior,
             data_ajuste=datetime.now(),
             ultima_alteracao=username,
             acao=item.acao_,
@@ -424,23 +546,14 @@ async def update_item(item_id: str,
             email_colaborador=item.email_colaborador,
             outros=item.outros,
             justificativa=item.justificativa,
-            ressarcimento=item.ressarcimento
+            ressarcimento=item.ressarcimento,
+            cnpj=item.cnpj,
+            razao_social=item.razao_social
         )
         session.add(novo_registro)
         await session.commit()
         return {"status": "success", "message": "Registro cadastrado com sucesso."}
-    #
-    # db_key = "etapa1" if etapa == 1 else "etapa2"
-    # if item_id in db[db_key]:
-    #     db[db_key][item_id] = item.model_dump()
-    #     print(f"[LOG] Etapa {etapa} atualizada: {db[db_key][item_id]}")
-    print(item.cpf)
-    print(item.nome)
-    print(item.cidade)
-    if item:
-        #print(f"[LOG] Etapa 1 atualizada: {item}")
-        return {"status": "success", "item": item_id}
-    return {"status": "error", "message": "Item não encontrado"}
+    
 
 @router.post("/api/enviar_final")
 async def post_final_submission(submission: FinalSubmission):
