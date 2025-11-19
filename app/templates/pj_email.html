@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,242 +8,228 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
     <style>
-        /* --- TEMA REVERTIDO PARA CIANO (Combina com a Aurora) --- */
+        /* --- TEMA CIANO & AURORA --- */
         :root {
-          --cor-fundo-gradiente-1: #10161d;
-          --cor-fundo-gradiente-2: #090e13; /* Fundo principal */
-          --cor-card-fundo: rgba(255, 255, 255, 0.15);
-          --cor-card-fundo-hover: rgba(255, 255, 255, 0.25);
-          --cor-card-borda: rgba(255, 255, 255, 0.25);
-          --cor-texto-claro: #c2cbd6;
-          --cor-texto-branco: #e0e6ec;
-
-          /* Cores de Destaque (Ciano Original) */
-          --cor-destaque-primaria: #00bcd4; /* Ciano */
-          --cor-destaque-secundaria: #0087a3; /* Ciano escuro */
-
-          --cor-shadow-leve: rgba(0, 0, 0, 0.2);
-          --cor-shadow-media: rgba(0, 0, 0, 0.4);
-          --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
-          --cor-sucesso: #198754;
-          --cor-sucesso-hover: #157347;
-          --cor-perigo: #dc3545;
-          --cor-perigo-claro: #ffbaba;
-          
-          /* 🟢 NOVO: Cor de Alerta/Info */
-          --cor-info: #0dcaf0; 
+            --cor-fundo-gradiente-1: #10161d;
+            --cor-fundo-gradiente-2: #090e13;
+            --cor-card-fundo: rgba(255, 255, 255, 0.15);
+            --cor-card-fundo-hover: rgba(255, 255, 255, 0.25);
+            --cor-card-borda: rgba(255, 255, 255, 0.25);
+            --cor-texto-claro: #c2cbd6;
+            --cor-texto-branco: #e0e6ec;
+            --cor-destaque-primaria: #00bcd4;
+            --cor-destaque-secundaria: #0087a3;
+            --cor-shadow-leve: rgba(0, 0, 0, 0.2);
+            --cor-shadow-media: rgba(0, 0, 0, 0.4);
+            --cor-shadow-intensa: rgba(0, 0, 0, 0.6);
+            --cor-sucesso: #198754;
+            --cor-sucesso-fundo: rgba(25, 135, 84, 0.2);
+            --cor-dataPag: #f3f3f3;
+            --cor-perigo: #dc3545;
+            --cor-perigo-claro: #ffbaba;
         }
 
-        /* --- NOVO: Body (Estilo Aurora) --- */
         body {
-          background: var(--cor-fundo-gradiente-2);
-          min-height: 100vh;
-          font-family: "Inter", Arial, sans-serif;
-          color: var(--cor-texto-claro);
-          overflow-x: hidden;
-          /* Adiciona padding para a navbar fixa */
-          padding-top: 80px; /* Ajustado para a altura da nova navbar */
-          padding-bottom: 50px;
+            background: var(--cor-fundo-gradiente-2);
+            min-height: 100vh;
+            font-family: "Inter", Arial, sans-serif;
+            color: var(--cor-texto-claro);
+            overflow-x: hidden;
+            padding-top: 80px;
+            padding-bottom: 50px;
         }
-        
-        /* --- NOVO: FUNDO AURORA (Estilo Trae.ai) --- */
+
+        /* --- FUNDO AURORA --- */
         .aurora-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          z-index: -2; /* Atrás de todo o conteúdo */
-          overflow: hidden;
-          filter: blur(90px); /* O blur pesado que faz a mágica */
-          opacity: 0.25; /* Sutil, para não cansar a vista */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+            filter: blur(90px);
+            opacity: 0.25;
         }
 
         .aurora-blob {
-          position: absolute;
-          width: 60vw; /* Tamanho grande */
-          height: 60vw;
-          min-width: 500px;
-          min-height: 500px;
-          background-color: var(--cor-blob);
-          border-radius: 50%;
-          /* Animação complexa com bezier para suavidade */
-          animation: aurora-anim 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            min-width: 500px;
+            min-height: 500px;
+            background-color: var(--cor-blob);
+            border-radius: 50%;
+            animation: aurora-anim 30s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
         }
 
-        /* Posições e delays diferentes para cada bolha */
         .aurora-blob:nth-child(1) {
-          top: -30vh;
-          left: -15vw;
-          animation-delay: 0s;
-          animation-duration: 32s;
+            top: -30vh;
+            left: -15vw;
+            animation-delay: 0s;
+            animation-duration: 32s;
         }
+
         .aurora-blob:nth-child(2) {
-          top: 10vh;
-          right: -20vw;
-          animation-delay: -8s;
-          animation-duration: 30s;
+            top: 10vh;
+            right: -20vw;
+            animation-delay: -8s;
+            animation-duration: 30s;
         }
+
         .aurora-blob:nth-child(3) {
-          bottom: -25vh;
-          left: 20vw;
-          animation-delay: -16s;
-          animation-duration: 28s;
+            bottom: -25vh;
+            left: 20vw;
+            animation-delay: -16s;
+            animation-duration: 28s;
         }
+
         .aurora-blob:nth-child(4) {
-          bottom: 0vh;
-          right: 30vw;
-          animation-delay: -24s;
-          animation-duration: 34s;
+            bottom: 0vh;
+            right: 30vw;
+            animation-delay: -24s;
+            animation-duration: 34s;
         }
 
-        /* A animação que move, escala e gira */
         @keyframes aurora-anim {
-          0% {
-            transform: translate(0, 0) scale(1) rotate(0deg);
-          }
-          25% {
-            transform: translate(40vw, 30vh) scale(1.2) rotate(30deg);
-          }
-          50% {
-            transform: translate(10vw, -20vh) scale(0.8) rotate(60deg);
-          }
-          75% {
-            transform: translate(-30vw, 20vh) scale(1.1) rotate(90deg);
-          }
-          100% {
-            transform: translate(0, 0) scale(1) rotate(0deg);
-          }
-        }
-        /* --- FIM DO FUNDO AURORA --- */
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
 
-        /* --- NOVO: Estilos da Navbar Custom --- */
+            25% {
+                transform: translate(40vw, 30vh) scale(1.2) rotate(30deg);
+            }
+
+            50% {
+                transform: translate(10vw, -20vh) scale(0.8) rotate(60deg);
+            }
+
+            75% {
+                transform: translate(-30vw, 20vh) scale(1.1) rotate(90deg);
+            }
+
+            100% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+        }
+
+        /* --- Navbar --- */
         .navbar-custom {
-          background: rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 4px 30px var(--cor-shadow-leve);
-          padding: 0.8rem 1.5rem;
-          z-index: 1040;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 30px var(--cor-shadow-leve);
+            padding: 0.8rem 1.5rem;
+            z-index: 1040;
         }
+
         .navbar-custom .navbar-brand {
-          color: var(--cor-texto-branco);
-          font-weight: 700;
-          font-size: 1.3rem;
-          text-shadow: 0 0 5px rgba(0, 188, 212, 0.2); /* Tema Ciano */
+            color: var(--cor-texto-branco);
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-shadow: 0 0 5px rgba(0, 188, 212, 0.2);
         }
+
         .navbar-custom .nav-link {
-          color: var(--cor-texto-claro);
-          font-weight: 500;
-          transition: all 0.3s ease;
-          padding: 0.5rem 1rem;
-          border-radius: 8px;
+            color: var(--cor-texto-claro);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
         }
+
         .navbar-custom .nav-link:hover,
         .navbar-custom .nav-link.active {
-          color: var(--cor-texto-branco);
-          background-color: rgba(255, 255, 255, 0.05);
-          text-shadow: 0 0 3px rgba(0, 188, 212, 0.2); /* Tema Ciano */
-        }
-        .navbar-toggler {
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .navbar-toggler-icon {
-          /* Usa o filtro do Bootstrap 5.3 para o ícone do toggler */
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-        }
-        .dropdown-menu {
-          background: rgba(18, 28, 38, 0.9);
-          backdrop-filter: blur(15px);
-          border: 1px solid var(--cor-card-borda);
-          box-shadow: 0 15px 40px var(--cor-shadow-media);
-          border-radius: 12px;
-          padding: 0.75rem 0;
-        }
-        .dropdown-item {
-          color: var(--cor-texto-claro) !important;
-          font-weight: 500;
-          padding: 0.6rem 1.25rem;
-          transition: all 0.2s ease;
-        }
-        .dropdown-item:hover {
-          background-color: rgba(0, 188, 212, 0.15); /* Tema Ciano */
-          color: var(--cor-destaque-primaria) !important;
-        }
-        .dropdown-item-text {
-          color: var(--cor-texto-branco) !important;
-          padding: 0.6rem 1.25rem;
-          font-weight: 600;
-        }
-        .dropdown-divider {
-          border-color: rgba(255, 255, 255, 0.1);
-          margin: 0.5rem 0;
-        }
-        /* --- FIM Estilos Navbar --- */
-        
-        /* --- Contêiner principal (Corrigido) --- */
-        .dashboard-container {
-          width: 90%;
-          margin: 0 auto; /* Margin-top é controlado pelo padding-top do body */
-          padding: 35px 30px;
-          background: var(--cor-card-fundo);
-          backdrop-filter: blur(12px);
-          border: 1px solid var(--cor-card-borda);
-          border-radius: 10px;
-          box-shadow: 0 15px 40px var(--cor-shadow-media);
-          position: relative;
-          overflow: hidden;
-          min-height: 400px;
+            color: var(--cor-texto-branco);
+            background-color: rgba(255, 255, 255, 0.05);
+            text-shadow: 0 0 3px rgba(0, 188, 212, 0.2);
         }
 
-        /* --- NOVO: Borda Animada --- */
+        .navbar-toggler {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .dropdown-menu {
+            background: rgba(18, 28, 38, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--cor-card-borda);
+            box-shadow: 0 15px 40px var(--cor-shadow-media);
+            border-radius: 12px;
+        }
+
+        .dropdown-item {
+            color: var(--cor-texto-claro) !important;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 188, 212, 0.15);
+            color: var(--cor-destaque-primaria) !important;
+        }
+
+        .dropdown-item-text {
+            color: var(--cor-texto-branco) !important;
+            font-weight: 600;
+        }
+
+        .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Dashboard --- */
+        .dashboard-container {
+            width: 90%;
+            margin: 0 auto;
+            padding: 35px 30px;
+            background: var(--cor-card-fundo);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--cor-card-borda);
+            border-radius: 10px;
+            box-shadow: 0 15px 40px var(--cor-shadow-media);
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
         .dashboard-container::before {
-          content: "";
-          position: absolute;
-          top: -2px;
-          left: -2px;
-          right: -2px;
-          bottom: -2px;
-          background: linear-gradient(
-            45deg,
-            var(--cor-destaque-primaria) 0%,
-            #007bff 25%,
-            var(--cor-destaque-primaria) 50%,
-            #007bff 75%,
-            var(--cor-destaque-primaria) 100%
-          );
-          background-size: 200% 200%;
-          border-radius: 10px; /* Bate com o border-radius do container */
-          z-index: -1;
-          animation: gradient-border 10s ease infinite;
-          opacity: 0.5;
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--cor-destaque-primaria) 0%, #007bff 25%, var(--cor-destaque-primaria) 50%, #007bff 75%, var(--cor-destaque-primaria) 100%);
+            background-size: 200% 200%;
+            border-radius: 10px;
+            z-index: -1;
+            animation: gradient-border 10s ease infinite;
+            opacity: 0.5;
         }
+
         @keyframes gradient-border {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
-        /* --- FIM Borda Animada --- */
 
         .dashboard-container h3 {
             color: var(--cor-texto-branco);
@@ -250,37 +237,30 @@
             text-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
             margin-bottom: 0.5rem !important;
         }
-          .dashboard-container p {
+
+        .dashboard-container p {
             color: var(--cor-texto-claro);
             font-size: 1.05rem;
             margin-bottom: 1rem !important;
-          }
-
-        /* --- Animação de Fade (Transição de Página) --- */
-        .page-fade-enter-active,
-        .page-fade-leave-active {
-          transition: opacity 0.3s ease;
-        }
-        .page-fade-enter-from,
-        .page-fade-leave-to {
-          opacity: 0;
         }
 
-        /* --- Stepper (Com melhorias) --- */
+        /* --- Stepper --- */
         .stepper-wrapper {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
         }
+
         .stepper-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            flex-basis: 0;
             flex-grow: 1;
+            flex-basis: 0;
         }
+
         .step-counter {
             width: 40px;
             height: 40px;
@@ -294,18 +274,20 @@
             font-size: 1.2rem;
             transition: all 0.3s ease;
         }
+
         .step-name {
             margin-top: 8px;
             color: #888;
             font-size: 0.9rem;
             transition: all 0.3s ease;
         }
+
         .stepper-line {
             flex-grow: 1;
             height: 3px;
-            background-color: #333; /* Cor de fundo (vazio) */
+            background-color: #333;
             margin: 0 10px;
-            position: relative; 
+            position: relative;
             transition: all 0.3s ease;
         }
 
@@ -315,37 +297,37 @@
             top: 0;
             left: 0;
             height: 100%;
-            width: 0%; /* Começa vazio */
+            width: 0%;
             background-color: var(--cor-sucesso);
-            transition: width 0.5s ease-out; /* A animação! */
+            transition: width 0.5s ease-out;
         }
 
-        /* Estado ATIVO */
-          .stepper-item.active .step-counter {
+        .stepper-item.active .step-counter {
             background-color: var(--cor-destaque-primaria);
             color: white;
             transform: scale(1.15);
             box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
-          }
-          .stepper-item.active .step-name {
+        }
+
+        .stepper-item.active .step-name {
             color: var(--cor-destaque-primaria);
             font-weight: bold;
-          }
-          /* Estado CONCLUÍDO */
-          .stepper-item.completed .step-counter {
+        }
+
+        .stepper-item.completed .step-counter {
             background-color: var(--cor-sucesso);
             color: white;
-            font-size: 1.5rem;
-          }
-          .stepper-item.completed .step-name {
+        }
+
+        .stepper-item.completed .step-name {
             color: var(--cor-texto-claro);
-          }
-          
-          .stepper-line.completed::before {
+        }
+
+        .stepper-line.completed::before {
             width: 100%;
-          }
-        
-        /* --- Estilos da Tabela --- */
+        }
+
+        /* --- Tabela e Checkbox Bonito --- */
         .table-container-custom {
             background: var(--cor-card-fundo);
             backdrop-filter: blur(8px);
@@ -355,12 +337,13 @@
             box-shadow: 0 5px 20px var(--cor-shadow-leve);
             overflow: hidden;
         }
+
         .table-custom {
             background-color: transparent;
             color: var(--cor-texto-claro);
-            border-color: var(--cor-card-borda);
             margin-bottom: 0;
         }
+
         .table-custom th {
             color: var(--cor-texto-branco);
             font-weight: 500;
@@ -370,268 +353,221 @@
             border-color: var(--cor-card-borda) !important;
             background-color: rgba(255, 255, 255, 0.05);
         }
+
         .table-custom td {
             border-color: var(--cor-card-borda) !important;
             vertical-align: middle;
             font-size: 0.85rem;
         }
-        .table-custom.table-striped > tbody > tr:nth-of-type(even) {
-            background-color: rgba(0, 0, 0, 0.15);
-        }
-        .table-custom.table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: transparent;
-        }
-        .table-custom tbody tr {
-            transition: all 0.2s ease-out;
-        }
+
         .table-custom tbody tr:hover {
             background-color: var(--cor-card-fundo-hover);
             color: var(--cor-texto-branco);
-            transform: translateY(-2px);
-        }
-        .table-container-custom .table-responsive {
-            padding: 0.5rem;
-        }
-        .table-custom th,
-        .table-custom td {
-            padding: 0.85rem 1rem;
-        }
-        .table-custom .btn {
-            padding: 0.25rem 0.6rem;
-            font-size: 0.85rem;
         }
 
-        .btn {
-            transition: all 0.2s ease-out;
-        }
-        .btn:hover:not(:disabled) {
-            transform: scale(1.03);
-            box-shadow: 0 4px 15px var(--cor-shadow-leve);
+        /* 🟢 Visual para Item Enviado */
+        .tr-enviado {
+            background-color: rgba(25, 135, 84, 0.15) !important;
+            /* Fundo esverdeado */
+            opacity: 0.75;
+            /* Um pouco mais apagado */
         }
 
-        /* --- Estilos de Formulário --- */
-        .form-control-custom, .form-select-custom {
+        .tr-enviado:hover {
+            opacity: 1;
+            background-color: rgba(25, 135, 84, 0.25) !important;
+        }
+
+        /* 🟢 Checkbox Bonito */
+        .custom-checkbox {
+            width: 1.3em;
+            height: 1.3em;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--cor-card-borda);
+            border-radius: 6px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            display: grid;
+            place-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .custom-checkbox::before {
+            content: "";
+            width: 0.75em;
+            height: 0.75em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--cor-destaque-primaria);
+            background-color: var(--cor-destaque-primaria);
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .custom-checkbox:checked::before {
+            transform: scale(1);
+        }
+
+        .custom-checkbox:checked {
+            border-color: var(--cor-destaque-primaria);
+            background-color: rgba(0, 188, 212, 0.1);
+        }
+
+        .custom-checkbox:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
+        }
+
+        /* 🟢 Alerta de Seleção Global */
+        .selection-alert {
+            background-color: rgba(255, 193, 7, 0.15);
+            border: 1px solid rgba(255, 193, 7, 0.4);
+            color: #ffda6a;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .selection-alert:hover {
+            background-color: rgba(255, 193, 7, 0.25);
+            text-decoration: underline;
+        }
+
+        .selection-alert strong {
+            color: #fff;
+        }
+
+        /* --- Form Elements --- */
+        .form-control-custom,
+        .form-select-custom {
             background: var(--cor-card-fundo);
             border: 1px solid var(--cor-card-borda);
             color: var(--cor-texto-branco);
             border-radius: 0.375rem;
             transition: all 0.3s ease;
         }
-        .form-control-custom:focus, .form-select-custom:focus {
+
+        .form-control-custom:focus,
+        .form-select-custom:focus {
             background: var(--cor-card-fundo);
             border-color: var(--cor-destaque-primaria);
             color: var(--cor-texto-branco);
             box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
         }
+
         .form-control-custom::placeholder {
             color: var(--cor-texto-claro);
             opacity: 0.7;
         }
-        
-        /* Estilos específicos para o <select> */
-        .form-select-custom {
-             -webkit-appearance: none;
-             -moz-appearance: none;
-             appearance: none;
-             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c2cbd6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-             background-repeat: no-repeat;
-             background-position: right 0.75rem center;
-             background-size: 16px 12px;
-             padding-right: 2.5rem; /* Espaço para a seta */
-        }
-        .form-select-custom option {
-             background-color: #090e13;
-             color: var(--cor-texto-branco);
-        }
-        
-        /* Desabilita a aparência padrão de 'disabled' */
-        .form-control-custom:disabled, .form-control-custom[readonly],
-        .form-select-custom:disabled, .form-select-custom[readonly] {
-             background-color: rgba(0, 0, 0, 0.1);
-             color: var(--cor-texto-claro);
-             opacity: 0.7;
-             border-color: var(--cor-card-borda);
-        }
-        
-        /* --- ESTILOS DE VALIDAÇÃO --- */
-        .form-control-custom.is-invalid, 
-        .form-select-custom.is-invalid {
-             border-color: var(--cor-perigo) !important;
-             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-        }
-        .text-danger {
-             color: var(--cor-perigo-claro) !important; /* Vermelho claro para fundos escuros */
-             font-size: 0.875em;
-        }
-        /* --- Fim Estilos Validação --- */
 
-        .input-group-glass .form-control-custom {
-            border-right: 0;
+        .form-select-custom option {
+            background-color: #090e13;
+            color: var(--cor-texto-branco);
         }
-        .input-group-glass .form-control-custom:focus {
-            border-right: 0;
+
+        .form-control-custom:disabled,
+        .form-control-custom[readonly] {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: var(--cor-texto-claro);
+            opacity: 0.7;
         }
+
+        .form-control-custom.is-invalid,
+        .form-select-custom.is-invalid {
+            border-color: var(--cor-perigo) !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+        .text-danger {
+            color: var(--cor-perigo-claro) !important;
+            font-size: 0.875em;
+        }
+
         .input-group-glass .input-group-text {
             background: var(--cor-card-fundo);
             border: 1px solid var(--cor-card-borda);
             color: var(--cor-destaque-primaria);
             border-left: 0;
-            border-radius: 0.375rem;
-        }
-        .form-control-custom:focus + .input-group-text {
-            border-color: var(--cor-destaque-primaria);
-            border-left: 0;
         }
 
-        /* --- Estilos do Modal --- */
-          .modal-content-custom {
+        /* --- Modal --- */
+        .modal-content-custom {
             background: #0e2231b0;
             backdrop-filter: blur(15px);
             border: 1px solid var(--cor-card-borda);
-            border-radius: 15px;
             color: var(--cor-texto-claro);
-            box-shadow: 0 15px 40px var(--cor-shadow-media);
-          }
-          .modal-content-custom .modal-header {
-            border-bottom: 1px solid var(--cor-card-borda);
-          }
-          .modal-content-custom .modal-header .modal-title {
-            color: var(--cor-texto-branco);
-            font-weight: 600;
-          }
-          .modal-content-custom .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%);
-          }
-          .modal-content-custom .modal-body .form-label {
-            color: var(--cor-texto-claro);
-            font-weight: 500;
-          }
-          .modal-content-custom .form-control-custom,
-          .modal-content-custom .form-select-custom {
-            background: rgba(0, 0, 0, 0.2);
-          }
-          .modal-content-custom .modal-footer {
-            border-top: 1px solid var(--cor-card-borda);
-          }
-          .modal-footer .btn-outline-secondary {
-            color: var(--cor-texto-claro);
-            border-color: var(--cor-card-borda);
-            background: transparent;
-          }
-          .modal-footer .btn-outline-secondary:hover {
-            background-color: var(--cor-card-fundo-hover);
-            border-color: var(--cor-texto-claro);
-            color: var(--cor-texto-branco);
-          }
+        }
 
-        /* --- Scrollbar --- */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .modal-content-custom .modal-header {
+            border-bottom: 1px solid var(--cor-card-borda);
         }
-        ::-webkit-scrollbar-track {
-            background: var(--cor-fundo-gradiente-2);
+
+        .modal-content-custom .form-control-custom {
+            background: rgba(0, 0, 0, 0.2);
         }
-        ::-webkit-scrollbar-thumb {
-            background-color: var(--cor-card-borda);
-            border-radius: 10px;
-            border: 2px solid var(--cor-fundo-gradiente-2);
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: var(--cor-destaque-primaria);
-        }
-        
-        /* --- Loading Overlay --- */
-          #loading-overlay {
-            /* MODIFICADO: Não mais 'fixed', para ficar dentro do #app */
-            position: absolute; 
+
+        /* --- Loading --- */
+        #loading-overlay {
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100%; /* Ocupa 100% do #app */
-            height: 100%; /* Ocupa 100% do #app */
+            width: 100%;
+            height: 100%;
             background-color: var(--cor-fundo-gradiente-2);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.3s ease-in-out;
-            border-radius: 10px; /* Para bater com o dashboard-container */
-          }
-          .spinner {
+        }
+
+        .spinner {
             width: 50px;
             height: 50px;
             border: 5px solid var(--cor-card-borda);
             border-top-color: var(--cor-destaque-primaria);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-
-        /* --- Estilo para a paginação --- */
-        .pagination-custom {
-             --bs-pagination-color: var(--cor-destaque-primaria);
-             --bs-pagination-active-bg: var(--cor-destaque-primaria);
-             --bs-pagination-active-border-color: var(--cor-destaque-primaria);
-             --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(0, 188, 212, 0.25);
-             --bs-pagination-disabled-color: var(--cor-card-borda);
-             --bs-pagination-bg: var(--cor-card-fundo);
-             --bs-pagination-border-color: var(--cor-card-borda);
-        }
-        .pagination-custom .page-link {
-             background-color: var(--bs-pagination-bg);
-             border-color: var(--bs-pagination-border-color);
-             color: var(--bs-pagination-color);
-        }
-        .pagination-custom .page-item.active .page-link {
-             background-color: var(--bs-pagination-active-bg);
-             border-color: var(--bs-pagination-active-border-color);
-             color: white;
-        }
-          .pagination-custom .page-item.disabled .page-link {
-             color: var(--bs-pagination-disabled-color);
-             background-color: transparent;
-             border-color: var(--bs-pagination-border-color);
-        }
-        .pagination-custom .page-link:hover {
-             background-color: var(--cor-card-fundo-hover);
-             color: var(--cor-texto-branco);
         }
 
-        /* 🟢 CORRIGIDO: Estilos do Toast (Notificação) - Fixado no canto INFERIOR DIREITO */
-        .toast-container {
-            position: fixed;
-            bottom: 20px; 
-            right: 20px;
-            z-index: 1050;
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        .toast-custom {
-            background-color: rgba(20, 30, 40, 0.95);
-            color: var(--cor-texto-branco);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px var(--cor-shadow-media);
-            transition: all 0.3s ease-in-out;
+
+        /* --- SweetAlert2 Theme --- */
+        .swal2-popup {
+            background: var(--cor-fundo-gradiente-1) !important;
+            color: var(--cor-texto-branco) !important;
+            border: 1px solid var(--cor-card-borda) !important;
+            border-radius: 15px !important;
         }
-        .toast-custom .toast-header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--cor-texto-branco);
-            background-color: transparent;
+
+        .swal2-title {
+            color: var(--cor-texto-branco) !important;
+            font-size: 1rem !important;
         }
-        .toast-custom .toast-body {
-            font-size: 1rem;
-            font-weight: 500;
+
+        .swal2-html-container {
+            color: var(--cor-texto-claro) !important;
         }
-        /* Icones e Cores do Header do Toast */
-        .toast-header .text-success { color: var(--cor-sucesso) !important; }
-        .toast-header .text-danger { color: var(--cor-perigo-claro) !important; }
-        .toast-header .text-info { color: var(--cor-destaque-primaria) !important; }
-        
+
+        .swal2-timer-progress-bar {
+            background-color: var(--cor-destaque-primaria) !important;
+        }
+
+        .swal2-toast {
+            border: 1px solid var(--cor-card-borda) !important;
+            box-shadow: 0 8px 25px var(--cor-shadow-intensa) !important;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="aurora-container">
@@ -640,120 +576,83 @@
         <div class="aurora-blob" style="--cor-blob: #00bcd4"></div>
         <div class="aurora-blob" style="--cor-blob: #ad1457"></div>
     </div>
-    
+
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#"
-          ><i class="bi bi-person-vcard me-2"></i>{{empresa}}</a
-        >
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarContent"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            {% for item in menus %} {% if item.submenu %}
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {{ item.title }}
-              </a>
-              <ul class="dropdown-menu">
-                {% for sub in item.submenu %}
-                <li>
-                  <a class="dropdown-item" href="{{ sub.url }}"
-                    >{{ sub.title }}</a
-                  >
-                </li>
-                {% endfor %}
-              </ul>
-            </li>
-            {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
-            </li>
-            {% endif %} {% endfor %}
-          </ul>
-          <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="bi bi-person-circle me-1"></i> Perfil
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <span class="dropdown-item-text"
-                    ><strong>{{ username }}</strong></span
-                  >
-                </li>
-                <li>
-                  <span class="dropdown-item-text text-muted small"
-                    >{{ user_username }}</span
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item" href="/logout"
-                    ><i class="bi bi-box-arrow-right me-2"></i> Sair</a
-                  >
-                </li>
-              </ul>
-            </li>
-          </ul>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="bi bi-person-vcard me-2"></i>{{empresa}}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% for item in menus %} {% if item.submenu %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {{ item.title }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for sub in item.submenu %}
+                            <li><a class="dropdown-item" href="{{ sub.url }}">{{ sub.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ item.url }}">{{ item.title }}</a></li>
+                    {% endif %} {% endfor %}
+                </ul>
+                <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i> Perfil
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text"><strong>{{ username }}</strong></span></li>
+                            <li><span class="dropdown-item-text text-muted small">{{ user_username }}</span></li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>
+                                    Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
 
     {% raw %}
     <div id="app" class="dashboard-container mx-auto">
-        
+
         <div id="loading-overlay" v-if="isLoading">
             <div class="spinner"></div>
         </div>
-    
+
         <div v-else>
             <div class="stepper-wrapper">
                 <div class="stepper-item" :class="{ 'active': currentStep === 1, 'completed': currentStep > 1 }">
-                    <div class="step-counter">
-                        <i v-if="currentStep > 1" class="bi bi-check-lg"></i>
-                        <span v-else>1</span>
+                    <div class="step-counter"><i v-if="currentStep > 1" class="bi bi-check-lg"></i><span v-else>1</span>
                     </div>
                     <div class="step-name">Verificação</div>
                 </div>
                 <div class="stepper-line" :class="{ 'completed': currentStep > 1 }"></div>
                 <div class="stepper-item" :class="{ 'active': currentStep === 2, 'completed': currentStep > 2 }">
-                    <div class="step-counter">
-                        <i v-if="currentStep > 2" class="bi bi-check-lg"></i>
-                        <span v-else>2</span>
+                    <div class="step-counter"><i v-if="currentStep > 2" class="bi bi-check-lg"></i><span v-else>2</span>
                     </div>
-                    <div class="step-name">Validação</div>
+                    <div class="step-name">Datas de Corte</div>
                 </div>
                 <div class="stepper-line" :class="{ 'completed': currentStep > 2 }"></div>
                 <div class="stepper-item" :class="{ 'active': currentStep === 3 }">
-                    <div class="step-counter">
-                        <i v-if="currentStep === 3 && selecaoFinal.length > 0" class="bi bi-send"></i>
-                        <span v-else>3</span>
-                    </div>
+                    <div class="step-counter"><i
+                            v-if="currentStep === 3 && (selecaoFinal.length > 0 || selecionarTudoGlobal)"
+                            class="bi bi-send"></i><span v-else>3</span></div>
                     <div class="step-name">Envio de E-mail</div>
                 </div>
             </div>
-    
+
             <Transition name="page-fade" mode="out-in">
-    
+
                 <div v-if="currentStep === 1" key="step1">
                     <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
                         <div>
@@ -761,19 +660,18 @@
                             <p>Confira os dados da fonte principal e faça os ajustes necessários.</p>
                         </div>
                         <div class="input-group input-group-glass" style="max-width: 410px;">
-                             <select v-model="filtroStatus" class="form-select form-select-custom" style="max-width: 165px;">
+                            <select v-model="filtroStatus" class="form-select form-select-custom"
+                                style="max-width: 165px;">
                                 <option value="">Todos</option>
                                 <option value="1">🟡 Pendentes</option>
                                 <option value="0">🟢 Ajustados</option>
-                             </select>
-                                                        
-                             <input type="text" v-model="search1" class="form-control form-control-custom" placeholder="Pesquisar na Etapa 1...">
-                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                             
+                            </select>
+                            <input type="text" v-model="search1" class="form-control form-control-custom"
+                                placeholder="Pesquisar na Etapa 1...">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
                         </div>
-                        
                     </div>
-                    
+
                     <div class="table-container-custom">
                         <div class="table-responsive">
                             <table class="table table-custom table-striped align-middle">
@@ -781,174 +679,208 @@
                                     <tr>
                                         <th>#</th>
                                         <th>CPF</th>
-                                       <th>Nome</th>
+                                        <th>Nome</th>
                                         <th>Cidade</th>
                                         <th>Centro de Custo</th>
-                                        <th>PS/Odonto</th>
-                                        <th>Ressarcimento</th>
-                                        <th>V. Refeição</th>
-                                        <th>Outros</th>
+                                        <th class="text-end">Planos</th>
+                                        <th class="text-end">Ressarc.</th>
+                                        <th class="text-end">VR</th>
+                                        <th class="text-end">Outros</th>
                                         <th>Ação</th>
-                                        <th>Total</th>
-                                        <th>Ação</th> </tr>
+                                        <th class="text-end">Total</th>
+                                        <th>Edit</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in paginatedEtapa1" :key="item.cpf">
-                                       <td>
-                                            <span v-if="item.status === 0" style="color: green;">🟢 </span>
-                                            <span v-else-if="item.status === 1" style="color: gold;">🟡</span>       
+                                    <tr v-if="isLoadingEtapa1">
+                                        <td colspan="12" class="text-center p-5">
+                                            <div class="spinner-border text-info" role="status"></div>
+                                        </td>
+                                    </tr>
+                                    <tr v-else v-for="item in paginatedEtapa1" :key="item.cpf">
+                                        <td>
+                                            <span v-if="item.status === 0" style="color: green;">🟢</span>
+                                            <span v-else-if="item.status === 1" style="color: gold;">🟡</span>
                                             <span v-else>❓</span>
                                         </td>
                                         <td>{{ item.cpf }}</td>
-                                        <td>{{ (item.nome) }}</td>
+                                        <td>{{ item.nome }}</td>
                                         <td>{{ item.cidade }}</td>
                                         <td>{{ item.centro }}</td>
-                                        <td class="text-end">{{ formatCurrency(item.planos) }}</td>                                        
+                                        <td class="text-end">{{ formatCurrency(item.planos) }}</td>
                                         <td class="text-end">{{ formatCurrency(item.ressarcimento) }}</td>
                                         <td class="text-end">{{ formatCurrency(item.vr) }}</td>
-                                            
                                         <td class="text-end">{{ formatCurrency(item.outros) }}</td>
-                                  
                                         <td>{{ item.acao_ }}</td>
-                                      
-                                            <td  class="text-end">
-                                            <span v-if="item.resultado < 0" style="color: rgb(233, 8, 8); font-weight: bold;">{{ formatCurrency(item.resultado) }}</span>
-                                            <span v-else-if="item.resultado >= 0 " style="color: rgb(6, 100, 6); font-weight: bold;">{{ formatCurrency(item.resultado) }}</span>
-                                            <span v-else>❓</span>
-                                            </td>
-                                        
-                                        <td>
-                                            <button class="btn btn-sm btn-warning" @click="abrirModal(item, 1)">
-                                                <i class="bi bi-pencil-square me-1"></i> 
-                                            </button>
+                                        <td class="text-end">
+                                            <span
+                                                :style="{ color: item.resultado < 0 ? 'var(--cor-perigo-claro)' : 'var(--cor-sucesso)', fontWeight: 'bold' }">{{
+                                                formatCurrency(item.resultado) }}</span>
                                         </td>
-                                    </tr>
-                                    <tr v-if="filteredEtapa1.length === 0">
-                                        <td :colspan="11" class="text-center" style="padding: 2rem;">
-                                            <i class="bi bi-search me-2"></i> Nenhum item encontrado.
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" @click="abrirModal(item, 1)"><i
+                                                    class="bi bi-pencil-square"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-    
-                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="totalItems1 > 0">
-                        <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
-                            Página {{ etapa1Page }} de {{ totalPage1 }}. (Total geral: {{ totalItems1 }} itens)
-                        </span>
-                        <nav aria-label="Paginação Etapa 1" v-if="totalPage1 > 1">
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2"
+                        v-if="totalItems1 > 0">
+                        <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">Página {{ etapa1Page }} de {{
+                            totalPage1 }}. (Total: {{ totalItems1 }})</span>
+                        <nav v-if="totalPage1 > 1">
                             <ul class="pagination pagination-sm mb-0 pagination-custom">
-                                <li class="page-item" :class="{ 'disabled': etapa1Page === 1 }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage1(etapa1Page - 1)"><i class="bi bi-chevron-left"></i></a>
-                                </li>
-                                
-                                <li class="page-item" v-for="page in visiblePages1" :key="'1-'+page" :class="{ 'active': page === etapa1Page, 'disabled': page === '...' }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage1(page)">{{ page }}</a>
-                                </li>
-    
-                                <li class="page-item" :class="{ 'disabled': etapa1Page === totalPage1 }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage1(etapa1Page + 1)"><i class="bi bi-chevron-right"></i></a>
-                                </li>
+                                <li class="page-item" :class="{ disabled: etapa1Page === 1 }"><a class="page-link"
+                                        href="#" @click.prevent="goToPage1(etapa1Page - 1)"><i
+                                            class="bi bi-chevron-left"></i></a></li>
+                                <li class="page-item" v-for="page in visiblePages1" :key="page"
+                                    :class="{ active: page === etapa1Page, disabled: page === '...' }"><a
+                                        class="page-link" href="#" @click.prevent="goToPage1(page)">{{ page }}</a></li>
+                                <li class="page-item" :class="{ disabled: etapa1Page === totalPage1 }"><a
+                                        class="page-link" href="#" @click.prevent="goToPage1(etapa1Page + 1)"><i
+                                            class="bi bi-chevron-right"></i></a></li>
                             </ul>
                         </nav>
                     </div>
-                    
+
                     <button @click="currentStep = 2" class="btn btn-primary float-end mt-3">Próximo</button>
                 </div>
-    
+
                 <div v-if="currentStep === 2" key="step2">
-                    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
-                        <div>
-                            <h3>Etapa 2: Validação</h3>
-                            <p>Confira os dados da fonte secundária (ex: produtos, status).</p>
-                        </div>
-                        <div class="input-group input-group-glass" style="max-width: 320px;">
-                             <input type="text" v-model="search2" class="form-control form-control-custom" placeholder="Pesquisar na Etapa 2...">
-                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        </div>
+                    <div class="text-center mb-4">
+                        <h3>Etapa 2: Definição de Datas</h3>
+                        <p>Informe as datas de corte e pagamento.</p>
                     </div>
-                    
-                    <div class="table-container-custom">
-                        <div class="table-responsive">
-                            <table class="table table-custom table-striped align-middle">
-                                <thead>
-                                    <tr><th>ID</th><th>Produto</th><th>Status</th><th>Ação</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="item in paginatedEtapa2" :key="item.id">
-                                        <td>{{ item.id }}</td>
-                                        <td>{{ item.nome }}</td>
-                                        <td>{{ item.email }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning" @click="abrirModal(item, 2)">
-                                                <i class="bi bi-pencil-square me-1"></i> Alterar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr v-if="filteredEtapa2.length === 0">
-                                        <td :colspan="4" class="text-center" style="padding: 2rem;">
-                                            <i class="bi bi-search me-2"></i> Nenhum item encontrado.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="row justify-content-center mt-5">
+                        <div class="col-md-8 col-lg-6">
+                            <div class="p-4"
+                                style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--cor-card-borda); border-radius: 15px;">
+                                <div class="mb-4">
+                                    <label class="form-label text-white"><i class="bi bi-receipt me-2"></i>Data de
+                                        Emissão da Nota</label>
+                                    <input type="date" v-model="dataEmissao" class="form-control form-control-custom"
+                                        style="color-scheme: dark;">
+                                </div>
+                                <div>
+                                    <label class="form-label text-white"><i class="bi bi-cash-coin me-2"></i>Data
+                                        Prevista de Pagamento</label>
+                                    <input type="date" v-model="dataPagamento" class="form-control form-control-custom"
+                                        style="color-scheme: dark;">
+                                </div>
+                            </div>
                         </div>
                     </div>
-    
-                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="filteredEtapa2.length > 0">
-                        <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
-                            Página {{ etapa2Page }} de {{ totalPage2 }}. (Mostrando {{ paginatedEtapa2.length }} de {{ filteredEtapa2.length }} itens)
-                        </span>
-                        <nav aria-label="Paginação Etapa 2" v-if="totalPage2 > 1">
-                            <ul class="pagination pagination-sm mb-0 pagination-custom">
-                                <li class="page-item" :class="{ 'disabled': etapa2Page === 1 }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage2(etapa2Page - 1)"><i class="bi bi-chevron-left"></i></a>
-                                </li>
-                                <li class="page-item" v-for="page in visiblePages2" :key="'2-'+page" :class="{ 'active': page === etapa2Page, 'disabled': page === '...' }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage2(page)">{{ page }}</a>
-                                </li>
-                                <li class="page-item" :class="{ 'disabled': etapa2Page === totalPage2 }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage2(etapa2Page + 1)"><i class="bi bi-chevron-right"></i></a>
-                                </li>
-                            </ul>
-                        </nav>
+                    <div class="d-flex justify-content-between mt-5">
+                        <button @click="currentStep = 1" class="btn btn-secondary">Voltar</button>
+                        <button @click="currentStep = 3" class="btn btn-primary"
+                            :disabled="!dataEmissao || !dataPagamento">Próximo <i
+                                class="bi bi-chevron-right ms-1"></i></button>
                     </div>
-    
-                    <button @click="currentStep = 1" class="btn btn-secondary mt-3">Voltar</button>
-                    <button @click="currentStep = 3" class="btn btn-primary float-end mt-3">Próximo</button>
                 </div>
-    
+
                 <div v-if="currentStep === 3" key="step3">
                     <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
                         <div>
                             <h3>Etapa 3: Envio de E-mail</h3>
-                            <p>Selecione quais itens devem ser incluídos no disparo de e-mail.</p>
+                            <p>Selecione os itens para disparo. Utilize os filtros para segmentar.</p>
                         </div>
-                        <div class="input-group input-group-glass" style="max-width: 320px;">
-                             <input type="text" v-model="search3" class="form-control form-control-custom" placeholder="Pesquisar na Etapa Final...">
-                             <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <div class="d-flex gap-2" style="max-width: 600px; flex-grow: 1; justify-content: flex-end;">
+
+
+
+                            <select v-model="filtroAprovador" class="form-select form-select-custom">
+
+                                <option value="">Todos Aprovadores</option>
+                                <option v-for="aprov in listaAprovadores" :key="aprov" :value="aprov">
+
+                                    {{ aprov }}
+
+                                </option>
+
+                            </select>
+
+                            <div class="input-group input-group-glass" style="max-width: 300px;">
+                                <input type="text" v-model="search3" class="form-control form-control-custom"
+                                    placeholder="Pesquisar...">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            </div>
                         </div>
                     </div>
-                    
+
+                    <div v-if="mostrarAlertaSelecaoGlobal" class="selection-alert" @click="toggleSelectAllGlobal">
+                        Todos os <strong>{{ paginatedEtapa3.length }}</strong> itens desta página estão selecionados.
+                        <strong>Clique aqui para selecionar todos os {{ totalItems3 }} itens do banco de dados.</strong>
+                    </div>
+                    <div v-if="selecionarTudoGlobal" class="selection-alert"
+                        style="background-color: rgba(13, 202, 240, 0.15); border-color: var(--cor-info); color: var(--cor-texto-branco); cursor: default;">
+                        Todos os <strong>{{ totalItems3 }}</strong> itens do banco de dados estão selecionados.
+                        <a href="#" @click.prevent="limparSelecao"
+                            style="color: var(--cor-destaque-primaria); margin-left: 10px;">Limpar seleção</a>
+                    </div>
+
                     <div class="table-container-custom">
-                           <div class="table-responsive">
-                             <table class="table table-custom table-striped align-middle">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-striped align-middle">
                                 <thead>
                                     <tr>
-                                        <th width="5%"><input type="checkbox" @change="selecionarTodos" v-model="todosSelecionados" class="form-check-input"></th>
-                                        <th width="10%">ID</th>
-                                        <th>Descrição</th>
+                                        <th width="5%" class="text-center">
+                                            <input type="checkbox" v-model="todosSelecionados" class="custom-checkbox">
+                                        </th>
+                                        <th>#</th>
+                                        <th>CPF</th>
+                                        <th>Nome</th>
+                                        <th>Aprovador</th>
+                                        <th>Cidade</th>
+                                        <th class="text-end">Planos</th>
+                                        <th class="text-end">Ressarc.</th>
+                                        <th class="text-end">VR</th>
+                                        <th class="text-end">Outros</th>
+                                        <th>Ação</th>
+                                        <th class="text-end">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in paginatedEtapa3" :key="item.id">
-                                        <td><input type="checkbox" :value="item.id" v-model="selecaoFinal" class="form-check-input"></td>
-                                        <td>{{ item.id }}</td>
+                                    <tr v-for="item in paginatedEtapa3" :key="item.cpf"
+                                        :class="{ 'tr-enviado': item.enviado }">
+                                        <td class="text-center">
+                                            <input type="checkbox" :value="item.cpf" v-model="selecaoFinal"
+                                                :disabled="selecionarTudoGlobal" class="custom-checkbox">
+                                        </td>
+
+                                        <td>
+                                            <span v-if="item.status === 0" title="Modificado">🟢</span>
+                                            <span v-else-if="item.status === 1" title="Pendente">🟡</span>
+                                            <span v-else>❓</span>
+                                            <i v-if="item.status_envio === 1" class="bi bi-envelope-check-fill ms-1 text-success"
+                                                title="Já Enviado"></i>
+                                        </td>
+
+                                        <td>{{ item.cpf }}</td>
                                         <td>{{ item.nome }}</td>
+                                        <td>
+                                            <span class="badge"
+                                                style="background-color: rgba(0, 188, 212, 0.15); color: var(--cor-destaque-primaria); border: 1px solid rgba(0, 188, 212, 0.3);">
+                                                {{ item.aprovador || 'N/D' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ item.cidade }}</td>
+                                        <td class="text-end">{{ formatCurrency(item.planos) }}</td>
+                                        <td class="text-end">{{ formatCurrency(item.ressarcimento) }}</td>
+                                        <td class="text-end">{{ formatCurrency(item.vr) }}</td>
+                                        <td class="text-end">{{ formatCurrency(item.outros) }}</td>
+                                        <td>{{ item.acao_ }}</td>
+                                        <td class="text-end">
+                                            <span
+                                                :style="{ color: item.resultado < 0 ? 'var(--cor-perigo-claro)' : 'var(--cor-sucesso)', fontWeight: 'bold' }">{{
+                                                formatCurrency(item.resultado) }}</span>
+                                        </td>
                                     </tr>
+
                                     <tr v-if="filteredEtapa3.length === 0">
-                                        <td :colspan="3" class="text-center" style="padding: 2rem;">
+                                        <td :colspan="12" class="text-center p-4">
                                             <i class="bi bi-search me-2"></i> Nenhum item encontrado.
                                         </td>
                                     </tr>
@@ -956,139 +888,113 @@
                             </table>
                         </div>
                     </div>
-    
-                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" v-if="filteredEtapa3.length > 0">
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2"
+                        v-if="totalItems3 > 0">
                         <span style="color: var(--cor-texto-claro); font-size: 0.9rem;">
-                            Página {{ etapa3Page }} de {{ totalPage3 }}. (Mostrando {{ paginatedEtapa3.length }} de {{ filteredEtapa3.length }} itens)
+                            Página {{ etapa3Page }} de {{ totalPage3 }}. (Visualizando {{ paginatedEtapa3.length }} de
+                            {{ totalItems3 }} itens)
                         </span>
-                        <nav aria-label="Paginação Etapa 3" v-if="totalPage3 > 1">
+                        <nav v-if="totalPage3 > 1">
                             <ul class="pagination pagination-sm mb-0 pagination-custom">
-                                <li class="page-item" :class="{ 'disabled': etapa3Page === 1 }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage3(etapa3Page - 1)"><i class="bi bi-chevron-left"></i></a>
-                                </li>
-                                <li class="page-item" v-for="page in visiblePages3" :key="'3-'+page" :class="{ 'active': page === etapa3Page, 'disabled': page === '...' }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage3(page)">{{ page }}</a>
-                                </li>
-                                <li class="page-item" :class="{ 'disabled': etapa3Page === totalPage3 }">
-                                    <a class="page-link" href="#" @click.prevent="goToPage3(etapa3Page + 1)"><i class="bi bi-chevron-right"></i></a>
-                                </li>
+                                <li class="page-item" :class="{ disabled: etapa3Page === 1 }"><a class="page-link"
+                                        href="#" @click.prevent="goToPage3(etapa3Page - 1)"><i
+                                            class="bi bi-chevron-left"></i></a></li>
+                                <li class="page-item" v-for="page in visiblePages3" :key="page"
+                                    :class="{ active: page === etapa3Page, disabled: page === '...' }"><a
+                                        class="page-link" href="#" @click.prevent="goToPage3(page)">{{ page }}</a></li>
+                                <li class="page-item" :class="{ disabled: etapa3Page === totalPage3 }"><a
+                                        class="page-link" href="#" @click.prevent="goToPage3(etapa3Page + 1)"><i
+                                            class="bi bi-chevron-right"></i></a></li>
                             </ul>
                         </nav>
                     </div>
-    
-                    <button @click="currentStep = 2" class="btn btn-secondary mt-3">Voltar</button>
-                    <button @click="enviarFinal" class="btn btn-success float-end mt-3" :disabled="selecaoFinal.length === 0 || isSending">
-                        <span v-if="isSending" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                        <i v-else class="bi bi-send"></i>
-                        {{ isSending ? 'Enviando...' : `Enviar E-mails (${selecaoFinal.length})` }}
-                    </button>
+
+                    <div class="mt-3">
+                        <button @click="currentStep = 2" class="btn btn-secondary">Voltar</button>
+                        <button @click="enviarFinal" class="btn btn-success float-end"
+                            :disabled="(selecaoFinal.length === 0 && !selecionarTudoGlobal) || isSending">
+                            <span v-if="isSending" class="spinner-border spinner-border-sm me-1"></span>
+                            <i v-else class="bi bi-send"></i>
+                            {{ isSending ? 'Enviando...' : `Enviar (${selecionarTudoGlobal ? 'TODOS ' + totalItems3 :
+                            selecaoFinal.length})` }}
+                        </button>
+                    </div>
                 </div>
-            
-            </Transition> 
-    
+
+            </Transition>
+
             <teleport to="body">
                 <div class="modal fade" id="modalEdicao" ref="modalEdicao" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content modal-content-custom">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content modal-content-custom">
                             <div class="modal-header">
                                 <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Item</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                
                                 <div v-if="etapaItemSelecionado === 1">
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">CPF</label>
-                                            <input type="text" :value="itemSelecionado.cpf" class="form-control form-control-custom" disabled>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Nome</label>
-                                            <input type="text" :value="itemSelecionado.nome" class="form-control form-control-custom" disabled>
-                                        </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">CPF</label> <input
+                                                type="text" :value="itemSelecionado.cpf"
+                                                class="form-control form-control-custom" disabled> </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">Nome</label> <input
+                                                type="text" :value="itemSelecionado.nome"
+                                                class="form-control form-control-custom" disabled> </div>
                                     </div>
-                                    
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Desconto PS/Odonto (Planos)</label>
-                                            <input type="number" v-model.number="itemSelecionado.planos" class="form-control form-control-custom">
-                                        </div>
-                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Ressarcimento</label>
-                                            <input type="number" v-model.number="itemSelecionado.ressarcimento" class="form-control form-control-custom">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Vale Refeição (VR)</label>
-                                            <input type="number" v-model.number="itemSelecionado.vr" class="form-control form-control-custom">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Outros</label>
-                                            <input type="number" v-model.number="itemSelecionado.outros" class="form-control form-control-custom">
-                                        </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">Planos</label> <input
+                                                type="number" v-model.number="itemSelecionado.planos"
+                                                class="form-control form-control-custom"> </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">Ressarcimento</label>
+                                            <input type="number" v-model.number="itemSelecionado.ressarcimento"
+                                                class="form-control form-control-custom"> </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">VR</label> <input
+                                                type="number" v-model.number="itemSelecionado.vr"
+                                                class="form-control form-control-custom"> </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">Outros</label> <input
+                                                type="number" v-model.number="itemSelecionado.outros"
+                                                class="form-control form-control-custom"> </div>
                                     </div>
-                                    
                                     <hr style="border-color: var(--cor-card-borda);">
-    
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                             <label class="form-label">Ação (Automática)</label>
-                                             <input type="text" :value="itemSelecionado.acao_" class="form-control form-control-custom" disabled>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Resultado (Automático)</label>
-                                            <input type="number" :value="itemSelecionado.resultado" class="form-control form-control-custom" disabled>
-                                        </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">Ação</label> <input
+                                                type="text" :value="itemSelecionado.acao_"
+                                                class="form-control form-control-custom" disabled> </div>
+                                        <div class="col-md-6 mb-3"> <label class="form-label">Resultado</label> <input
+                                                type="number" :value="itemSelecionado.resultado"
+                                                class="form-control form-control-custom" disabled> </div>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="modal-motivo" class="form-label">Motivo</label>
-                                            <select class="form-select form-select-custom" id="modal-motivo" 
-                                                     v-model="itemSelecionado.motivo"
-                                                     :class="{ 'is-invalid': outrosSemMotivo }">
+                                            <label class="form-label">Motivo</label>
+                                            <select class="form-select form-select-custom"
+                                                v-model="itemSelecionado.motivo"
+                                                :class="{ 'is-invalid': outrosSemMotivo }">
                                                 <option value="" selected>Sem motivo</option>
                                                 <option value="Ferias">Férias</option>
                                                 <option value="Retroativo">Retroativo</option>
                                                 <option value="Outros">Outros</option>
                                             </select>
-                                            <small v-if="outrosSemMotivo" class="text-danger d-block mt-1">
-                                                <i class="bi bi-exclamation-triangle-fill"></i> Motivo obrigatório (pois 'Outros' está preenchido).
-                                            </small>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-12 mb-3">
-                                            <label for="modal-justificativa" class="form-label">Justificativa</label>
-                                            <textarea id="modal-justificativa" class="form-control form-control-custom" rows="3" 
-                                                      placeholder="Se 'Outros', justifique..." 
-                                                      v-model="itemSelecionado.justificativa"
-                                                      :class="{ 'is-invalid': motivoOutrosSemJustificativa }"></textarea>
-                                            <small v-if="motivoOutrosSemJustificativa" class="text-danger d-block mt-1">
-                                                <i class="bi bi-exclamation-triangle-fill"></i> Justificativa obrigatória (pois motivo é 'Outros').
-                                            </small>
+                                            <label class="form-label">Justificativa</label>
+                                            <textarea class="form-control form-control-custom" rows="3"
+                                                v-model="itemSelecionado.justificativa"
+                                                :class="{ 'is-invalid': motivoOutrosSemJustificativa }"></textarea>
                                         </div>
                                     </div>
-                                    </div>
-    
-                                <div v-if="etapaItemSelecionado === 2">
-                                       <div class="form-group mb-3">
-                                            <label class="form-label">Produto</label>
-                                            <input type="text" v-model="itemSelecionado.nome" class="form-control form-control-custom">
-                                        </div>
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">Status</label>
-                                            <input type="text" v-model="itemSelecionado.email" class="form-control form-control-custom">
-                                        </div>
                                 </div>
-    
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                    <i class="bi bi-x-circle me-1"></i> Cancelar
-                                </button>
-                                <button type="button" @click="salvarModal" class="btn btn-primary" :disabled="isModalSalvarDisabled">
-                                    <span v-if="isSaving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    <i v-else class="bi bi-save me-1"></i>
-                                    {{ isSaving ? 'Salvando...' : 'Salvar' }}
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" @click="salvarModal" class="btn btn-primary"
+                                    :disabled="isModalSalvarDisabled">
+                                    <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span> {{
+                                    isSaving ? 'Salvando...' : 'Salvar' }}
                                 </button>
                             </div>
                         </div>
@@ -1096,446 +1002,273 @@
                 </div>
             </teleport>
 
-            <!-- 🟢 NOVO: TOAST CONTAINER (Contêiner fixo para as notificações) -->
-            <teleport to="body">
-                <div class="toast-container">
-                    <div v-for="(toast, index) in toastMessages" :key="index" :id="'toast-'+index" class="toast toast-custom" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
-                        <div class="toast-header">
-                            <i :class="toast.icon" class="rounded me-2" :style="{ 'color': toast.color }"></i>
-                            <strong class="me-auto">{{ toast.title }}</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            {{ toast.message }}
-                        </div>
-                    </div>
-                </div>
-            </teleport>
-
-        </div> </div> {% endraw %}
+        </div>
+    </div> {% endraw %}
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    
-        
-        <script>
-    const { createApp, ref, computed, onMounted } = Vue
-    
-    // Objeto global para armazenar instâncias de Toast
-    const toastInstances = [];
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    createApp({
-        data() {
-            return {
-                // Controla o spinner inicial
-                isLoading: true, 
-                filtroStatus: '',
-                currentStep: 1,
-                
-                // DADOS
-                etapa1Data: [], 
-                etapa2Data: [],
-                etapa3Data: [],
+    <script>
+        const { createApp, ref, computed } = Vue
 
-                // PESQUISA
-                search1: '',
-                search2: '',
-                search3: '',
+        createApp({
+            data() {
+                return {
+                    isLoading: true, isLoadingEtapa1: false,
+                    filtroStatus: '', currentStep: 1,
+                    dataEmissao: '', dataPagamento: '',
+                    totalItems3: 0, selecaoFinal: [],
+                    listaAprovadores: [],
+                    // Flag para selecionar TUDO do banco
+                    selecionarTudoGlobal: false,
 
-                // SELEÇÃO E MODAL
-                selecaoFinal: [],
-                todosSelecionados: false,
-                itemSelecionado: {}, 
-                etapaItemSelecionado: null,
-                modalInstance: null,
-                isSaving: false,
-                isSending: false,
-                
-                // PAGINAÇÃO
-                etapa1Page: 1,
-                etapa1Limit: 10,
-                totalItems1: 0, // Total vindo do backend (Oracle + Postgres)
-
-                etapa2Page: 1,
-                etapa2Limit: 10,
-                etapa3Page: 1,
-                etapa3Limit: 10,
-
-                // 🟢 NOVO: Mensagens de Notificação
-                toastMessages: [],
-            }
-        },
-        
-        watch: {
-            // Quando mudar a pesquisa da Etapa 1, volta pra pág 1 e busca no backend
-            search1(newVal) {
-                this.etapa1Page = 1;
-                this.fetchData('1'); 
+                    etapa3Page: 1, etapa3Limit: 10,
+                    etapa1Data: [], etapa3Data: [],
+                    search1: '', search3: '', filtroAprovador: '',
+                    itemSelecionado: {}, etapaItemSelecionado: null, modalInstance: null,
+                    isSaving: false, isSending: false,
+                    etapa1Page: 1, etapa1Limit: 10, totalItems1: 0,
+                }
             },
-            // Quando mudar a página da Etapa 1, busca no backend
-            etapa1Page(newVal) {
-                this.fetchData('1'); 
+
+            watch: {
+                search1() { this.etapa1Page = 1; this.fetchData('1'); },
+                etapa1Page() { this.fetchData('1'); },
+                filtroStatus() { this.etapa1Page = 1; this.fetchData('1'); },
+                filtroAprovador() { 
+                        this.etapa3Page = 1; 
+                        this.limparSelecao(); 
+                        this.fetchData('3'); // Adicionado para buscar no banco com o novo filtro
+                    },                search3() { this.etapa3Page = 1; this.fetchData('3'); },
+                etapa3Page() { this.fetchData('3'); },
+                itemSelecionado: {
+                    handler(newItem) {
+                        if (this.etapaItemSelecionado === 1) {
+                            const planos = Number(newItem.planos) || 0;
+                            const vr = Number(newItem.vr) || 0;
+                            const outros = Number(newItem.outros) || 0;
+                            const ressarcimento = Number(newItem.ressarcimento) || 0;
+                            const resultadoCalc = ressarcimento + vr - planos + outros;
+                            this.itemSelecionado.resultado = parseFloat(resultadoCalc.toFixed(2));
+                            this.itemSelecionado.acao_ = resultadoCalc < 0 ? 'Descontar na Nota >>>>>' : 'Adicionar na Nota >>>>>';
+                        }
+                    }, deep: true
+                }
             },
-            filtroStatus(newVal) {
-                this.etapa1Page = 1;
-                this.fetchData('1');
-            },
-            search2(newVal) { if (newVal !== this.search2) this.etapa2Page = 1; },
-            search3(newVal) { if (newVal !== this.search3) this.etapa3Page = 1; },
 
-            // Watcher para calcular valores no Modal em tempo real
-            itemSelecionado: {
-                handler(newItem) {
-                     if (this.etapaItemSelecionado === 1) {
-                         // Garantindo que os valores são números
-                        const planos = Number(newItem.planos) || 0;
-                        const vr = Number(newItem.vr) || 0;
-                        const outros = Number(newItem.outros) || 0;
-                        const ressarcimento = Number(newItem.ressarcimento) || 0;
+            computed: {
+                paginatedEtapa1() { return this.etapa1Data; },
+                totalPage1() { return this.totalItems1 === 0 ? 1 : Math.ceil(this.totalItems1 / this.etapa1Limit); },
+                visiblePages1() { return this.getVisiblePages(this.etapa1Page, this.totalPage1); },
 
-                        const resultadoCalc = ressarcimento + vr - planos + outros;
-                        
-                        // Atualiza o resultado com 2 casas decimais
-                        this.itemSelecionado.resultado = parseFloat(resultadoCalc.toFixed(2));
-
-                        // Atualiza a Ação
-                        if (resultadoCalc < 0) {
-                            this.itemSelecionado.acao_ = 'Descontar na Nota >>>>>';
+                // Logica de Seleção do Header
+                todosSelecionados: {
+                    get() {
+                        if (this.selecionarTudoGlobal) return true; // Visualmente marcado se global estiver ativo
+                        if (!this.paginatedEtapa3 || this.paginatedEtapa3.length === 0) return false;
+                        return this.paginatedEtapa3.every(item => this.selecaoFinal.includes(item.cpf));
+                    },
+                    set(value) {
+                        const cpfsPaginaAtual = this.paginatedEtapa3.map(item => item.cpf);
+                        if (value) {
+                            // Seleciona pagina atual
+                            cpfsPaginaAtual.forEach(cpf => {
+                                if (!this.selecaoFinal.includes(cpf)) this.selecaoFinal.push(cpf);
+                            });
                         } else {
-                            this.itemSelecionado.acao_ = 'Adicionar na Nota >>>>>';
+                            // Deseleciona e limpa global
+                            this.selecionarTudoGlobal = false;
+                            this.selecaoFinal = this.selecaoFinal.filter(cpf => !cpfsPaginaAtual.includes(cpf));
                         }
                     }
                 },
-                deep: true
-            }
-        },
 
-        computed: {
-            // --- ETAPA 1 (Server-Side) ---
-            // Como a API já traz filtrado e paginado, aqui só retornamos os dados
-            filteredEtapa1() { return this.etapa1Data; },
-            paginatedEtapa1() { return this.etapa1Data; },
-            
-            // O total de páginas agora usa o totalItems1 vindo do banco
-            totalPage1() { 
-                if (this.totalItems1 === 0) return 1;
-                return Math.ceil(this.totalItems1 / this.etapa1Limit); 
-            },
-            visiblePages1() { return this.getVisiblePages(this.etapa1Page, this.totalPage1); },
+                // Mostra alerta se todos da PÁGINA estão selecionados, mas NÃO todos do banco
+                mostrarAlertaSelecaoGlobal() {
+                    if (this.selecionarTudoGlobal) return false; // Já selecionou tudo
+                    if (this.totalItems3 <= this.etapa3Limit) return false; // Só tem 1 página
+                    if (!this.paginatedEtapa3 || this.paginatedEtapa3.length === 0) return false;
 
-            // --- ETAPA 2 (Client-Side) ---
-            filteredEtapa2() {
-                if (!this.search2) return this.etapa2Data;
-                const s = this.search2.toLowerCase();
-                return this.etapa2Data.filter(item => 
-                    (item.nome && item.nome.toLowerCase().includes(s)) || 
-                    (item.email && item.email.toLowerCase().includes(s))
-                );
-            },
-            paginatedEtapa2() {
-                const start = (this.etapa2Page - 1) * this.etapa2Limit;
-                return this.filteredEtapa2.slice(start, start + this.etapa2Limit);
-            },
-            totalPage2() { return Math.ceil(this.filteredEtapa2.length / this.etapa2Limit); },
-            visiblePages2() { return this.getVisiblePages(this.etapa2Page, this.totalPage2); },
+                    // Verifica se todos da página atual estão selecionados
+                    const todosPagina = this.paginatedEtapa3.every(item => this.selecaoFinal.includes(item.cpf));
+                    return todosPagina;
+                },
 
-            // --- ETAPA 3 (Client-Side) ---
-            filteredEtapa3() {
-                if (!this.search3) return this.etapa3Data;
-                const s = this.search3.toLowerCase();
-                return this.etapa3Data.filter(item => 
-                    (item.nome && item.nome.toLowerCase().includes(s))
-                );
-            },
-            paginatedEtapa3() {
-                const start = (this.etapa3Page - 1) * this.etapa3Limit;
-                return this.filteredEtapa3.slice(start, start + this.etapa3Limit);
-            },
-            totalPage3() { return Math.ceil(this.filteredEtapa3.length / this.etapa3Limit); },
-            visiblePages3() { return this.getVisiblePages(this.etapa3Page, this.totalPage3); },
+                filteredEtapa3() {
+                    let dados = this.etapa3Data || [];
+                    // if (this.filtroAprovador) {
+                    //     dados = dados.filter(item => String(item.aprovador || '').trim() === String(this.filtroAprovador).trim());
+                    // }
+                    return dados;
+                },
+                paginatedEtapa3() { return this.filteredEtapa3; },
+                totalPage3() { return !this.totalItems3 ? 1 : Math.ceil(this.totalItems3 / this.etapa3Limit); },
+                visiblePages3() { return this.getVisiblePages(this.etapa3Page, this.totalPage3); },
 
-            // --- VALIDAÇÕES ---
-            outrosSemMotivo() {
-                if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('outros')) return false;
-                const outrosPreenchido = this.itemSelecionado.outros && Number(this.itemSelecionado.outros) !== 0;
-                const motivoVazio = !this.itemSelecionado.motivo || this.itemSelecionado.motivo === "";
-                return outrosPreenchido && motivoVazio;
+                outrosSemMotivo() {
+                    if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('outros')) return false;
+                    return (this.itemSelecionado.outros && Number(this.itemSelecionado.outros) !== 0) && (!this.itemSelecionado.motivo || this.itemSelecionado.motivo === "");
+                },
+                motivoOutrosSemJustificativa() {
+                    if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('motivo')) return false;
+                    return (this.itemSelecionado.motivo === "Outros") && (!this.itemSelecionado.justificativa || this.itemSelecionado.justificativa.trim() === "");
+                },
+                isModalSalvarDisabled() { return this.isSaving || this.outrosSemMotivo || this.motivoOutrosSemJustificativa; },
+                // listaAprovadores() {
+                //     if (!this.etapa3Data || this.etapa3Data.length === 0) return [];
+                //     return this.etapa3Data.map(i => i.aprovador).filter((v, i, a) => v && a.indexOf(v) === i).sort();
+                // },
             },
-            motivoOutrosSemJustificativa() {
-                if (this.etapaItemSelecionado !== 1 || !this.itemSelecionado.hasOwnProperty('motivo')) return false;
-                const motivoEOutros = this.itemSelecionado.motivo === "Outros";
-                const justificativaVazia = !this.itemSelecionado.justificativa || this.itemSelecionado.justificativa.trim() === "";
-                return motivoEOutros && justificativaVazia;
-            },
-            isModalSalvarDisabled() {
-                return this.isSaving || this.outrosSemMotivo || this.motivoOutrosSemJustificativa;
-            }
-        },
 
-        methods: {
-            // 🟢 NOVO: Método para exibir Toast
-            showToast(type, title, message) {
-                const colors = {
-                    success: '#198754',
-                    error: '#dc3545',
-                    info: '#00bcd4' // Usando ciano para 'info'
-                };
-                
-                const icons = {
-                    success: 'bi bi-check-circle-fill text-success',
-                    error: 'bi bi-x-circle-fill text-danger',
-                    info: 'bi bi-info-circle-fill text-info'
-                };
+            methods: {
+                showToast(type, title, message) {
+                    const Toast = Swal.mixin({ toast: true, position: "top-end", showConfirmButton: false, timer: 3000, timerProgressBar: true, customClass: { popup: "swal2-toast" } });
+                    let iconType = type === 'danger' ? 'error' : type;
+                    Toast.fire({ icon: iconType, title: title, text: message });
+                },
 
-                const newToast = {
-                    title: title,
-                    message: message,
-                    icon: icons[type],
-                    color: colors[type]
-                };
-                
-                // Adiciona a mensagem e espera o DOM renderizar
-                this.toastMessages.push(newToast);
+                fetchData(etapa) {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => { controller.abort(); if (etapa === '1') this.isLoadingEtapa1 = false; }, 15000);
+                    if (etapa === '1') this.isLoadingEtapa1 = true;
 
-                this.$nextTick(() => {
-                    const newToastElement = document.getElementById('toast-' + (this.toastMessages.length - 1));
-                    if (newToastElement) {
-                         // Cria a instância do Bootstrap Toast
-                        const bsToast = new bootstrap.Toast(newToastElement);
-                        
-                        // Garante que o toast seja removido do array após ser escondido
-                        newToastElement.addEventListener('hidden.bs.toast', () => {
-                            this.toastMessages.shift(); // Remove o primeiro (o mais antigo)
+                    let url = `/api/dados_etapa${etapa}`;
+                    
+                    if (etapa === '1') {
+                        url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}&status=${this.filtroStatus}`;
+                    } 
+                    else if (etapa === '3') {
+                        url = '/api/etapa_final';
+                        // AJUSTE AQUI: Incluindo o filtroAprovador na requisição GET
+                        url += `?page=${this.etapa3Page}&limit=${this.etapa3Limit}&search=${encodeURIComponent(this.search3)}&aprovador=${encodeURIComponent(this.filtroAprovador)}`;
+                    }
+
+                    return fetch(url, { signal: controller.signal })
+                        .then(res => res.json())
+                        .then(data => {
+                            clearTimeout(timeoutId);
+                            if (etapa === '1') {
+                                this.etapa1Data = data.data || []; this.totalItems1 = data.total || 0;
+                                this.isLoadingEtapa1 = false;
+                            } else if (etapa === '3') {
+                                this.etapa3Data = data.data || []; this.totalItems3 = data.total || 0;
+                            }
+                        })
+                        .catch(err => {
+                            clearTimeout(timeoutId);
+                            if (etapa === '1') this.isLoadingEtapa1 = false;
+                            this[`etapa${etapa}Data`] = [];
                         });
+                },
+                formatCurrency(value) { return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); },
+                abrirModal(item, etapa) {
+                    this.itemSelecionado = { ...item, motivo: item.motivo || '', justificativa: item.justificativa || '' };
+                    this.etapaItemSelecionado = etapa;
+                    if (this.modalInstance) this.modalInstance.show();
+                },
+                fetchAprovadores() {
+                    fetch('/api/lista_aprovadores')
+                        .then(res => res.json())
+                        .then(data => {
+                            this.listaAprovadores = data || [];
+                        })
+                        .catch(err => console.error("Erro ao buscar aprovadores:", err));
+                },
+                async salvarModal() {
+                    this.isSaving = true;
+                    const etapa = this.etapaItemSelecionado;
+                    const item = this.itemSelecionado;
+                    try {
+                        const response = await fetch(`/api/item/${etapa === 1 ? item.cpf : item.id}?etapa=${etapa}`, {
+                            method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(item)
+                        });
+                        if (response.ok) {
+                            this.showToast('success', 'Sucesso!', `Alterado com sucesso.`);
+                            this.modalInstance.hide();
+                            if (etapa === 1) this.fetchData('1');
+                        } else {
+                            this.showToast('error', 'Erro', 'Falha ao salvar.');
+                        }
+                    } catch (e) { this.showToast('error', 'Erro', 'Erro de conexão.'); }
+                    finally { this.isSaving = false; }
+                },
 
-                        bsToast.show();
-                    }
-                });
-            },
-            formatCurrency(value) {
-                if (value === null || value === undefined) return 'R$ 0,00';
-                const numberValue = Number(value);
-                if (isNaN(numberValue)) return 'R$ 0,00';
-                
-                // Formata para o padrão monetário brasileiro (BRL)
-                return numberValue.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                });
-            },    
-            // 🟢 MODIFICADO: Função para buscar dados
-            fetchData(etapa) {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => {
-                    controller.abort();
-                    this.showToast('error', 'Erro de Conexão', `A requisição da Etapa ${etapa} excedeu o tempo limite.`);
-                }, 15000); // 15s timeout
+                // 🟢 Lógica de Seleção Global
+                toggleSelectAllGlobal() {
+                    this.selecionarTudoGlobal = true;
+                    // Esvazia a seleção manual para não enviar IDs duplicados, pois o flag global manda tudo
+                    this.selecaoFinal = [];
+                },
+                limparSelecao() {
+                    this.selecaoFinal = [];
+                    this.selecionarTudoGlobal = false;
+                },
 
-                let url = `/api/dados_etapa${etapa}`;
-                if (etapa === '3') url = '/api/etapa_final';
-                
-                // Se for Etapa 1, adiciona paginação e busca na URL para o Python processar
-                if (etapa === '1') {
-                    //url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}`;
-                    url += `?page=${this.etapa1Page}&limit=${this.etapa1Limit}&search=${encodeURIComponent(this.search1)}&status=${this.filtroStatus}`;
-                }
+                async enviarFinal() {
+                        if (this.selecaoFinal.length === 0 && !this.selecionarTudoGlobal) {
+                            this.showToast('info', 'Atenção', 'Selecione pelo menos um item.'); return;
+                        }
+                        this.isSending = true;
 
-                return fetch(url, { signal: controller.signal })
-                    .then(res => {
-                        clearTimeout(timeoutId);
-                        if (!res.ok) throw new Error(res.status);
-                        return res.json();
-                    })
-                    .then(data => {
-                        // ETAPA 1: Lógica Server-Side (recebe data e total)
-                        if (etapa === '1') {
-                            if (data && data.data) {
-                                this.etapa1Data = data.data;
-                                this.totalItems1 = data.total || 0;
+                        const payload = {
+                            ids: this.selecaoFinal,
+                            enviar_tudo: this.selecionarTudoGlobal,
+                            filtros: {
+                                search: this.search3,
+                                aprovador: this.filtroAprovador
+                            },
+                            data_emissao: this.dataEmissao,
+                            data_pagamento: this.dataPagamento
+                        };
+
+                        try {
+                            const response = await fetch('/api/enviar_final', {
+                                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                            });
+                            if (response.ok) {
+                                const data = await response.json();
+                                this.showToast('success', 'Envio Concluído!', `${data.recebidos} itens processados.`);
+                                
+                                this.limparSelecao();
+                                
+                                // --- AJUSTE AQUI: REMOVIDO O RESET ---
+                                // this.dataEmissao = '';  <-- Removido
+                                // this.dataPagamento = ''; <-- Removido
+                                // this.currentStep = 1;    <-- Removido
+                                
+                                // Mantemos na etapa 3 e apenas atualizamos a lista para sumir com os enviados
+                                this.fetchData('3'); 
+                                
+                                // Opcional: Atualizar etapa 1 em background caso algo tenha voltado
+                                this.fetchData('1'); 
                             } else {
-                                this.etapa1Data = [];
-                                this.totalItems1 = 0;
+                                this.showToast('error', 'Falha', 'Erro no envio.');
                             }
-                        } 
-                        // ETAPA 2 e 3: Lógica antiga
-                        else {
-                            if (data && data.data) {
-                                this[`etapa${etapa}Data`] = data.data;
-                            } else {
-                                this[`etapa${etapa}Data`] = [];
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        clearTimeout(timeoutId);
-                        console.error(`Erro fetch etapa ${etapa}`, err);
-                        if (err.name !== 'AbortError') {
-                            this.showToast('error', 'Erro na API', `Falha ao carregar dados da Etapa ${etapa}. Status: ${err.message || 'Desconhecido'}`);
-                        }
-                        this[`etapa${etapa}Data`] = [];
-                    });
-            },
+                        } catch (e) { this.showToast('error', 'Erro', 'Erro de conexão.'); }
+                        finally { this.isSending = false; }
+                    },
 
-            abrirModal(item, etapa) {
-                let novoItem = { ...item };
-                if (etapa === 1) {
-                    // Inicializa campos de controle para o modal (mesmo que sejam vazios no backend)
-                    novoItem.motivo = item.motivo || ''; 
-                    novoItem.justificativa = item.justificativa || '';
-                }
-                this.itemSelecionado = novoItem; 
-                this.etapaItemSelecionado = etapa;
-                if (this.modalInstance) this.modalInstance.show();
-            },
-
-            // 🟢 MODIFICADO: Função para salvar com Toast
-            async salvarModal() {
-                this.isSaving = true;
-                const etapa = this.etapaItemSelecionado;
-                const item = this.itemSelecionado;
-                const keyApi = etapa === 1 ? item.cpf : item.id;
-                const findKey = etapa === 1 ? 'cpf' : 'id';
-                
-                try {
-                    const response = await fetch(`/api/item/${keyApi}?etapa=${etapa}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(item)
-                    });
-
-                    if (response.ok) {
-                        // 1. Atualiza o dado na memória
-                        const dataKey = etapa === 1 ? 'etapa1Data' : 'etapa2Data';
-                        const index = this[dataKey].findIndex(i => i[findKey] === item[findKey]);
-                        if (index !== -1) {
-                            this[dataKey][index] = { ...item };
-                        }
-                        
-                        // 2. Notificação de Sucesso
-                        this.showToast('success', 'Sucesso!', `Colaborador ${item.nome || item.id} alterado com sucesso.`);
-
-                        // 3. Fecha o modal
-                        this.modalInstance.hide();
-
-                        // 4. Se for Etapa 1, recarrega a página atual para refletir as mudanças do backend (Postgres)
-                        if (etapa === 1) {
-                            this.fetchData('1');
-                        }
-
-                    } else {
-                        // Trata erros da API
-                        const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido.' }));
-                        this.showToast('error', 'Falha ao Salvar', `Erro: ${response.status}. Detalhe: ${errorData.detail || 'Verifique o console para mais informações.'}`);
-                    }
-                } catch (error) {
-                    console.error("Erro de conexão ao salvar:", error);
-                    this.showToast('error', 'Erro de Conexão', "Falha ao se comunicar com o servidor.");
-                } finally {
-                    this.isSaving = false;
+                goToPage1(page) { if (page >= 1 && page <= this.totalPage1 && page !== '...') this.etapa1Page = page; },
+                goToPage3(page) { if (page >= 1 && page <= this.totalPage3 && page !== '...') this.etapa3Page = page; },
+                getVisiblePages(curr, total) {
+                    const max = 5; if (total <= max) return Array.from({ length: total }, (_, i) => i + 1);
+                    let start = Math.max(1, curr - 2), end = Math.min(total, curr + 2);
+                    if (curr <= 3) end = max; else if (curr >= total - 2) start = total - max + 1;
+                    const p = []; if (start > 1) { p.push(1); if (start > 2) p.push('...'); }
+                    for (let i = start; i <= end; i++) p.push(i);
+                    if (end < total) { if (end < total - 1) p.push('...'); p.push(total); }
+                    return p;
                 }
             },
-
-            selecionarTodos() {
-                 if (this.todosSelecionados) {
-                     // Pega todos os IDs da página atual (pois estamos em client-side para a Etapa 3)
-                     this.paginatedEtapa3.forEach(item => {
-                        if (!this.selecaoFinal.includes(item.id)) {
-                             this.selecaoFinal.push(item.id);
-                        }
-                     });
-                 } else {
-                     // Remove apenas os IDs da página atual da seleção
-                     const idsPaginaAtual = this.paginatedEtapa3.map(item => item.id);
-                     this.selecaoFinal = this.selecaoFinal.filter(id => !idsPaginaAtual.includes(id));
-                 }
-            },
-
-            // 🟢 MODIFICADO: Função para enviar com Toast
-            async enviarFinal() {
-                if (this.selecaoFinal.length === 0) { 
-                    this.showToast('info', 'Atenção', 'Selecione pelo menos um item para envio.');
-                    return; 
-                }
-                
-                this.isSending = true;
-                
-                try {
-                    const response = await fetch('/api/enviar_final', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ids: this.selecaoFinal })
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.showToast('success', 'Envio Concluído!', `${data.recebidos} itens processados e e-mails enviados com sucesso.`);
-                        this.selecaoFinal = [];
-                        this.todosSelecionados = false;
-                        this.currentStep = 1; 
-                        this.fetchData('1'); // Recarrega os dados da Etapa 1
-                        this.fetchData('3'); // Recarrega os dados da Etapa 3
-                    } else {
-                        const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido.' }));
-                        this.showToast('error', 'Falha no Envio', `Erro: ${response.status}. Detalhe: ${errorData.detail || 'Verifique o console para mais informações.'}`);
-                    }
-
-                } catch (error) {
-                    console.error("Erro de conexão ao enviar:", error);
-                    this.showToast('error', 'Erro de Conexão', "Falha ao se comunicar com o servidor para o envio final.");
-                } finally {
-                    this.isSending = false;
-                }
-            },
-
-            goToPage1(page) {
-                if (page >= 1 && page <= this.totalPage1 && page !== '...') {
-                    this.etapa1Page = page;
-                }
-            },
-            goToPage2(page) { if (page >= 1 && page <= this.totalPage2 && page !== '...') this.etapa2Page = page; },
-            goToPage3(page) { if (page >= 1 && page <= this.totalPage3 && page !== '...') this.etapa3Page = page; },
-
-            getVisiblePages(currentPage, totalPages) {
-                 const maxVisible = 5; 
-                 if (totalPages <= maxVisible) return Array.from({ length: totalPages }, (_, i) => i + 1);
-                 
-                 let start = Math.max(1, currentPage - 2);
-                 let end = Math.min(totalPages, currentPage + 2);
-                 
-                 if (currentPage <= 3) {
-                      end = maxVisible;
-                 } else if (currentPage >= totalPages - 2) {
-                      start = totalPages - maxVisible + 1;
-                 }
-                 
-                 const pages = [];
-                 if (start > 1) { pages.push(1); if (start > 2) pages.push('...'); }
-                 for (let i = start; i <= end; i++) pages.push(i);
-                 if (end < totalPages) { if (end < totalPages - 1) pages.push('...'); pages.push(totalPages); }
-                 return pages;
+            mounted() {
+                this.isLoading = false;
+                this.$nextTick(() => { if (this.$refs.modalEdicao) this.modalInstance = new bootstrap.Modal(this.$refs.modalEdicao); });
+                this.fetchData('1'); this.fetchData('3');
+                 this.fetchAprovadores();
             }
-        }, // <--- FIM DO METHODS
-
-        // MOUNTED FORA DO METHODS!
-        mounted() {
-            console.log("Aplicação Vue Montada!");
-            this.isLoading = false; // Desativa o spinner imediatamente
-
-            // Inicializa o Modal do Bootstrap
-            this.$nextTick(() => {
-                if (this.$refs.modalEdicao) {
-                     this.modalInstance = new bootstrap.Modal(this.$refs.modalEdicao);
-                }
-            });
-
-            // Busca dados iniciais
-            this.fetchData('1');
-            this.fetchData('2');
-            this.fetchData('3');
-        }
-    }).mount('#app')
-
+        }).mount('#app')
     </script>
 </body>
+
 </html>

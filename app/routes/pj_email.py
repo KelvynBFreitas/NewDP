@@ -22,9 +22,21 @@ from datetime  import datetime,date
 from sqlalchemy.sql.expression import literal_column
 from datetime import date, timedelta
 from app.models.funcionarios_pj_postgres import app_dp_pj_aprovador_x_prestado
-# --- Modelos de Dados (Inalterados) ---
+from datetime import datetime
+from pydantic import BaseModel
+from typing import List
+from fastapi.responses import JSONResponse  # <--- Adicione este aqui
+# --- Modelos Pydantic ---
+class FiltrosModel(BaseModel):
+    search: Optional[str] = ""
+    aprovador: Optional[str] = ""
 
-
+class EnvioFinalRequest(BaseModel):
+    ids: List[str] = []          # Pode vir vazio se enviar_tudo=True
+    enviar_tudo: bool = False    # Nova flag
+    filtros: Optional[FiltrosModel] = None
+    data_emissao: str
+    data_pagamento: str
 class FinalSubmission(BaseModel):
     ids: List[int]
 
@@ -465,10 +477,363 @@ async def get_dados_etapa2(request: Request,):
         return RedirectResponse(url="/", status_code=302)
     return {"data": list(db["etapa2"].values())}
 
-@router.get("/api/dados_etapa_final")
-async def get_dados_etapa_final():
-    return {"data": list(db["etapa_final"].values())}
+@router.get("/api/etapa_final")
+async def get_etapa_final(
+    request: Request,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1),
+    search: str = Query(""),
+    status: str = Query(""),
+    aprovador: str = "",
+    kw: str = Query(None),
+    session_postgres: AsyncSession = Depends(get_postgres_session),
+    session_oracle: AsyncSession = Depends(get_oracle_session),
+):
+    """
+    Busca dados filtrando corretamente pelo APROVADOR direto no banco de dados.
+    """
+    # 1. Configuração de Datas
+    hoje = date.today()
+    primeiro_dia_mes_atual = hoje.replace(day=1)
+    ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
+    
+    search_term = search.strip()
+    filtro_data_ref = AppDpAjustesValoresPj.datareferencia == ultimo_dia_mes_anterior
 
+    # ==============================================================================
+    # 🚀 CORREÇÃO CRÍTICA: PRÉ-CARREGAR CPFS DO APROVADOR
+    # ==============================================================================
+    # Se houver filtro de aprovador, buscamos QUAIS CPFs pertencem a ele antes de tudo.
+    cpfs_do_aprovador_filtro = None
+    
+    if aprovador and aprovador.strip():
+        try:
+            stmt_aprov = select(app_dp_pj_aprovador_x_prestado.cpf_prestador).where(
+                app_dp_pj_aprovador_x_prestado.nome_aprovador == aprovador.strip()
+            )
+            result_aprov = await session_postgres.execute(stmt_aprov)
+            # Cria um SET de strings para busca rápida e remoção de duplicatas
+            cpfs_do_aprovador_filtro = {str(c).strip() for c in result_aprov.scalars().all()}
+            
+            # Se filtrou por aprovador e ele não tem ninguém, retorna vazio imediatamente
+            if not cpfs_do_aprovador_filtro:
+                return {"data": [], "total": 0, "page": page, "limit": limit}
+        except Exception as e:
+            print(f"Erro ao buscar CPFs do aprovador: {e}")
+            # Opcional: retornar erro ou continuar sem filtro (aqui optamos por retornar vazio por segurança)
+            return {"data": [], "total": 0, "page": page, "limit": limit}
+
+    # ==============================================================================
+    # 🛠️ FUNÇÃO AUXILIAR: ENRICH (Mantida para preencher os dados visuais)
+    # ==============================================================================
+    async def enrich_with_prestador_data(lista_colaboradores: List[Dict[str, Any]]):
+        if not lista_colaboradores: return
+
+        cpfs_para_buscar = {str(row.get("cpf")).strip() for row in lista_colaboradores if row.get("cpf")}
+        if not cpfs_para_buscar: return
+
+        try:
+            stmt = select(
+                app_dp_pj_aprovador_x_prestado.cpf_prestador,
+                app_dp_pj_aprovador_x_prestado.cnpj,
+                app_dp_pj_aprovador_x_prestado.razao_social,
+                app_dp_pj_aprovador_x_prestado.nome_aprovador
+            ).where(app_dp_pj_aprovador_x_prestado.cpf_prestador.in_(cpfs_para_buscar))
+
+            result = await session_postgres.execute(stmt)
+            prestadores = result.all()
+            
+            mapa_prestadores = {
+                str(p.cpf_prestador).strip(): {
+                    "cnpj": p.cnpj, "razao_social": p.razao_social, "aprovador": p.nome_aprovador
+                } for p in prestadores
+            }
+
+            for colab in lista_colaboradores:
+                cpf_key = str(colab.get("cpf")).strip()
+                dados = mapa_prestadores.get(cpf_key)
+                if dados:
+                    colab["cnpj"] = dados["cnpj"]
+                    colab["razao_social"] = dados["razao_social"]
+                    colab["aprovador"] = dados["aprovador"]
+                else:
+                    colab.setdefault("cnpj", None)
+                    colab.setdefault("razao_social", None)
+                    colab.setdefault("aprovador", None)
+        except Exception as e:
+            print(f"Erro enrich: {e}")
+
+    # ==========================================================
+    # LÓGICA DE FILTRO POR STATUS
+    # ==========================================================
+
+    # --- CASO A: STATUS 0 (JÁ AJUSTADOS / APENAS POSTGRES) ---
+    if status == "0":
+        try:
+            # Montar condições base
+            conditions = [filtro_data_ref]
+
+            if search_term:
+                conditions.append(
+                    (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
+                    (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+                )
+            
+            # 🚀 APLICA O FILTRO DE APROVADOR AQUI
+            if cpfs_do_aprovador_filtro:
+                conditions.append(AppDpAjustesValoresPj.cpf.in_(cpfs_do_aprovador_filtro))
+
+            # Query de Contagem
+            count_stmt_ajustes = select(func.count()).select_from(AppDpAjustesValoresPj).where(and_(*conditions))
+            total_registros = await session_postgres.scalar(count_stmt_ajustes) or 0
+            
+            dados_combinados = []
+            if total_registros > 0:
+                offset = (page - 1) * limit
+                stmt_ajustes = select(
+                    AppDpAjustesValoresPj.cpf.label("cpf"),
+                    AppDpAjustesValoresPj.nome.label("nome"),
+                    AppDpAjustesValoresPj.cidade.label("cidade"),
+                    AppDpAjustesValoresPj.centro_de_custo.label("centro"),
+                    AppDpAjustesValoresPj.desconto_plano.label("planos"),
+                    AppDpAjustesValoresPj.vr.label("vr"),
+                    AppDpAjustesValoresPj.ressarcimento.label("ressarcimento"),
+                    AppDpAjustesValoresPj.outros.label("outros"),
+                    AppDpAjustesValoresPj.acao.label("acao_"),
+                    AppDpAjustesValoresPj.resultado.label("resultado"),
+                    AppDpAjustesValoresPj.motivo_tab.label("motivo"),
+                    AppDpAjustesValoresPj.justificativa.label("justificativa"),
+                    AppDpAjustesValoresPj.dataadmissao.label("dataadmissao"),
+                    AppDpAjustesValoresPj.email_colaborador.label("email_colaborador"),
+                    AppDpAjustesValoresPj.cnpj.label("cnpj"),
+                    AppDpAjustesValoresPj.razao_social.label("razao_social"),
+                    AppDpAjustesValoresPj.status_envio.label("status_envio"),
+                    literal_column("0").label("status")
+                ).select_from(AppDpAjustesValoresPj).where(and_(*conditions))
+
+                stmt_ajustes = stmt_ajustes.order_by(AppDpAjustesValoresPj.nome).offset(offset).limit(limit)
+                result_ajustes = await session_postgres.execute(stmt_ajustes)
+                dados_combinados = [dict(r) for r in result_ajustes.mappings().all()]
+
+                await enrich_with_prestador_data(dados_combinados)
+            
+            return {"data": dados_combinados, "total": total_registros, "page": page, "limit": limit}
+            
+        except Exception as e:
+            print(f"Erro Status 0: {e}")
+            raise HTTPException(status_code=500, detail="Erro no banco Postgres")
+
+    # --- CASO B: STATUS 1 (PENDENTES / ORACLE) ---
+    elif status == "1":
+        try:
+            stmt_cadastrados = select(AppDpAjustesValoresPj.cpf).where(filtro_data_ref)
+            result_cadastrados = await session_postgres.execute(stmt_cadastrados)
+            cpfs_cadastrados = {str(cpf).strip() for cpf in result_cadastrados.scalars().all()} 
+
+            if not QUERY_COLABORADORES: raise HTTPException(status_code=500, detail="Query vazia")
+            
+            base_sql = f"({QUERY_COLABORADORES}) A"
+            params = {}
+            search_like = f"%{search_term.upper()}%"
+            where_parts = ["(UPPER(A.NOME) LIKE :search_like OR A.CPF LIKE :search_like)"]
+            params["search_like"] = search_like
+
+            if cpfs_cadastrados:
+                cpfs_clean = [c for c in cpfs_cadastrados if c.isalnum()]
+                if cpfs_clean:
+                    cpfs_formatted = ", ".join([f"'{c}'" for c in cpfs_clean])
+                    where_parts.append(f"A.CPF NOT IN ({cpfs_formatted})")
+            
+            # 🚀 APLICA O FILTRO DE APROVADOR AQUI (ORACLE)
+            if cpfs_do_aprovador_filtro:
+                # Oracle tem limite de 1000 itens no IN. Se for muito grande, precisaria de chunk.
+                # Assumindo volume razoável por aprovador para este contexto.
+                cpfs_aprov_list = [f"'{c}'" for c in cpfs_do_aprovador_filtro if c.isalnum()]
+                if cpfs_aprov_list:
+                    cpfs_aprov_formatted = ", ".join(cpfs_aprov_list)
+                    where_parts.append(f"A.CPF IN ({cpfs_aprov_formatted})")
+                else:
+                    # Aprovador tem CPFs, mas nenhum alfanumérico válido? Bloqueia.
+                    where_parts.append("1=0")
+
+            where_sql = "WHERE " + " AND ".join(where_parts)
+
+            count_sql = f"SELECT COUNT(*) FROM {base_sql} {where_sql}"
+            total_registros = (await session_oracle.execute(text(count_sql), params)).scalar() or 0
+            
+            dados_combinados = []
+            if total_registros > 0:
+                offset = (page - 1) * limit
+                params["offset_val"] = offset
+                params["limit_val"] = limit
+                
+                query_sql = f"""
+                    SELECT CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
+                           ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA,
+                           1 AS STATUS , 0 STATUS_ENVIO
+                    FROM {base_sql} {where_sql}
+                    ORDER BY A.NOME
+                    OFFSET :offset_val ROWS FETCH NEXT :limit_val ROWS ONLY
+                """
+                oracle_result = await session_oracle.execute(text(query_sql), params)
+                dados_combinados = [dict(r) for r in oracle_result.mappings().all()]
+                await enrich_with_prestador_data(dados_combinados)
+
+            return {"data": dados_combinados, "total": total_registros, "page": page, "limit": limit}
+            
+        except Exception as e:
+            print(f"Erro Status 1: {e}")
+            raise HTTPException(status_code=500, detail="Erro no Oracle")
+
+    # --- CASO C: MISTO (TODOS) ---
+    else:
+        # 1. Prepara CPFs cadastrados
+        cpfs_cadastrados = set()
+        try:
+            stmt_cadastrados = select(AppDpAjustesValoresPj.cpf).where(filtro_data_ref)
+            result_cadastrados = await session_postgres.execute(stmt_cadastrados)
+            cpfs_cadastrados = {str(cpf).strip() for cpf in result_cadastrados.scalars().all()} 
+        except Exception as e:
+            print(f"Erro CPFs cadastrados: {e}")
+        
+        # 2. Configura Oracle (Com Filtro de Aprovador)
+        if not QUERY_COLABORADORES: raise HTTPException(status_code=500, detail="Query vazia")
+        base_sql = f"({QUERY_COLABORADORES}) A"
+        params = {}
+        search_like = f"%{search_term.upper()}%"
+        where_parts = ["(UPPER(A.NOME) LIKE :search_like OR A.CPF LIKE :search_like)"]
+        params["search_like"] = search_like
+
+        if cpfs_cadastrados:
+            cpfs_clean = [c for c in cpfs_cadastrados if c.isalnum()]
+            if cpfs_clean:
+                cpfs_formatted = ", ".join([f"'{c}'" for c in cpfs_clean])
+                where_parts.append(f"A.CPF NOT IN ({cpfs_formatted})")
+
+        # 🚀 APLICA FILTRO APROVADOR (ORACLE MISTO)
+        if cpfs_do_aprovador_filtro:
+            cpfs_aprov_list = [f"'{c}'" for c in cpfs_do_aprovador_filtro if c.isalnum()]
+            if cpfs_aprov_list:
+                cpfs_aprov_formatted = ", ".join(cpfs_aprov_list)
+                where_parts.append(f"A.CPF IN ({cpfs_aprov_formatted})")
+            else:
+                where_parts.append("1=0")
+
+        where_sql = "WHERE " + " AND ".join(where_parts)
+
+        # 3. Contagens
+        total_oracle_pendentes = 0
+        try:
+            count_sql = f"SELECT COUNT(*) FROM {base_sql} {where_sql}"
+            total_oracle_pendentes = (await session_oracle.execute(text(count_sql), params)).scalar() or 0
+        except Exception as e:
+            print(f"Erro Count Oracle: {e}")
+
+        total_postgres_ajustados = 0
+        try:
+            count_pg = select(func.count()).select_from(AppDpAjustesValoresPj).where(filtro_data_ref)
+            if search_term:
+                count_pg = count_pg.where(
+                    (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
+                    (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+                )
+            # 🚀 APLICA FILTRO APROVADOR (POSTGRES MISTO)
+            if cpfs_do_aprovador_filtro:
+                count_pg = count_pg.where(AppDpAjustesValoresPj.cpf.in_(cpfs_do_aprovador_filtro))
+
+            total_postgres_ajustados = await session_postgres.scalar(count_pg) or 0
+        except Exception as e:
+            print(f"Erro Count Postgres: {e}")
+
+        total_registros_geral = total_oracle_pendentes + total_postgres_ajustados
+
+        # 4. Busca Unificada
+        funcionarios_oracle = []
+        ajustes_postgres = []
+        start_index = (page - 1) * limit
+
+        # 4.1 Fetch Oracle
+        if start_index < total_oracle_pendentes:
+            offset_oracle = start_index
+            limit_oracle = min(limit, total_oracle_pendentes - offset_oracle)
+            
+            if limit_oracle > 0:
+                params["offset_val"] = offset_oracle
+                params["limit_val"] = limit_oracle
+                query_sql = f"""
+                    SELECT CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
+                           ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA,
+                           1 AS STATUS, 0 STATUS_ENVIO
+                    FROM {base_sql} {where_sql}
+                    ORDER BY A.NOME
+                    OFFSET :offset_val ROWS FETCH NEXT :limit_val ROWS ONLY
+                """
+                try:
+                    oracle_result = await session_oracle.execute(text(query_sql), params)
+                    funcionarios_oracle = [dict(r) for r in oracle_result.mappings().all()]
+                    await enrich_with_prestador_data(funcionarios_oracle)
+                except Exception as e:
+                    print(f"Erro Fetch Oracle: {e}")
+
+        # 4.2 Fetch Postgres
+        slots_restantes = limit - len(funcionarios_oracle)
+        # Ajuste offset para Postgres
+        # Se o start_index já passou do total do Oracle, o offset é (start_index - total_oracle)
+        # Se estamos pegando uma parte do Oracle e uma parte do PG, o offset do PG é 0
+        offset_postgres = max(0, start_index - total_oracle_pendentes)
+        
+        if slots_restantes > 0 and offset_postgres < total_postgres_ajustados:
+            limit_postgres = min(slots_restantes, total_postgres_ajustados - offset_postgres)
+
+            if limit_postgres > 0:
+                try:
+                    stmt_pg = select(
+                        AppDpAjustesValoresPj.cpf.label("cpf"),
+                        AppDpAjustesValoresPj.nome.label("nome"),
+                        AppDpAjustesValoresPj.cidade.label("cidade"),
+                        AppDpAjustesValoresPj.centro_de_custo.label("centro"),
+                        AppDpAjustesValoresPj.desconto_plano.label("planos"),
+                        AppDpAjustesValoresPj.vr.label("vr"),
+                        AppDpAjustesValoresPj.ressarcimento.label("ressarcimento"),
+                        AppDpAjustesValoresPj.outros.label("outros"),
+                        AppDpAjustesValoresPj.acao.label("acao_"),
+                        AppDpAjustesValoresPj.resultado.label("resultado"),
+                        AppDpAjustesValoresPj.motivo_tab.label("motivo"),
+                        AppDpAjustesValoresPj.justificativa.label("justificativa"),
+                        AppDpAjustesValoresPj.dataadmissao.label("dataadmissao"),
+                        AppDpAjustesValoresPj.email_colaborador.label("email_colaborador"),
+                        AppDpAjustesValoresPj.cnpj.label("cnpj"),
+                        AppDpAjustesValoresPj.razao_social.label("razao_social"),
+                        AppDpAjustesValoresPj.status_envio.label("status_envio"),
+                        literal_column("0").label("status")
+                    ).select_from(AppDpAjustesValoresPj).where(filtro_data_ref)
+                    
+                    if search_term:
+                        stmt_pg = stmt_pg.where(
+                            (AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | 
+                            (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%"))
+                        )
+
+                    # 🚀 APLICA FILTRO APROVADOR (POSTGRES MISTO FETCH)
+                    if cpfs_do_aprovador_filtro:
+                         stmt_pg = stmt_pg.where(AppDpAjustesValoresPj.cpf.in_(cpfs_do_aprovador_filtro))
+
+                    stmt_pg = stmt_pg.order_by(AppDpAjustesValoresPj.nome).offset(offset_postgres).limit(limit_postgres)
+                    result_pg = await session_postgres.execute(stmt_pg)
+                    ajustes_postgres = [dict(r) for r in result_pg.mappings().all()]
+                    await enrich_with_prestador_data(ajustes_postgres)
+                    
+                except Exception as e:
+                    print(f"Erro Fetch Postgres: {e}")
+
+        dados_combinados = funcionarios_oracle + ajustes_postgres
+        
+        return {
+            "data": dados_combinados,
+            "total": total_registros_geral,
+            "page": page,
+            "limit": limit
+        }
 @router.get("/api/item/{item_id}")
 async def get_item(item_id: str, etapa: int = 1):
     db_key = "etapa1" if etapa == 1 else "etapa2"
@@ -555,11 +920,264 @@ async def update_item(item_id: str,
         return {"status": "success", "message": "Registro cadastrado com sucesso."}
     
 
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import List, Dict, Any
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, text
+from datetime import datetime, date, timedelta
+
+# Certifique-se de que os modelos e sessões estão importados corretamente
+# from seu_modulo import AppDpAjustesValoresPj, app_dp_pj_aprovador_x_prestado, ...
+
 @router.post("/api/enviar_final")
-async def post_final_submission(submission: FinalSubmission):
-    print(f"[LOG] IDs recebidos para envio final: {submission.ids}")
-    return {
-        "status": "recebido",
-        "recebidos": len(submission.ids),
-        "ids": submission.ids
-    }
+async def post_enviar_final(
+    payload: EnvioFinalRequest,
+    session_postgres: AsyncSession = Depends(get_postgres_session),
+    session_oracle: AsyncSession = Depends(get_oracle_session)
+):
+    try:
+        # ==========================================================================
+        # 1. RESOLUÇÃO DOS CPFS (Global ou Manual)
+        # ==========================================================================
+        cpfs_selecionados = []
+
+        # CASO A: Selecionar Tudo (Busca no banco baseada nos filtros)
+        if payload.enviar_tudo:
+            # Configura datas para filtrar a query
+            hoje = date.today()
+            primeiro_dia_mes_atual = hoje.replace(day=1)
+            ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
+            filtro_data_ref = AppDpAjustesValoresPj.datareferencia == ultimo_dia_mes_anterior
+
+            # Recupera filtros
+            search_term = payload.filtros.search.strip() if payload.filtros and payload.filtros.search else ""
+            filtro_aprovador = payload.filtros.aprovador.strip() if payload.filtros and payload.filtros.aprovador else ""
+
+            # A.1 Filtro de Aprovador
+            cpfs_aprovador = set()
+            if filtro_aprovador:
+                stmt_aprov = select(app_dp_pj_aprovador_x_prestado.cpf_prestador).where(
+                    app_dp_pj_aprovador_x_prestado.nome_aprovador == filtro_aprovador
+                )
+                res_aprov = await session_postgres.execute(stmt_aprov)
+                cpfs_aprovador = {str(c).strip() for c in res_aprov.scalars().all()}
+                if not cpfs_aprovador:
+                    return JSONResponse(content={"message": "Nenhum item para este aprovador"}, status_code=400)
+
+            # A.2 Busca Postgres (Status 0)
+            conditions = [filtro_data_ref]
+            if search_term:
+                conditions.append((AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%")))
+            if cpfs_aprovador:
+                conditions.append(AppDpAjustesValoresPj.cpf.in_(cpfs_aprovador))
+
+            stmt_pg_ids = select(AppDpAjustesValoresPj.cpf).where(and_(*conditions))
+            res_pg_ids = await session_postgres.execute(stmt_pg_ids)
+            ids_pg = [str(c).strip() for c in res_pg_ids.scalars().all()]
+
+            # A.3 Busca Oracle (Status 1)
+            # Excluir quem já está no PG
+            stmt_cad = select(AppDpAjustesValoresPj.cpf).where(filtro_data_ref)
+            res_cad = await session_postgres.execute(stmt_cad)
+            cpfs_ignorar = {str(c).strip() for c in res_cad.scalars().all()}
+
+            base_sql = f"({QUERY_COLABORADORES}) A"
+            where_parts = []
+            params = {}
+            if search_term:
+                params["search_like"] = f"%{search_term.upper()}%"
+                where_parts.append("(UPPER(A.NOME) LIKE :search_like OR A.CPF LIKE :search_like)")
+            if cpfs_ignorar:
+                clean = [c for c in cpfs_ignorar if c.isalnum()]
+                if clean: where_parts.append(f"A.CPF NOT IN ({', '.join([f"'{c}'" for c in clean])})")
+            if cpfs_aprovador:
+                clean_aprov = [c for c in cpfs_aprovador if c.isalnum()]
+                if clean_aprov: where_parts.append(f"A.CPF IN ({', '.join([f"'{c}'" for c in clean_aprov])})")
+                else: where_parts.append("1=0")
+
+            where_sql = "WHERE " + " AND ".join(where_parts) if where_parts else ""
+            sql_oracle = f"SELECT CPF FROM {base_sql} {where_sql}"
+            try:
+                res_ora = await session_oracle.execute(text(sql_oracle), params)
+                ids_oracle = [str(row.cpf).strip() for row in res_ora.all()]
+            except:
+                ids_oracle = []
+
+            cpfs_selecionados = list(set(ids_pg + ids_oracle))
+
+        # CASO B: Seleção Manual
+        else:
+            cpfs_selecionados = [cpf.strip() for cpf in payload.ids]
+
+        # Validação Final
+        if not cpfs_selecionados:
+            return JSONResponse(content={"message": "Nenhum item selecionado"}, status_code=400)
+
+        # ==========================================================================
+        # 2. SUA LÓGICA ORIGINAL (Processamento)
+        # ==========================================================================
+        
+        # Conversão de Datas
+        try:
+            dt_emissao = datetime.strptime(payload.data_emissao, "%Y-%m-%d").date()
+            dt_pagamento = datetime.strptime(payload.data_pagamento, "%Y-%m-%d").date()
+        except ValueError:
+            return JSONResponse(content={"detail": "Formato de data inválido"}, status_code=400)
+
+        processed_count = 0
+        
+        # Datas de referência para o update/insert
+        hoje = date.today()
+        primeiro_dia_mes_atual = hoje.replace(day=1)
+        ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
+
+        # --- Função Enrich (Mantida igual) ---
+        async def enrich_with_prestador_data(lista_colaboradores: List[Dict[str, Any]]):
+            if not lista_colaboradores: return
+            cpfs_para_buscar = {str(row.get("cpf")).strip() for row in lista_colaboradores if row.get("cpf")}
+            if not cpfs_para_buscar: return
+
+            try:
+                stmt = select(
+                    app_dp_pj_aprovador_x_prestado.cpf_prestador,
+                    app_dp_pj_aprovador_x_prestado.cnpj,
+                    app_dp_pj_aprovador_x_prestado.razao_social,
+                    app_dp_pj_aprovador_x_prestado.nome_aprovador
+                ).where(app_dp_pj_aprovador_x_prestado.cpf_prestador.in_(cpfs_para_buscar))
+
+                result = await session_postgres.execute(stmt)
+                prestadores = result.all()
+                
+                mapa_prestadores = {
+                    str(p.cpf_prestador).strip(): {
+                        "cnpj": p.cnpj, "razao_social": p.razao_social, "aprovador": p.nome_aprovador
+                    } for p in prestadores
+                }
+
+                for colab in lista_colaboradores:
+                    cpf_key = str(colab.get("cpf")).strip()
+                    dados_extra = mapa_prestadores.get(cpf_key)
+                    if dados_extra:
+                        colab["cnpj"] = dados_extra["cnpj"]
+                        colab["razao_social"] = dados_extra["razao_social"]
+                        colab["aprovador"] = dados_extra["aprovador"]
+                    else:
+                        colab.setdefault("cnpj", None)
+                        colab.setdefault("razao_social", None)
+                        colab.setdefault("aprovador", None)
+            except Exception as e:
+                print(f"Erro enrich: {e}")
+                for colab in lista_colaboradores:
+                    colab.setdefault("cnpj", None)
+                    colab.setdefault("razao_social", None)
+                    colab.setdefault("aprovador", None)
+
+        # --- Lógica Principal de Upsert ---
+
+        # 1. Buscar dados já existentes no Postgres (Histórico/Editados)
+        #    Agora usamos chunking para evitar estouro no IN clause se a lista for enorme
+        registros_existentes = []
+        chunk_size = 1000
+        for i in range(0, len(cpfs_selecionados), chunk_size):
+            chunk = cpfs_selecionados[i:i + chunk_size]
+            stmt_pg = select(AppDpAjustesValoresPj).where(AppDpAjustesValoresPj.cpf.in_(chunk))
+            result_pg = await session_postgres.execute(stmt_pg)
+            registros_existentes.extend(result_pg.scalars().all())
+        
+        mapa_postgres = {r.cpf: r for r in registros_existentes}
+        cpfs_encontrados_pg = set(mapa_postgres.keys())
+        
+        # 2. Identificar Novos (Só existem no Oracle)
+        cpfs_pendentes_oracle = list(set(cpfs_selecionados) - cpfs_encontrados_pg)
+        
+        dados_novos_oracle = []
+        if cpfs_pendentes_oracle:
+            # Chunking para Query Oracle também
+            for i in range(0, len(cpfs_pendentes_oracle), chunk_size):
+                chunk = cpfs_pendentes_oracle[i:i + chunk_size]
+                cpfs_sql = ", ".join([f"'{c}'" for c in chunk])
+                
+                query_oracle = f"""
+                    SELECT CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
+                           ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA
+                    FROM ({QUERY_COLABORADORES}) A
+                    WHERE A.CPF IN ({cpfs_sql})
+                """
+                res_oracle = await session_oracle.execute(text(query_oracle))
+                dados_novos_oracle.extend([dict(r) for r in res_oracle.mappings().all()])
+
+            if dados_novos_oracle:
+                await enrich_with_prestador_data(dados_novos_oracle)
+
+        # 3. Processamento (Upsert)
+        
+        # A. UPDATE: Atualizar os existentes
+        for cpf, registro in mapa_postgres.items():
+            registro.data_emissao_nota = dt_emissao
+            registro.data_pagamento = dt_pagamento
+            registro.status_envio = 1 
+            processed_count += 1
+
+        # B. INSERT: Inserir os novos (Enriquecidos)
+        for row in dados_novos_oracle:
+            novo_registro = AppDpAjustesValoresPj(
+                cpf=str(row.get("cpf")).strip(),
+                nome=row.get("nome"),
+                cidade=row.get("cidade"),
+                centro_de_custo=row.get("centro"),
+                cnpj=row.get("cnpj"),                
+                razao_social=row.get("razao_social"), 
+                # aprovador=row.get("aprovador"), # Descomente se tiver coluna no modelo
+                desconto_plano=row.get("planos") or 0.0,
+                vr=row.get("vr") or 0.0,
+                ressarcimento=row.get("ressarcimento") or 0.0,
+                outros=row.get("outros") or 0.0,
+                acao=row.get("acao_"),
+                resultado=row.get("resultado") or 0.0,
+                motivo_tab=row.get("motivo"),
+                justificativa=row.get("justificativa"),
+                dataadmissao=row.get("dataadmissao"),
+                email_colaborador=row.get("email_colaborador"),
+                data_emissao_nota=dt_emissao,
+                data_pagamento=dt_pagamento,
+                datareferencia=ultimo_dia_mes_anterior,
+                status_envio=1 
+            )
+            session_postgres.add(novo_registro)
+            processed_count += 1
+
+        await session_postgres.commit()
+
+        return {"message": "Processamento concluído", "recebidos": processed_count}
+
+    except Exception as e:
+        await session_postgres.rollback()
+        print(f"Erro no envio final: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+@router.get("/api/lista_aprovadores")
+async def get_lista_aprovadores(
+    session_postgres: AsyncSession = Depends(get_postgres_session)
+):
+    """
+    Retorna a lista de todos os aprovadores distintos cadastrados na tabela auxiliar.
+    Usado para popular o select do Frontend.
+    """
+    try:
+        # Busca nomes distintos e ordena alfabeticamente
+        stmt = select(app_dp_pj_aprovador_x_prestado.nome_aprovador)\
+            .where(app_dp_pj_aprovador_x_prestado.nome_aprovador != None)\
+            .distinct()\
+            .order_by(app_dp_pj_aprovador_x_prestado.nome_aprovador)
+        
+        result = await session_postgres.execute(stmt)
+        
+        # Retorna lista simples de strings ['Aprovador A', 'Aprovador B', ...]
+        lista = [row for row in result.scalars().all() if row]
+        return lista
+        
+    except Exception as e:
+        print(f"Erro ao buscar lista de aprovadores: {e}")
+        return []

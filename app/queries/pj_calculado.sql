@@ -68,7 +68,7 @@ DADOS_PLANOS_SAUDE AS (
         JOIN rhmeta.rhempresas em ON tc.empresa = em.empresa
         WHERE t.convenio IN (2000, 3000, 6000, 0001, 7000) AND tc.situacao IN (1, 2)
         AND em.descricao20 IN ('Prestadores de servi')
-        AND ecd.datainicio >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+        AND ecd.datainicio >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 0)
         AND ecd.datatermino < ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
         UNION ALL
         SELECT

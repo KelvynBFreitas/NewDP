@@ -24,4 +24,6 @@ class AppDpAjustesValoresPj(Base):
     ressarcimento = Column(Float)
     cnpj = Column(String)
     razao_social = Column(String,)
-
+    data_emissao_nota = Column(Date)
+    data_pagamento = Column(Date)
+    status_envio = Column(Integer, index=True)

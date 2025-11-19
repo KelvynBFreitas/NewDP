@@ -69,7 +69,7 @@ FROM
       AND tc.situacao IN (1, 2)
       AND em.descricao20 IN ('Prestadores de servi')
       -- FILTRO MOVIDO PARA CÁ
-      AND ecd.datainicio >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+      AND ecd.datainicio >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 0)
       AND ecd.datatermino < ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
   ) benefi
 GROUP BY
