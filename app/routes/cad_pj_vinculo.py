@@ -189,6 +189,7 @@ async def search_funcionarios(
         stmt_cadastrados = select(app_dp_pj_aprovador_x_prestado.cpf_prestador)
         result_cadastrados = await session_postgres.execute(stmt_cadastrados)
         cpfs_cadastrados = set(result_cadastrados.scalars().all())
+        print(f"CPFs já cadastrados: {cpfs_cadastrados}")
     except Exception as e:
         print(f"Erro ao buscar CPFs no Postgres: {e}")
         raise HTTPException(status_code=500, detail="Erro ao verificar CPFs existentes.")

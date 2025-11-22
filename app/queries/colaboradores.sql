@@ -13,7 +13,8 @@ SELECT
     else RCC.DESCRICAO40 
   end CLASSIFICACAO_CONTABIL,
   r.dataadmissao AS "DATAADMISSAO",
-  rp.emailcorporativo as email_colaborador
+  --rp.emailcorporativo 
+  'kelvyn.freitas@gruponew.com' as email_colaborador
 
 FROM RHMETA.RHCONTRATOS R
 JOIN RHMETA.RHPESSOAS RP ON R.PESSOA = RP.PESSOA AND R.EMPRESA = RP.EMPRESA
@@ -26,7 +27,7 @@ JOIN RHMETA.RHCLASSCONTABEIS RCC ON R.CLASSIFICACAOCONTABIL = RCC.CLASSIFICACAOC
 
 WHERE R.SITUACAO IN (1,2)
 AND E.DESCRICAO20 IN ('Prestadores de servi')
-and R.DATAADMISSAO >= TO_DATE('01/08/2025', 'DD/MM/YYYY')
+--and R.DATAADMISSAO >= TO_DATE('01/08/2025', 'DD/MM/YYYY')
 UNION ALL
 
 SELECT 
@@ -41,7 +42,7 @@ SELECT
   '1104' AS ESTABELECIMENTOCONTRATA,
   'Veículos Novos' AS CLASSIFICACAO_CONTABIL,
   TO_DATE('15/04/2024', 'DD/MM/YYYY') AS "DATAADMISSAO",
-  'julio.nunes@gwmnewhouse.com.br' AS email_colaborador
+  'kelvyn.freitas@gruponew.com' as email_colaborador
 from dual
 
 UNION ALL
@@ -58,5 +59,5 @@ SELECT
   '1102' AS ESTABELECIMENTOCONTRATA,
   'Veículos Novos' AS CLASSIFICACAO_CONTABIL,
   TO_DATE('01/02/2024', 'DD/MM/YYYY') AS "DATAADMISSAO",
-  'jorgeanne.melo@newlandjlr.com.br' AS email_colaborador
+  'kelvyn.freitas@gruponew.com' as email_colaborador
 from dual

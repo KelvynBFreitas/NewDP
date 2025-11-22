@@ -193,12 +193,18 @@ DADOS_VALOR_HORA_CIDADE AS (
 SELECT 
     P.CPF,
     P.NOMECOMPLETO AS Nome,
-    DVH.CIDADE,
+    case when P.CPF = '04950558323' then 'Fortaleza'
+         else   DVH.CIDADE
+         end CIDADE,
     P.CLASSIFICACAO_CONTABIL AS centro,
     COALESCE(ROUND(PS.TOTAL_PLANO, 2), 0) AS planos,
+
     DVH.VALOR,
     DVH.calendario,
-    ROUND((DVH.DIAS_UTEIS_MENOS_FERIADOS * DVH.VALOR) * 0.9, 2) AS vr,
+    
+    case when P.CPF = '04950558323' then  0.0
+         else   ROUND((DVH.DIAS_UTEIS_MENOS_FERIADOS * DVH.VALOR) * 0.9, 2) 
+         end AS vr,
     CASE 
         WHEN ROUND(((DVH.DIAS_UTEIS_MENOS_FERIADOS ) * DVH.VALOR) * 0.9, 2) - COALESCE(PS.TOTAL_PLANO, 0) <= 0 
         THEN 'Descontar na Nota >>>>>'
@@ -211,7 +217,7 @@ SELECT
     ) AS Resultado,
     NULL AS Motivo,
     P.dataadmissao AS dataadmissao,
-    p.email_colaborador,
+    'kelvyn.freitas@gruponew.com' as email_colaborador,
     NULL AS outros,
     case when ps.METODO = ('METODO_NOVO') then PS.CUSTOEMPRESA 
          else 0 

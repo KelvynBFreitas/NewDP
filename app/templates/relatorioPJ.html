@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Relatório de Pagamentos PJ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        /* ========================================================== */
+        /* VARIÁVEIS DE COR E ESTILOS GERAIS */
+        /* ========================================================== */
+        :root {
+            --cor-fundo-gradiente-1: #0d141a;
+            --cor-fundo-gradiente-2: #0a0f14;
+            --cor-card-borda: rgba(255, 255, 255, .1);
+            --cor-texto-claro: #c2c9d1;
+            --cor-texto-branco: #fff;
+            --cor-texto-secundario: #9aa5b1;
+            --cor-destaque-primaria: #00bcd4;
+            /* Ciano */
+            --cor-destaque-secundaria: #0093a8;
+            --cor-blob: #00bcd4;
+            --cor-shadow-leve: rgba(0, 0, 0, .25);
+            --cor-shadow-media: rgba(0, 0, 0, .45);
+            --cor-sucesso: #4fd896;
+            --cor-perigo: #ff7085;
+            --cor-warning: #ffda79;
+        }
+
+        body {
+            background: linear-gradient(300deg, var(--cor-fundo-gradiente-1), var(--cor-fundo-gradiente-2));
+            color: var(--cor-texto-claro);
+            font-family: Inter, sans-serif;
+            padding-top: 80px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* ========================================================== */
+        /* EFEITO AURORA */
+        /* ========================================================== */
+        .aurora-container {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            filter: blur(100px);
+            opacity: 0.18;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            min-width: 480px;
+            min-height: 480px;
+            background: var(--cor-blob);
+            border-radius: 50%;
+            animation: aurora-anim 30s ease-in-out infinite;
+        }
+
+        @keyframes aurora-anim {
+            0%,
+            100% {
+                transform: translate(0) scale(1);
+            }
+
+            30% {
+                transform: translate(-20%, 30%) scale(1.1);
+            }
+
+            70% {
+                transform: translate(25%, -15%) scale(0.95);
+            }
+        }
+
+        /* ========================================================== */
+        /* NAVBAR */
+        /* ========================================================== */
+        .navbar-custom {
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--cor-card-borda);
+            box-shadow: 0 4px 30px var(--cor-shadow-leve);
+        }
+
+        .navbar-custom .navbar-brand {
+            color: var(--cor-texto-branco);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-custom .nav-link {
+            color: var(--cor-texto-claro);
+            padding: 0.55rem 1rem;
+            border-radius: 8px;
+            transition: background 0.25s;
+        }
+
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active {
+            color: var(--cor-texto-branco);
+            background: rgba(255, 255, 255, .1);
+        }
+
+        /* ========================================================== */
+        /* DASHBOARD PRINCIPAL (PAINEL) */
+        /* ========================================================== */
+        .dashboard-container {
+            background: rgba(10, 15, 20, .6);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--cor-card-borda);
+            border-radius: 12px;
+            padding: 35px 28px;
+            box-shadow: 0 15px 40px var(--cor-shadow-media);
+            position: relative;
+            /* === NOVOS ESTILOS PARA 95% DE LARGURA === */
+            max-width: 95%;
+            /* Limita a largura a 95% da tela */
+            margin-left: auto;
+            /* Centraliza horizontalmente */
+            margin-right: auto;
+            /* Centraliza horizontalmente */
+            /* Garante que o padding lateral do container-fluid não seja muito grande */
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        /* Borda de gradiente sutil */
+        .dashboard-container:before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, rgba(0, 188, 212, .6), rgba(0, 123, 255, .5), rgba(0, 188, 212, .6));
+            background-size: 200% 200%;
+            animation: gradient-border 12s ease infinite;
+            border-radius: 14px;
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        @keyframes gradient-border {
+            0% {
+                background-position: 0 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0 50%
+            }
+        }
+
+        /* ========================================================== */
+        /* COMPONENTES DE FORMLÁRIO/BOTÕES PERSONALIZADOS */
+        /* ========================================================== */
+        .small.text-muted {
+            color: var(--cor-texto-secundario) !important
+        }
+
+        .form-control-custom {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid var(--cor-card-borda);
+            color: var(--cor-texto-branco);
+            border-radius: 8px;
+            transition: .25s
+        }
+
+        .form-control-custom:focus {
+            background: rgba(255, 255, 255, .1);
+            border-color: var(--cor-destaque-primaria);
+            box-shadow: 0 0 5px var(--cor-destaque-primaria);
+            color: var(--cor-texto-branco);
+            /* Garante que o texto permanece branco no foco */
+        }
+
+        /* Botões Ciano */
+        .btn-cyano,
+        .btn-success {
+            background: var(--cor-destaque-primaria) !important;
+            border-color: var(--cor-destaque-primaria) !important;
+            color: var(--cor-fundo-gradiente-2) !important;
+            font-weight: 600
+        }
+
+        .btn-cyano:hover,
+        .btn-success:hover {
+            background: var(--cor-destaque-secundaria) !important;
+            border-color: var(--cor-destaque-secundaria) !important;
+            color: var(--cor-texto-branco) !important
+        }
+
+        .btn-outline-cyano {
+            border: 1px solid var(--cor-destaque-primaria);
+            color: var(--cor-destaque-primaria);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .btn-outline-cyano:hover,
+        .btn-outline-cyano.active {
+            background: var(--cor-destaque-primaria);
+            color: var(--cor-fundo-gradiente-2);
+            border-color: var(--cor-destaque-primaria)
+        }
+
+        /* Input Group: Ajusta o texto do ícone dentro do input */
+        .input-group-text {
+            border: 1px solid var(--cor-card-borda);
+        }
+
+        .input-group-text.bg-transparent {
+            background: rgba(255, 255, 255, .08) !important;
+        }
+
+        /* ========================================================== */
+        /* CARDS DE ESTATÍSTICAS */
+        /* ========================================================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--cor-card-borda);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            transition: .3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .3)
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--cor-destaque-primaria);
+            background: rgba(255, 255, 255, .08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .5)
+        }
+
+        .stat-value {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--cor-texto-branco)
+        }
+
+        .stat-label {
+            font-size: .85rem;
+            color: var(--cor-texto-secundario) !important;
+            opacity: 1
+        }
+
+        /* Estilo para o cartão de Total Líquido */
+        .stat-card[style*="border-left"] {
+            border-left: 5px solid var(--cor-destaque-primaria) !important;
+            background: rgba(0, 188, 212, .08) !important
+        }
+
+
+        /* ========================================================== */
+        /* TABELA PERSONALIZADA (Glass Table) */
+        /* ========================================================== */
+        .table-container-glass {
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .25);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(3px)
+        }
+
+        .table-custom {
+            color: #b9c6df;
+            font-size: .92rem;
+            margin-bottom: 0;
+            /* Remove margem inferior da tabela dentro do container */
+        }
+
+        .table-custom thead th {
+            background: rgba(255, 255, 255, .08);
+            font-weight: 600;
+            color: #f3f4f6;
+            border-bottom: 1px solid rgba(255, 255, 255, .15)
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, .04)
+        }
+
+        .table-custom tbody tr:nth-child(odd) {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        /* Efeito de hover melhorado */
+        .table-custom tbody tr:hover {
+            background: var(--cor-destaque-primaria);
+            color: var(--cor-fundo-gradiente-2);
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* Classe de destaque para a coluna principal */
+        .coluna-total-liquido {
+            background: rgba(0, 188, 212, .12) !important;
+            /* Fundo levemente mais escuro */
+            font-weight: 700 !important;
+            border-left: 3px solid var(--cor-destaque-primaria) !important;
+            /* Borda de destaque */
+        }
+
+        /* Garante que o hover funciona na célula destacada */
+        .table-custom tbody tr:hover .coluna-total-liquido {
+            background: var(--cor-destaque-secundaria) !important;
+            color: var(--cor-fundo-gradiente-2) !important;
+        }
+
+        /* Cores de status */
+        .text-danger {
+            color: var(--cor-perigo) !important
+        }
+
+        .text-success {
+            color: var(--cor-sucesso) !important
+        }
+
+        .text-warning {
+            color: var(--cor-warning) !important
+        }
+
+        .text-info {
+            color: #7dd3fc !important
+        }
+
+        .valor-negativo {
+            color: var(--cor-perigo) !important
+        }
+
+        .valor-positivo {
+            color: var(--cor-sucesso) !important
+        }
+
+        .btn-acao-custom {
+            color: var(--cor-destaque-primaria);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: .2s
+        }
+
+        .btn-acao-custom:hover {
+            color: var(--cor-destaque-secundaria);
+            /* Cor do ícone em hover */
+        }
+
+        /* Garante que o ícone fique escuro no hover da linha */
+        .table-custom tbody tr:hover .btn-acao-custom {
+            color: var(--cor-fundo-gradiente-2);
+        }
+        
+        /* Estilos para o Modal (opcional, mas melhoram a aparência) */
+        .modal-content {
+            background-color: var(--cor-fundo-gradiente-1);
+            border: 1px solid var(--cor-card-borda);
+            box-shadow: 0 10px 25px var(--cor-shadow-media);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--cor-card-borda);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--cor-card-borda);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="aurora-container">
+        <div class="aurora-blob" style="top: 10%; left: 15%; --cor-blob: #0d47a1"></div>
+        <div class="aurora-blob" style="bottom: 20%; right: 10%; --cor-blob: #4a148c"></div>
+        <div class="aurora-blob" style="top: 50%; left: 50%; transform: translate(-50%, -50%); --cor-blob: #00bcd4">
+        </div>
+        <div class="aurora-blob" style="top: 5%; right: 5%; --cor-blob: #ad1457"></div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="bi bi-person-vcard me-2"></i>{{empresa}}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% for item in menus %} {% if item.submenu %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {{ item.title }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for sub in item.submenu %}
+                            <li><a class="dropdown-item" href="{{ sub.url }}">{{ sub.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ item.url }}">{{ item.title }}</a></li>
+                    {% endif %} {% endfor %}
+                </ul>
+                <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i> Perfil
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text"><strong>{{ username }}</strong></span></li>
+                            <li><span class="dropdown-item-text text-muted small">{{ user_username }}</span></li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>
+                                    Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="app" class="dashboard-container container-fluid">
+
+        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+            <div>
+                <h3 class="fw-bold mb-1">Painel de Pagamentos PJ <i
+                        class="bi bi-file-earmark-bar-graph text-info ms-2"></i></h3>
+                <p class="small text-muted mb-0">Visualize e exporte os dados financeiros do período selecionado.</p>
+            </div>
+            <button @click="exportarCSV" class="btn btn-success px-4" :disabled="loading || dados.length === 0">
+                <i class="bi bi-file-earmark-excel me-2"></i>Exportar Relatório
+            </button>
+        </div>
+
+        <div class="glass-panel mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-12 mb-2">
+                    <label class="form-label small text-muted d-block mb-2">Períodos Rápidos</label>
+                    <div class="btn-group">
+                        <button @click="setPeriodo('este_mes')" class="btn btn-sm btn-outline-cyano"
+                            :class="{ active: periodoAtivo === 'este_mes' }">Este Mês</button>
+                        <button @click="setPeriodo('mes_passado')" class="btn btn-sm btn-outline-cyano"
+                            :class="{ active: periodoAtivo === 'mes_passado' }">Mês Passado</button>
+                        <button @click="setPeriodo('ano_atual')" class="btn btn-sm btn-outline-cyano"
+                            :class="{ active: periodoAtivo === 'ano_atual' }">Ano Atual</button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-white">Data Inicial</label>
+                    <input type="date" v-model="filtro.dataInicio" class="form-control form-control-custom">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-white">Data Final</label>
+                    <input type="date" v-model="filtro.dataFim" class="form-control form-control-custom">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-white">Busca Rápida</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-white"><i
+                                class="bi bi-search text-white"></i></span>
+                        <input type="text" v-model="filtro.search" @keyup.enter="buscarDados"
+                            class="form-control form-control-custom border-start-0 "
+                            placeholder="Nome, CPF, Razão Social ou Aprovador...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button @click="buscarDados" class="btn btn-cyano w-100" :disabled="loading">
+                        <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+                        <span v-else>Aplicar Filtros</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="resumo" class="stats-grid">
+            <div class="stat-card" style="border-left: 4px solid var(--cor-destaque-primaria);">
+                <div class="stat-value text-info">${ formatCurrency(resumo.total_valor) }</div>
+                <div class="stat-label text-info">Total Líquido Pago</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-danger">${ formatCurrency(resumo.total_plano) }</div>
+                <div class="stat-label">Descontos (Planos)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-success">${ formatCurrency(resumo.total_vr) }</div>
+                <div class="stat-label">Vale Refeição</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-warning">${ formatCurrency(resumo.total_ressarcimento) }</div>
+                <div class="stat-label">Ressarcimentos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${ resumo.total_registros }</div>
+                <div class="stat-label">Colaboradores Processados</div>
+            </div>
+        </div>
+
+        <div class="table-container-glass shadow-lg">
+            <div class="table-responsive">
+                <table class="table table-custom table-borderless align-middle">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 120px;">Data Ref.</th>
+                            <th style="min-width: 130px;">CPF</th>
+                            <th style="min-width: 250px;">Nome</th>
+                            <th style="min-width: 150px;">Aprovador</th>
+                            <th class="text-end">Ressarc.</th>
+                            <th class="text-end">VR</th>
+                            <th class="text-end">Planos</th>
+                            <th class="text-end">Outros</th>
+                            <th class="text-end coluna-total-liquido">Total Líquido</th>
+                            <th class="text-center" style="min-width: 80px;">Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="loading">
+                            <td colspan="10" class="text-center py-5 text-muted">
+                                <div class="spinner-border text-info mb-3" style="width: 3rem; height: 3rem;"
+                                    role="status"></div>
+                                <p class="mb-0">Carregando dados do servidor...</p>
+                            </td>
+                        </tr>
+                        <tr v-else-if="dados.length === 0">
+                            <td colspan="10" class="text-center py-5 text-muted opacity-75">
+                                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                                Nenhum registro encontrado para os filtros aplicados.
+                            </td>
+                        </tr>
+                        <tr v-else v-for="(item, index) in filteredData" :key="index">
+                            <td>${ formatDate(item.data_referencia) }</td>
+                            <td class="font-monospace ">${ item.cpf_prestador }</td>
+                            <td class="fw-medium text-muted ">${ item.nome }</td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-semibold px-2">
+                                    ${ item.aprovador || 'N/D' }
+                                </span>
+                            </td>
+
+
+                            <td class="text-end small ">${ formatCurrency(item.ressarcimento) }</td>
+                            <td class="text-end small ">${ formatCurrency(item.vr) }</td>
+                            <td class="text-end small ">${ formatCurrency(item.planos) }</td>
+                            <td class="text-end small ">${ formatCurrency(item.outros) }</td>
+
+                            <td class="text-end fw-bold fs-6 coluna-total-liquido"
+                                :class="item.total < 0 ? 'valor-negativo' : 'valor-positivo'">
+                                ${ formatCurrency(item.total) }
+                            </td>
+                            <td class="text-center">
+                                <i @click="detalhesRegistro(item)" class="bi bi-eye-fill btn-acao-custom"
+                                    title="Ver Detalhes"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-3 border-top border-secondary border-opacity-25 text-end text-muted small">
+                Mostrando <strong>${ dados.length }</strong> registros encontrados.
+            </div>
+        </div>
+
+        <div class="modal fade" id="detalheModal" tabindex="-1" aria-labelledby="detalheModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-white" id="detalheModalLabel">
+                            <i class="bi bi-info-circle me-2 text-info"></i>Detalhes do Pagamento PJ
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" v-if="detalheSelecionado">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p class="mb-1 small text-muted">Nome do Prestador</p>
+                                <h4 class="text-white">${ detalheSelecionado.nome }</h4>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1 small text-muted">Data Referência</p>
+                                <strong class="text-white">${ formatDate(detalheSelecionado.data_referencia) }</strong>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1 small text-muted">CPF</p>
+                                <strong class="text-white font-monospace">${ detalheSelecionado.cpf_prestador }</strong>
+                            </div>
+                        </div>
+
+                        <hr class="border-secondary opacity-25">
+
+                        <h6 class="text-info mt-4 mb-3">Valores Detalhados</h6>
+                        <div class="row row-cols-2 row-cols-md-4 g-3">
+                            <div class="col">
+                                <div class="stat-card p-3">
+                                    <p class="stat-label mb-1">Ressarcimentos</p>
+                                    <strong class="stat-value fs-5 text-warning">${ formatCurrency(detalheSelecionado.ressarcimento) }</strong>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-card p-3">
+                                    <p class="stat-label mb-1">Vale Refeição</p>
+                                    <strong class="stat-value fs-5 text-success">${ formatCurrency(detalheSelecionado.vr) }</strong>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-card p-3">
+                                    <p class="stat-label mb-1">Descontos (Planos)</p>
+                                    <strong class="stat-value fs-5 text-danger">${ formatCurrency(detalheSelecionado.planos) }</strong>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-card p-3">
+                                    <p class="stat-label mb-1">Outras Deduções</p>
+                                    <strong class="stat-value fs-5">${ formatCurrency(detalheSelecionado.outros) }</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="text-info mt-4 mb-3">Totais</h6>
+                        <div class="stat-card p-3 border-left"
+                            style="border-left: 5px solid var(--cor-destaque-primaria) !important;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="stat-label mb-1 text-info">TOTAL LÍQUIDO PAGO</p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="stat-value fs-4"
+                                        :class="detalheSelecionado.total < 0 ? 'valor-negativo' : 'valor-positivo'">
+                                        ${ formatCurrency(detalheSelecionado.total) }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="text-info mt-4 mb-3">Informações de Processamento</h6>
+                        <div class="row small">
+                            <div class="col-md-4">
+                                <p class="mb-1 text-muted">Aprovador:</p>
+                                <strong class="text-white">${ detalheSelecionado.aprovador || 'N/D' }</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <p class="mb-1 text-muted">Razão Social (Simulado):</p>
+                                <strong class="text-white">${ detalheSelecionado.razao_social_simulado || 'Empresa PJ Ltda.' }</strong>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-cyano"><i class="bi bi-printer me-2"></i>Imprimir
+                            Recibo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            delimiters: ['${', '}'],
+
+            data() {
+                return {
+                    loading: false,
+                    // Dados prontos para serem preenchidos pela API
+                    dados: [],
+                    resumo: null,
+
+                    periodoAtivo: 'este_mes',
+                    filtro: {
+                        dataInicio: '',
+                        dataFim: '',
+                        search: ''
+                    },
+                    detalheSelecionado: null,
+                    modalInstance: null, // Variável para armazenar a instância do modal Bootstrap
+                }
+            },
+            computed: {
+                filteredData() {
+                    return this.dados;
+                }
+            },
+            methods: {
+                // REMOVIDO o método getModalInstance
+                formatCurrency(value) {
+                    if (value === null || value === undefined) return 'R$ 0,00';
+                    const numberValue = Number(value);
+                    if (isNaN(numberValue)) return 'R$ 0,00';
+                    return numberValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                },
+                formatDate(dateStr) {
+                    if (!dateStr) return '-';
+                    // Tratamento para evitar problemas de fuso horário, garantindo que o dia está correto.
+                    const date = new Date(dateStr + 'T12:00:00'); 
+                    return date.toLocaleDateString('pt-BR');
+                },
+                getLocalDateISO(dateObj) {
+                    const offset = dateObj.getTimezoneOffset();
+                    const date = new Date(dateObj.getTime() - (offset * 60 * 1000));
+                    return date.toISOString().split('T')[0];
+                },
+                setPeriodo(tipo) {
+                    this.periodoAtivo = tipo;
+                    const hoje = new Date();
+                    let inicio, fim;
+
+                    if (tipo === 'este_mes') {
+                        inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                        fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+                    } else if (tipo === 'mes_passado') {
+                        inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+                        fim = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+                    } else if (tipo === 'ano_atual') {
+                        inicio = new Date(hoje.getFullYear(), 0, 1);
+                        fim = hoje;
+                    }
+
+                    this.filtro.dataInicio = this.getLocalDateISO(inicio);
+                    this.filtro.dataFim = this.getLocalDateISO(fim);
+                    this.buscarDados();
+                },
+
+                async buscarDados() {
+                    if (!this.filtro.dataInicio || !this.filtro.dataFim) {
+                        alert('Por favor, defina a Data Inicial e a Data Final.');
+                        return;
+                    }
+                    this.loading = true;
+                    this.periodoAtivo = '';
+
+                    try {
+                        const params = new URLSearchParams({
+                            data_inicio: this.filtro.dataInicio,
+                            data_fim: this.filtro.dataFim,
+                            search: this.filtro.search
+                        });
+
+                        // 🚀 CHAMADA REAL À API
+                        // Nota: Esta URL é um placeholder e deve ser a API real
+                        const response = await fetch(`/api/relatorio?${params}`); 
+
+                        if (!response.ok) {
+                            // Tenta ler a mensagem de erro do backend, se disponível
+                            const errorBody = await response.text();
+                            throw new Error(`Erro na API: ${response.status} ${response.statusText}. Detalhes: ${errorBody}`);
+                        }
+
+                        const json = await response.json();
+
+                        this.dados = json.data;
+                        this.resumo = json.resumo;
+
+                    } catch (error) {
+                        console.error("Erro ao buscar dados do Backend:", error);
+                        alert('Erro ao buscar dados. Verifique o console para detalhes.');
+                        this.dados = [];
+                        this.resumo = null;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                exportarCSV() {
+                    if (this.dados.length === 0) {
+                        alert('Não há dados para exportar.');
+                        return;
+                    }
+
+                    let csvContent = "\uFEFFData Ref;CPF;Nome;Aprovador;Ressarcimento;VR;Planos;Outros;Total Líquido\n";
+
+                    this.dados.forEach(row => {
+                        const rowData = [
+                            this.formatDate(row.data_referencia),
+                            `"${row.cpf_prestador}"`,
+                            `"${row.nome.replace(/"/g, '""')}"`,
+                            `"${(row.aprovador || '').replace(/"/g, '""')}"`,
+                            (row.ressarcimento || 0).toFixed(2).replace('.', ','),
+                            (row.vr || 0).toFixed(2).replace('.', ','),
+                            (row.planos || 0).toFixed(2).replace('.', ','),
+                            (row.outros || 0).toFixed(2).replace('.', ','),
+                            (row.total || 0).toFixed(2).replace('.', ',')
+                        ];
+                        csvContent += rowData.join(";") + "\n";
+                    });
+
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+
+                    const link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `relatorio_pagamentos_pj_${this.filtro.dataInicio}_a_${this.filtro.dataFim}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+
+                detalhesRegistro(item) {
+        // 1. Define os dados (o corpo do modal é preenchido)
+        this.detalheSelecionado = item;
+        
+        // 2. Garante que o DOM (HTML do modal) foi totalmente atualizado
+        this.$nextTick(() => { 
+            if (this.modalInstance) {
+                // 3. Só AGORA o modal é forçado a aparecer, com os dados já no DOM.
+                this.modalInstance.show(); 
+            } else {
+                console.error("Instância do modal não inicializada. Verifique o mounted().");
+            }
+        });
+    },
+            },
+            mounted() {
+                // CORREÇÃO: Inicializa a instância do modal Bootstrap UMA VEZ.
+                const modalElement = document.getElementById('detalheModal');
+                if (modalElement) {
+                    this.modalInstance = new bootstrap.Modal(modalElement);
+                }
+                
+                // Inicializa o filtro e busca os dados
+                this.setPeriodo('este_mes'); 
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>

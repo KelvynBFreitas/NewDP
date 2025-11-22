@@ -1097,9 +1097,7 @@
 
                 filteredEtapa3() {
                     let dados = this.etapa3Data || [];
-                    // if (this.filtroAprovador) {
-                    //     dados = dados.filter(item => String(item.aprovador || '').trim() === String(this.filtroAprovador).trim());
-                    // }
+                  
                     return dados;
                 },
                 paginatedEtapa3() { return this.filteredEtapa3; },
@@ -1115,10 +1113,7 @@
                     return (this.itemSelecionado.motivo === "Outros") && (!this.itemSelecionado.justificativa || this.itemSelecionado.justificativa.trim() === "");
                 },
                 isModalSalvarDisabled() { return this.isSaving || this.outrosSemMotivo || this.motivoOutrosSemJustificativa; },
-                // listaAprovadores() {
-                //     if (!this.etapa3Data || this.etapa3Data.length === 0) return [];
-                //     return this.etapa3Data.map(i => i.aprovador).filter((v, i, a) => v && a.indexOf(v) === i).sort();
-                // },
+            
             },
 
             methods: {
@@ -1140,7 +1135,7 @@
                     } 
                     else if (etapa === '3') {
                         url = '/api/etapa_final';
-                        // AJUSTE AQUI: Incluindo o filtroAprovador na requisição GET
+                        //Incluindo o filtroAprovador na requisição GET
                         url += `?page=${this.etapa3Page}&limit=${this.etapa3Limit}&search=${encodeURIComponent(this.search3)}&aprovador=${encodeURIComponent(this.filtroAprovador)}`;
                     }
 
@@ -1206,48 +1201,117 @@
                 },
 
                 async enviarFinal() {
-                        if (this.selecaoFinal.length === 0 && !this.selecionarTudoGlobal) {
-                            this.showToast('info', 'Atenção', 'Selecione pelo menos um item.'); return;
+                    // 1. Validação Básica
+                    if (this.selecaoFinal.length === 0 && !this.selecionarTudoGlobal) {
+                        this.showToast('info', 'Atenção', 'Selecione pelo menos um item.');
+                        return;
+                    }
+
+                    // Calcula quantidade visual para a mensagem
+                    const qtdItens = this.selecionarTudoGlobal ? this.totalItems3 : this.selecaoFinal.length;
+
+                    // 2. Confirmação com SweetAlert2
+                    const result = await Swal.fire({
+                        title: 'Confirmar Envio',
+                        html: `
+                            <div class="text-start" style="font-size: 0.95rem;">
+                                <p>Você está prestes a processar <b>${qtdItens}</b> colaboradores.</p>
+                                <p>Verifique os seguintes pontos:</p>
+                                <ul style="list-style: none; padding-left: 0;">
+                                    <li>✅ As datas de emissão e pagamento estão corretas?</li>
+                                    <li>✅ Os valores e justificativas foram revisados?</li>
+                                </ul>
+                                <p class="mb-0">Deseja iniciar o disparo dos e-mails?</p>
+                            </div>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: 'var(--cor-destaque-primaria)',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="bi bi-send me-2"></i>Sim, Enviar!',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true,
+                        allowOutsideClick: false
+                    });
+
+                    if (!result.isConfirmed) return;
+
+                    this.isSending = true;
+
+                    // 3. Simulação Visual de "Preparando Envio"
+                    // Mostra um loading enquanto chama o backend
+                    let timerInterval;
+                    Swal.fire({
+                        title: 'Processando...',
+                        html: 'Registrando informações e iniciando fila de envio.<br><b>Aguarde...</b>',
+                        timerProgressBar: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
                         }
-                        this.isSending = true;
+                    });
 
-                        const payload = {
-                            ids: this.selecaoFinal,
-                            enviar_tudo: this.selecionarTudoGlobal,
-                            filtros: {
-                                search: this.search3,
-                                aprovador: this.filtroAprovador
-                            },
-                            data_emissao: this.dataEmissao,
-                            data_pagamento: this.dataPagamento
-                        };
+                    const payload = {
+                        ids: this.selecaoFinal,
+                        enviar_tudo: this.selecionarTudoGlobal,
+                        filtros: {
+                            search: this.search3,
+                            aprovador: this.filtroAprovador
+                        },
+                        data_emissao: this.dataEmissao,
+                        data_pagamento: this.dataPagamento
+                    };
 
-                        try {
-                            const response = await fetch('/api/enviar_final', {
-                                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                    try {
+                        const response = await fetch('/api/enviar_final', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            // 4. Sucesso - Feedback Visual do processo assíncrono
+                            // O backend já respondeu "OK", mas dizemos ao usuário que o envio continua em background
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Processo Iniciado!',
+                                html: `
+                                    <p>Os dados foram gravados com sucesso.</p>
+                                    <p class="small text-muted">O envio dos e-mails para <b>${data.recebidos}</b> colaboradores continuará sendo processado em segundo plano pelo servidor.</p>
+                                `,
+                                confirmButtonText: 'Ok',
+                                confirmButtonColor: 'var(--cor-sucesso)'
                             });
-                            if (response.ok) {
-                                const data = await response.json();
-                                this.showToast('success', 'Envio Concluído!', `${data.recebidos} itens processados.`);
-                                
-                                this.limparSelecao();
-                                
-                                // --- AJUSTE AQUI: REMOVIDO O RESET ---
-                                // this.dataEmissao = '';  <-- Removido
-                                // this.dataPagamento = ''; <-- Removido
-                                // this.currentStep = 1;    <-- Removido
-                                
-                                // Mantemos na etapa 3 e apenas atualizamos a lista para sumir com os enviados
-                                this.fetchData('3'); 
-                                
-                                // Opcional: Atualizar etapa 1 em background caso algo tenha voltado
-                                this.fetchData('1'); 
-                            } else {
-                                this.showToast('error', 'Falha', 'Erro no envio.');
-                            }
-                        } catch (e) { this.showToast('error', 'Erro', 'Erro de conexão.'); }
-                        finally { this.isSending = false; }
-                    },
+
+                            this.limparSelecao();
+                            // Atualiza a lista para mostrar os ícones de "Enviado"
+                            this.fetchData('3'); 
+                            
+                            // Opcional: Atualizar etapa 1 caso algo tenha voltado
+                            this.fetchData('1');
+
+                        } else {
+                            const errData = await response.json();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Falha no Processamento',
+                                text: errData.detail || 'Ocorreu um erro ao tentar enviar.',
+                                confirmButtonColor: 'var(--cor-perigo)'
+                            });
+                        }
+                    } catch (e) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro de Conexão',
+                            text: 'Não foi possível contatar o servidor.',
+                            confirmButtonColor: 'var(--cor-perigo)'
+                        });
+                    } finally {
+                        this.isSending = false;
+                    }
+                },
 
                 goToPage1(page) { if (page >= 1 && page <= this.totalPage1 && page !== '...') this.etapa1Page = page; },
                 goToPage3(page) { if (page >= 1 && page <= this.totalPage3 && page !== '...') this.etapa3Page = page; },

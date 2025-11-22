@@ -21,13 +21,6 @@ from datetime import date, timedelta,datetime
 from app.models.funcionarios_pj_postgres import app_dp_pj_aprovador_x_prestado
 from fastapi.responses import JSONResponse
 from fastapi import BackgroundTasks
-import pandas as pd
-import os
-import traceback
-from app.core.email_utils import preparar_email, enviar_emails_em_lote
-from app.core.email_templates import gerar_html_para_email_aprovador
-# Adicione este import junto com seus outros modelos
-from app.models.aprovadores import app_dp_pj_aprovador
 # --- Modelos Pydantic ---
 class FiltrosModel(BaseModel):
     search: Optional[str] = ""
@@ -95,7 +88,6 @@ async def get_homepage(
              {"title": "Cadastro Colaborador", "url": "/prestadoresdeservico"},
             {"title": "Cadastro Aprovador", "url": "/aprovador"},
             {"title": "E-Mail PJ", "url": "/pjemail"},
-             {"title": "Relatorios PJ", "url": "/relatoriopj"},
         ]}
     ]
     result_user = await session.execute(select(User).where(User.username == username))
@@ -909,23 +901,25 @@ async def update_item(item_id: str,
 @router.post("/api/enviar_final")
 async def post_enviar_final(
     payload: EnvioFinalRequest,
-    # background_tasks: BackgroundTasks,  <--- REMOVIDO PARA SEGURAR O FRONT
+    background_tasks: BackgroundTasks, # <--- INJEÇÃO DA BACKGROUND TASK
     session_postgres: AsyncSession = Depends(get_postgres_session),
     session_oracle: AsyncSession = Depends(get_oracle_session)
 ):
     try:
         # ==========================================================================
-        # 1. RESOLUÇÃO DOS CPFS (Global ou Manual) - MANTIDO ORIGINAL
+        # 1. RESOLUÇÃO DOS CPFS (Global ou Manual)
         # ==========================================================================
         cpfs_selecionados = []
 
-        # CASO A: Selecionar Tudo
+        # CASO A: Selecionar Tudo (Busca no banco baseada nos filtros)
         if payload.enviar_tudo:
+            # Configura datas para filtrar a query
             hoje = date.today()
             primeiro_dia_mes_atual = hoje.replace(day=1)
             ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
             filtro_data_ref = AppDpAjustesValoresPj.datareferencia == ultimo_dia_mes_anterior
 
+            # Recupera filtros
             search_term = payload.filtros.search.strip() if payload.filtros and payload.filtros.search else ""
             filtro_aprovador = payload.filtros.aprovador.strip() if payload.filtros and payload.filtros.aprovador else ""
 
@@ -940,7 +934,7 @@ async def post_enviar_final(
                 if not cpfs_aprovador:
                     return JSONResponse(content={"message": "Nenhum item para este aprovador"}, status_code=400)
 
-            # A.2 Busca Postgres
+            # A.2 Busca Postgres (Status 0)
             conditions = [filtro_data_ref]
             if search_term:
                 conditions.append((AppDpAjustesValoresPj.nome.ilike(f"%{search_term}%")) | (AppDpAjustesValoresPj.cpf.ilike(f"%{search_term}%")))
@@ -951,7 +945,8 @@ async def post_enviar_final(
             res_pg_ids = await session_postgres.execute(stmt_pg_ids)
             ids_pg = [str(c).strip() for c in res_pg_ids.scalars().all()]
 
-            # A.3 Busca Oracle
+            # A.3 Busca Oracle (Status 1)
+            # Excluir quem já está no PG
             stmt_cad = select(AppDpAjustesValoresPj.cpf).where(filtro_data_ref)
             res_cad = await session_postgres.execute(stmt_cad)
             cpfs_ignorar = {str(c).strip() for c in res_cad.scalars().all()}
@@ -984,12 +979,15 @@ async def post_enviar_final(
         else:
             cpfs_selecionados = [cpf.strip() for cpf in payload.ids]
 
+        # Validação Final
         if not cpfs_selecionados:
             return JSONResponse(content={"message": "Nenhum item selecionado"}, status_code=400)
 
         # ==========================================================================
-        # 2. UPDATE E INSERT NO BANCO (MANTIDO ORIGINAL)
+        # 2. SUA LÓGICA ORIGINAL (Processamento)
         # ==========================================================================
+        
+        # Conversão de Datas
         try:
             dt_emissao = datetime.strptime(payload.data_emissao, "%Y-%m-%d").date()
             dt_pagamento = datetime.strptime(payload.data_pagamento, "%Y-%m-%d").date()
@@ -997,15 +995,18 @@ async def post_enviar_final(
             return JSONResponse(content={"detail": "Formato de data inválido"}, status_code=400)
 
         processed_count = 0
+        
+        # Datas de referência para o update/insert
         hoje = date.today()
         primeiro_dia_mes_atual = hoje.replace(day=1)
         ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
 
-        # --- Função Enrich ---
+        # --- Função Enrich (Mantida igual) ---
         async def enrich_with_prestador_data(lista_colaboradores: List[Dict[str, Any]]):
             if not lista_colaboradores: return
             cpfs_para_buscar = {str(row.get("cpf")).strip() for row in lista_colaboradores if row.get("cpf")}
             if not cpfs_para_buscar: return
+
             try:
                 stmt = select(
                     app_dp_pj_aprovador_x_prestado.cpf_prestador,
@@ -1013,13 +1014,16 @@ async def post_enviar_final(
                     app_dp_pj_aprovador_x_prestado.razao_social,
                     app_dp_pj_aprovador_x_prestado.nome_aprovador
                 ).where(app_dp_pj_aprovador_x_prestado.cpf_prestador.in_(cpfs_para_buscar))
+
                 result = await session_postgres.execute(stmt)
                 prestadores = result.all()
+                
                 mapa_prestadores = {
                     str(p.cpf_prestador).strip(): {
                         "cnpj": p.cnpj, "razao_social": p.razao_social, "aprovador": p.nome_aprovador
                     } for p in prestadores
                 }
+
                 for colab in lista_colaboradores:
                     cpf_key = str(colab.get("cpf")).strip()
                     dados_extra = mapa_prestadores.get(cpf_key)
@@ -1038,7 +1042,10 @@ async def post_enviar_final(
                     colab.setdefault("razao_social", None)
                     colab.setdefault("aprovador", None)
 
-        # --- Upsert Logic ---
+        # --- Lógica Principal de Upsert ---
+
+        # 1. Buscar dados já existentes no Postgres (Histórico/Editados)
+        #    Agora usamos chunking para evitar estouro no IN clause se a lista for enorme
         registros_existentes = []
         chunk_size = 1000
         for i in range(0, len(cpfs_selecionados), chunk_size):
@@ -1049,13 +1056,17 @@ async def post_enviar_final(
         
         mapa_postgres = {r.cpf: r for r in registros_existentes}
         cpfs_encontrados_pg = set(mapa_postgres.keys())
+        
+        # 2. Identificar Novos (Só existem no Oracle)
         cpfs_pendentes_oracle = list(set(cpfs_selecionados) - cpfs_encontrados_pg)
         
         dados_novos_oracle = []
         if cpfs_pendentes_oracle:
+            # Chunking para Query Oracle também
             for i in range(0, len(cpfs_pendentes_oracle), chunk_size):
                 chunk = cpfs_pendentes_oracle[i:i + chunk_size]
                 cpfs_sql = ", ".join([f"'{c}'" for c in chunk])
+                
                 query_oracle = f"""
                     SELECT CPF, NOME, CIDADE, CENTRO, PLANOS, VR, RESSARCIMENTO, OUTROS, 
                            ACAO_, RESULTADO, DATAADMISSAO, EMAIL_COLABORADOR, MOTIVO, JUSTIFICATIVA
@@ -1064,17 +1075,20 @@ async def post_enviar_final(
                 """
                 res_oracle = await session_oracle.execute(text(query_oracle))
                 dados_novos_oracle.extend([dict(r) for r in res_oracle.mappings().all()])
+
             if dados_novos_oracle:
                 await enrich_with_prestador_data(dados_novos_oracle)
 
-        # Update
+        # 3. Processamento (Upsert)
+        
+        # A. UPDATE: Atualizar os existentes
         for cpf, registro in mapa_postgres.items():
             registro.data_emissao_nota = dt_emissao
             registro.data_pagamento = dt_pagamento
             registro.status_envio = 1 
             processed_count += 1
 
-        # Insert
+        # B. INSERT: Inserir os novos (Enriquecidos)
         for row in dados_novos_oracle:
             novo_registro = AppDpAjustesValoresPj(
                 cpf=str(row.get("cpf")).strip(),
@@ -1083,6 +1097,7 @@ async def post_enviar_final(
                 centro_de_custo=row.get("centro"),
                 cnpj=row.get("cnpj"),                
                 razao_social=row.get("razao_social"), 
+                # aprovador=row.get("aprovador"), # Descomente se tiver coluna no modelo
                 desconto_plano=row.get("planos") or 0.0,
                 vr=row.get("vr") or 0.0,
                 ressarcimento=row.get("ressarcimento") or 0.0,
@@ -1101,158 +1116,20 @@ async def post_enviar_final(
             session_postgres.add(novo_registro)
             processed_count += 1
 
-        await session_postgres.commit() # <<< DADOS SALVOS NO BANCO
-
+        await session_postgres.commit()
         # ==========================================================================
-        # 3. BUSCA DADOS COMPLETOS + JOIN APROVADOR + ENVIO DE EMAIL
-        # ==========================================================================
-        print("--- INICIANDO PROCESSO DE ENVIO DE E-MAILS ---")
-
-        stmt_email = (
-            select(
-                AppDpAjustesValoresPj.cpf,
-                AppDpAjustesValoresPj.nome,
-                AppDpAjustesValoresPj.razao_social,
-                AppDpAjustesValoresPj.centro_de_custo,
-                AppDpAjustesValoresPj.dataadmissao,
-                AppDpAjustesValoresPj.email_colaborador, 
-
-                # Campos Financeiros
-                AppDpAjustesValoresPj.desconto_plano,
-                AppDpAjustesValoresPj.vr,
-                AppDpAjustesValoresPj.ressarcimento,
-                AppDpAjustesValoresPj.outros,
-                AppDpAjustesValoresPj.acao,
-                AppDpAjustesValoresPj.resultado,
-                
-                # Dados do Aprovador
-                # Pegamos o nome da tabela de ligação (ou da tabela de aprovadores, se preferir)
-                app_dp_pj_aprovador_x_prestado.nome_aprovador.label('aprovador'),
-                
-                # O EMAIL vem da tabela nova (app_dp_pj_aprovador)
-                app_dp_pj_aprovador.email.label('email_gestor') 
-            )
-            # 1º Join: Prestador -> Tabela de Ligação (Descobre quem é o gestor)
-            .outerjoin(
-                app_dp_pj_aprovador_x_prestado, 
-                AppDpAjustesValoresPj.cpf == app_dp_pj_aprovador_x_prestado.cpf_prestador
-            )
-            # 2º Join: Tabela de Ligação -> Tabela de Cadastro do Aprovador (Pega o Email)
-            .outerjoin(
-                app_dp_pj_aprovador,
-                # AQUI: Supomos que 'cpf_aprovador' é a coluna na tabela de ligação que tem o CPF do gestor.
-                # Se sua tabela de ligação tiver outro nome (ex: cpf_gestor), ajuste aqui.
-                # Se a tabela de ligação SÓ tiver o nome, use: app_dp_pj_aprovador_x_prestado.nome_aprovador == app_dp_pj_aprovador.nome
-                app_dp_pj_aprovador_x_prestado.cpf_aprovador == app_dp_pj_aprovador.cpf
-            )
-            .where(
-                and_(
-                    AppDpAjustesValoresPj.cpf.in_(cpfs_selecionados),
-                    AppDpAjustesValoresPj.datareferencia == ultimo_dia_mes_anterior
-                )
-            )
-        )
-
-        res_email = await session_postgres.execute(stmt_email)
-        lista_dados_email = [dict(row) for row in res_email.mappings().all()]
-
-        # ==========================================================================
-        # 4. PREPARAÇÃO DOS E-MAILS (APROVADORES + COLABORADORES)
-        # ==========================================================================
-        df_pagamentos = pd.DataFrame(lista_dados_email)
-        mensagens_para_enviar = []
-        EMAIL_REMETENTE = os.getenv('EMAIL_USER')
-        
-        # Datas Formatadas
-        try:
-            dt_emissao_fmt = datetime.strptime(payload.data_emissao, "%Y-%m-%d").strftime("%d/%m/%Y")
-            dt_pgto_fmt = datetime.strptime(payload.data_pagamento, "%Y-%m-%d").strftime("%d/%m/%Y")
-            # Calculando dia da semana (opcional, pode hardcode se preferir)
-            dias_semana = ["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado", "Domingo"]
-            dia_sem_emissao = dias_semana[datetime.strptime(payload.data_emissao, "%Y-%m-%d").weekday()]
-            dia_sem_pgto = dias_semana[datetime.strptime(payload.data_pagamento, "%Y-%m-%d").weekday()]
-        except:
-            dt_emissao_fmt = payload.data_emissao
-            dt_pgto_fmt = payload.data_pagamento
-            dia_sem_emissao = "Dia Útil"
-            dia_sem_pgto = "Dia Útil"
-
-        # --- A. LÓGICA PARA GESTORES (Agrupado) ---
-        print(">>> Preparando e-mails de GESTORES...")
-        df_pagamentos['email_gestor'] = df_pagamentos['email_gestor'].fillna('')
-        gestores_group = df_pagamentos.groupby('email_gestor')
-
-        from app.core.email_templates import gerar_html_para_email_aprovador, gerar_html_para_email_colaborador
-
-        for email_gestor, dados_gestor in gestores_group:
-            if not email_gestor or "@" not in str(email_gestor): continue
-            
-            mock_vars_gestor = {
-                "email": email_gestor,
-                "quinto_dia": dt_emissao_fmt,
-                "dia_semana": dia_sem_emissao,
-                "primeiro_dia": dt_pgto_fmt,
-                "dia_semana_e": dia_sem_pgto,
-                "mes_ano_ref": f"INFORMATIVO {datetime.now().strftime('%m-%Y')}",
-                "referencia_holmes": "Serviços Mensais"
-            }
-            
-            html_gestor = gerar_html_para_email_aprovador(dados_gestor.to_dict('records'), mock_vars_gestor)
-            dest, msg = preparar_email(html_gestor, email_gestor, EMAIL_REMETENTE)
-            mensagens_para_enviar.append((dest, msg))
-
-        # --- B. LÓGICA PARA COLABORADORES (Individual) ---
-        print(">>> Preparando e-mails de COLABORADORES...")
-        
-        for row in lista_dados_email:
-            email_colab = row.get('email_colaborador')
-            
-            # Valida se tem email
-            if not email_colab or "@" not in str(email_colab):
-                # print(f"Colaborador {row.get('nome')} sem email. Pulando.")
-                continue
-
-            mock_vars_colab = {
-                "email": email_colab,
-                "quinto_dia": dt_emissao_fmt,
-                "dia_semana": dia_sem_emissao,
-                "primeiro_dia": dt_pgto_fmt,
-                "dia_semana_e": dia_sem_pgto,
-                "mes_ano_ref": f"INFORMATIVO {datetime.now().strftime('%m-%Y')}",
-                "referencia_holmes": "Serviços Mensais"
-            }
-            
-            # Gera HTML Individual
-            html_colab = gerar_html_para_email_colaborador(row, mock_vars_colab)
-            
-            # Altera o Assunto (opcional, ajustar na função preparar_email se quiser subject dinâmico)
-            dest_c, msg_c = preparar_email(html_colab, email_colab, EMAIL_REMETENTE)
-            
-            # Sobrescreve assunto padrão para o Colaborador
-            msg_c.replace_header('Subject', f"TESTE - Instruções NF - Gratificação Anual - {row.get('nome')}")
-            
-            mensagens_para_enviar.append((dest_c, msg_c))
-
-        # ==========================================================================
-        # 5. DISPARO EM LOTE (GESTORES + COLABORADORES)
-        # ==========================================================================
-        print(f"Total de e-mails na fila: {len(mensagens_para_enviar)}")
-        
-        if mensagens_para_enviar:
-            enviar_emails_em_lote(mensagens_para_enviar)
-
+        # 3. INICIA TAREFA DE ENVIO DE E-MAILS EM BACKGROUND
+        await simular_envio_email_sincrono(cpfs_selecionados)
         return {
-            "message": "Processamento concluído.",
-            "recebidos": processed_count,
-            "emails_enviados": len(mensagens_para_enviar)
+            "message": "Dados processados e envio de e-mails.",
+            "recebidos": processed_count
         }
 
     except Exception as e:
         await session_postgres.rollback()
         print(f"Erro no envio final: {e}")
-        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
-    
+
 @router.get("/api/lista_aprovadores")
 async def get_lista_aprovadores(
     session_postgres: AsyncSession = Depends(get_postgres_session)
@@ -1284,6 +1161,20 @@ async def get_lista_aprovadores(
         print(f"Erro ao buscar lista de aprovadores: {e}")
         return ["Sem Aprovador"] # Retorna pelo menos essa opção em caso de erro, se fizer sentido
     
+# async def simular_envio_email_background(cpfs: List[str]):
+#     """
+#     Simula o envio de e-mail assíncrono. 
+#     Na vida real, aqui entraria a conexão SMTP.
+#     """
+#     print(f"--- INICIANDO ENVIO EM LOTE DE {len(cpfs)} E-MAILS ---")
+#     total = len(cpfs)
+#     for index, cpf in enumerate(cpfs):
+#         # Simula um delay de envio (ex: 0.5s por email)
+#         await asyncio.sleep(5) 
+#         print(f"[{index + 1}/{total}] Enviando e-mail simulado para CPF: {cpf}...")
+#         await asyncio.sleep(5) 
+
+#     print("--- ENVIO EM LOTE FINALIZADO ---")
 
 async def simular_envio_email_sincrono(cpfs: List[str]):
     """
